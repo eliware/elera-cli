@@ -8,6 +8,12 @@ use `@eliware/galera-lib` for SQL metadata operations. Large backup and restore
 streams will continue to use native `mariadb-dump` and `mariadb` subprocesses;
 they will not pass through the supervisor API as JSON.
 
+The supervisor REST API remains the CLI’s primary control interface. The
+optional WebSocket routing stream belongs inside `@eliware/galera-lib`: it
+delivers versioned routing snapshots and topology events while the library
+maintains direct MariaDB connections on port `3306`. If that stream is
+unavailable, the library refreshes its bundle through the supervisor REST API.
+
 ## Current status
 
 This repository is a baseline scaffold. The current entrypoint supports

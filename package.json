@@ -11,6 +11,7 @@
     "test": "eliware-test",
     "lint": "eliware-test --lint",
     "check": "node --check src/galera-cli.mjs",
+    "contracts": "node scripts/verify-contracts.mjs",
     "pack": "npm pack --dry-run",
     "audit": "npm audit --omit=dev --audit-level=moderate"
   },
