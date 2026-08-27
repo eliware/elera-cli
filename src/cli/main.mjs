@@ -7,9 +7,9 @@ const exitCodes = { invalid: 2, auth: 3, network: 4 };
 
 export async function runCli({ argv = process.argv.slice(2), environment = process.env, output = process.stdout, errorOutput = process.stderr } = {}) {
   const command = argv[0]; const jsonOutput = argv.includes('--json'); const emit = (value) => output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
-  if (command === '--help' || command === undefined) { emit('elera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|cluster-status|cluster-observations|cluster-quorum|sql-smoke> [--json]'); return 0; }
+  if (command === '--help' || command === undefined) { emit('elera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|cluster-status|cluster-observations|cluster-quorum|cluster-plan|sql-smoke> [--json]'); return 0; }
   if (command === '--version') { output.write('0.1.0\n'); return 0; }
-  if (!['health', 'ready', 'status', 'config-inspect', 'config-plan', 'config-apply', 'config-verify', 'metadata-status', 'metadata-init', 'metadata-verify', 'cluster-status', 'cluster-observations', 'cluster-quorum', 'sql-smoke'].includes(command)) { errorOutput.write(`unknown command: ${command}\n`); return exitCodes.invalid; }
+  if (!['health', 'ready', 'status', 'config-inspect', 'config-plan', 'config-apply', 'config-verify', 'metadata-status', 'metadata-init', 'metadata-verify', 'cluster-status', 'cluster-observations', 'cluster-quorum', 'cluster-plan', 'sql-smoke'].includes(command)) { errorOutput.write(`unknown command: ${command}\n`); return exitCodes.invalid; }
   if (command === 'metadata-init' && !argv.includes('--confirm')) { errorOutput.write('metadata-init requires --confirm\n'); return exitCodes.invalid; }
   try {
     const config = loadCliConfig(environment); const client = createSupervisorClient(config);
@@ -25,6 +25,7 @@ export async function runCli({ argv = process.argv.slice(2), environment = proce
     if (command === 'cluster-status') { emit(await client.status()); return 0; }
     if (command === 'cluster-observations') { emit(await client.observations()); return 0; }
     if (command === 'cluster-quorum') { const result = await client.quorum(); emit(result); return result.data?.quorum ? 0 : 1; }
+    if (command === 'cluster-plan') { const action = argv[1]; if (!action) { errorOutput.write('cluster-plan requires an action\n'); return exitCodes.invalid; } emit(await client.lifecyclePlan(action, { target: argv[2] })); return 0; }
     if (command === 'sql-smoke') { const bundle = await client.lease(config.database, config.identity); const db = await createDb({ primary: { ...bundle.routes.primary[0], user: bundle.credentials?.username, password: bundle.credentials?.password, database: bundle.database }, bundle, identity: bundle.identity }); try { const [rows] = await db.query('SELECT 1 AS healthy'); emit({ ok: rows[0]?.healthy === 1 }); return rows[0]?.healthy === 1 ? 0 : 1; } finally { await db.close(); } }
   } catch (error) { errorOutput.write(`${error.message}\n`); return error.statusCode === 401 || error.statusCode === 403 ? exitCodes.auth : error.exitCode ?? exitCodes.network; }
 }

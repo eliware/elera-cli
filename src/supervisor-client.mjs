@@ -21,6 +21,7 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async metadataVerify() { return request('/api/v1/metadata/verify', { method: 'POST' }); },
     async observations() { return request('/api/v1/cluster/observations'); },
     async quorum() { return request('/api/v1/cluster/quorum'); },
+    async lifecyclePlan(action, options = {}) { return request('/api/v1/cluster/lifecycle/plan', { method: 'POST', body: JSON.stringify({ action, ...options }), headers: { 'content-type': 'application/json' } }); },
     async health() { return request('/healthz'); },
     async ready() { return request('/readyz'); },
     async lease(database, identity, routes = ['primary', 'balanced']) { const body = await request('/api/v1/credentials/lease', { method: 'POST', body: JSON.stringify({ database, identity, routes }), headers: { 'content-type': 'application/json' } }); return validateBundle(body.data ?? body); }
