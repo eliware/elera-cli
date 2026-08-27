@@ -10,3 +10,4 @@ export { restoreArtifact } from './restore/artifact-restore.mjs';
 export { createEncryptedArtifactStore } from './artifacts/encrypted-store.mjs';
 export { createAgeProcess } from './artifacts/age-process.mjs';
 export { createArtifactCommands } from './artifacts/commands.mjs';
+export { createGitOpsInputs } from './artifacts/gitops-inputs.mjs';

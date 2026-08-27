@@ -30,6 +30,11 @@ encryption for `secret-put`; `AGE_IDENTITY_FILE` is used only for local
 decryption by library workflows. Neither key is sent to the supervisor or
 persisted by the CLI.
 
+SSH, `known_hosts`, TLS, and backup inputs are resolved from GitOps/operator
+mounts using `ELERA_SSH_KEY_PATH`, `ELERA_KNOWN_HOSTS_PATH`,
+`ELERA_TLS_CERTIFICATE_PATH`, and `ELERA_BACKUP_CONFIG_PATH`. The CLI validates
+paths but does not log or copy their contents.
+
 ## Development
 
 The sibling repository must be available at `../elera-lib` for the local link:
