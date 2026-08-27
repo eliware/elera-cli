@@ -29,6 +29,10 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async routes(application) { return request(`/api/v1/routes?application=${encodeURIComponent(application ?? 'default')}`); },
     async routingBundle(identity) { const body = await request(`/api/v1/routing/bundle?identity=${encodeURIComponent(identity)}`); return validateBundle(body.data ?? body); },
     async refreshRoutes(input) { return request('/api/v1/routes/refresh', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
+    async resync(application) { return request(`/api/v1/routing/resync?application=${encodeURIComponent(application ?? 'default')}`); },
+    async trafficStatus() { return request('/api/v1/traffic/status'); },
+    async drain() { return request('/api/v1/traffic/drain', { method: 'POST' }); },
+    async undrain() { return request('/api/v1/traffic/undrain', { method: 'POST' }); },
     async lease(database, identity, routes = ['primary', 'balanced']) { const body = await request('/api/v1/credentials/lease', { method: 'POST', body: JSON.stringify({ database, identity, routes }), headers: { 'content-type': 'application/json' } }); return validateBundle(body.data ?? body); },
     async refreshCredentials(identity) { const body = await request('/api/v1/credentials/refresh', { method: 'POST', body: JSON.stringify({ identity }), headers: { 'content-type': 'application/json' } }); return validateBundle(body.data ?? body); },
     async databases() { return request('/api/v1/databases'); },
@@ -36,10 +40,10 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async identities(application) { return request(`/api/v1/identities?application=${encodeURIComponent(application)}`); },
     async provisionIdentity(input) { return request('/api/v1/identities', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
     async rotateIdentity(identity) { return request('/api/v1/identities/rotate', { method: 'POST', body: JSON.stringify({ identity }), headers: { 'content-type': 'application/json' } }); },
-    async createToken(input) { return request('/api/v1/tokens', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
-    ,async revokeToken(name) { return request('/api/v1/tokens/revoke', { method: 'POST', body: JSON.stringify({ name }), headers: { 'content-type': 'application/json' } }); }
-    ,async provisionAccount(input) { return request('/api/v1/accounts/provision', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
-    ,async revokeAccount(input) { return request('/api/v1/accounts/revoke', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
-    ,async verifyAccount(input) { return request('/api/v1/accounts/verify', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
+    async createToken(input) { return request('/api/v1/tokens', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
+    async revokeToken(name) { return request('/api/v1/tokens/revoke', { method: 'POST', body: JSON.stringify({ name }), headers: { 'content-type': 'application/json' } }); },
+    async provisionAccount(input) { return request('/api/v1/accounts/provision', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
+    async revokeAccount(input) { return request('/api/v1/accounts/revoke', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
+    async verifyAccount(input) { return request('/api/v1/accounts/verify', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
   };
 }
