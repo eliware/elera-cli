@@ -5,5 +5,11 @@ on:
     deployments:
       - target: dev
         cwd: /opt/galera-cli
-        commands:
-          - git pull --ff-only
+    commands:
+      - git pull --ff-only
+      - npm ci
+      - npm test
+      - npm run lint
+      - npm run check
+      - npm run audit
+      - npm run pack
