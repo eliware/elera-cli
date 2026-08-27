@@ -2,10 +2,11 @@ import { expect, jest, test } from '@jest/globals';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { restoreArtifact } from '../src/restore/artifact-restore.mjs';
 
 test('restores metadata, accounts, and application dumps while skipping system schemas', async () => {
-  const root = await mkdtemp(join(process.env.TEMP ?? process.env.TMP, 'elera-artifact-'));
+  const root = await mkdtemp(join(tmpdir(), 'elera-artifact-'));
   await writeFile(join(root, 'SUPERVISOR-METADATA.json'), JSON.stringify({ databases: ['app'], identities: ['runtime'], accounts: [{ user: 'u' }], artifacts: [{ name: 'ssh', ciphertext: 'age-encryption.org/v1/x' }] }));
   await writeFile(join(root, 'DATABASES'), 'mysql\napp\nsys\n');
   await writeFile(join(root, 'app.sql.gz'), gzipSync('sql'));
@@ -18,7 +19,7 @@ test('restores metadata, accounts, and application dumps while skipping system s
 });
 
 test('rejects artifact restores without confirmation and supports metadata without accounts', async () => {
-  const root = await mkdtemp(join(process.env.TEMP ?? process.env.TMP, 'elera-artifact-'));
+  const root = await mkdtemp(join(tmpdir(), 'elera-artifact-'));
   const client = { restoreMetadataApply: jest.fn() };
   await expect(restoreArtifact({ root, client })).rejects.toMatchObject({ statusCode: 409 });
   await writeFile(join(root, 'SUPERVISOR-METADATA.json'), '{}');

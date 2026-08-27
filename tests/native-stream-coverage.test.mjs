@@ -3,6 +3,7 @@ import { dumpDatabase, restoreDatabase } from '../src/backup/native-stream.mjs';
 import { PassThrough } from 'node:stream';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const bundle = { database: 'app', credentials: { username: 'u', password: 'p' }, routes: { primary: [{ host: 'db', port: 3306 }] } };
 test('streams dump and restore through injected process runner', async () => {
@@ -13,7 +14,7 @@ test('streams dump and restore through injected process runner', async () => {
 test('rejects native stream operations without complete bundle credentials', () => { expect(() => dumpDatabase({ database: 'app' }, '/tmp/x')).toThrow('connection bundle'); expect(() => restoreDatabase({ database: 'app' }, '/tmp/x')).toThrow('connection bundle'); });
 
 test('supports file paths and direct bundle host and port fields', async () => {
-  const root = await mkdtemp(join(process.env.TEMP ?? process.env.TMP, 'elera-native-'));
+  const root = await mkdtemp(join(tmpdir(), 'elera-native-'));
   const run = jest.fn(async (_command, _args, options) => { options.output?.end?.(); options.input?.resume?.(); return { code: 0 }; });
   const direct = { database: 'app', username: 'u', password: 'p', host: 'direct', port: 3307 };
   await dumpDatabase(direct, join(root, 'dump.sql'), { runImpl: run });
