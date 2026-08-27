@@ -279,7 +279,7 @@ export async function runCli({
           ? await createBackup({
               bundle,
               backupRoot: root,
-              databases: (argv[2] ?? config.database).split(","),
+              databases: (argv.slice(2).find((value) => !value.startsWith("--")) ?? config.database).split(","),
               metadata,
             })
           : command === "verify-backup"

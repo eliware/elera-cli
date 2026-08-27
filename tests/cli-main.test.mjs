@@ -123,7 +123,8 @@ test('collects metadata and accounts only for full backup operations', async () 
   };
   const dependencies = { createSupervisorClient: () => client, createBackupFromBundle: async (args) => { calls.push(args.metadata.accounts.length); return { ok: true }; } };
   expect(await runCli({ argv: ['backup', 'root'], environment, output: stream(), errorOutput: stream(), dependencies })).toBe(0);
-  expect(calls).toEqual(['metadata', 'accounts', 0]);
+  expect(await runCli({ argv: ['backup', 'root', '--json'], environment, output: stream(), errorOutput: stream(), dependencies })).toBe(0);
+  expect(calls).toEqual(['metadata', 'accounts', 0, 'metadata', 'accounts', 0]);
 });
 
 test('exercises omitted optional command arguments and default entrypoint options', async () => {
