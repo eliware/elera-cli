@@ -16,9 +16,16 @@ unavailable, the library refreshes its bundle through the supervisor REST API.
 
 ## Current status
 
-This repository is a baseline scaffold. The current entrypoint supports
-`--help` and `--version`; provisioning, credential leases, cluster operations,
-encrypted artifacts, reconciliation, and backup/restore commands are planned.
+The CLI currently supports health and readiness checks, supervisor status and
+routing inspection, metadata and cluster lifecycle operations, managed
+database/identity/account/token commands, reconciliation, and native-stream
+backup/restore verification. Metadata-first artifact restore reads the local
+`SUPERVISOR-METADATA.json` sidecar, restores metadata and logical accounts
+through the supervisor API, and streams application SQL with native MariaDB
+commands.
+
+Encrypted artifact storage and broader GitOps secret orchestration remain
+Sprint 9 work; the CLI does not persist age private keys or plaintext secrets.
 
 ## Development
 
