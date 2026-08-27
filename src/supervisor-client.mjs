@@ -47,6 +47,11 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async verifyAccount(input) { return request('/api/v1/accounts/verify', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
     async reconcilePlan(desired) { return request('/api/v1/reconcile/plan', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); },
     async reconcileApply(desired) { return request('/api/v1/reconcile/apply', { method: 'POST', body: JSON.stringify({ desired, confirm: true }), headers: { 'content-type': 'application/json' } }); },
-    async reconcileVerify(desired) { return request('/api/v1/reconcile/verify', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); }
+    async reconcileVerify(desired) { return request('/api/v1/reconcile/verify', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); },
+    async restoreMetadataPlan(desired) { return request('/api/v1/restores/metadata/plan', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); },
+    async restoreMetadataApply(desired) { return request('/api/v1/restores/metadata/apply', { method: 'POST', body: JSON.stringify({ desired, confirm: true }), headers: { 'content-type': 'application/json' } }); },
+    async restoreAccountsPlan(accounts) { return request('/api/v1/restores/accounts/plan', { method: 'POST', body: JSON.stringify({ accounts }), headers: { 'content-type': 'application/json' } }); },
+    async restoreAccountsApply(accounts) { return request('/api/v1/restores/accounts/apply', { method: 'POST', body: JSON.stringify({ accounts, confirm: true }), headers: { 'content-type': 'application/json' } }); },
+    async restoreAccountsVerify(accounts) { return request('/api/v1/restores/accounts/verify', { method: 'POST', body: JSON.stringify({ accounts }), headers: { 'content-type': 'application/json' } }); }
   };
 }
