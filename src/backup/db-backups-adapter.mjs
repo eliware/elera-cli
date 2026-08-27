@@ -14,8 +14,12 @@ export async function withBundleCredentials(bundle, operation) {
   try { return await operation(file); } finally { await rm(directory, { recursive: true, force: true }); }
 }
 
-export function createBackupFromBundle({ bundle, backupRoot, databases, ...options }) {
-  return withBundleCredentials(bundle, (credentialsFile) => createBackup({ backupRoot, databases, credentialsFile, host: bundle.host, mysqlDump: 'mariadb-dump', ...options }));
+export function createBackupFromBundle({ bundle, backupRoot, databases, metadata, ...options }) {
+  return withBundleCredentials(bundle, async (credentialsFile) => {
+    const result = await createBackup({ backupRoot, databases, credentialsFile, host: bundle.host, mysqlDump: 'mariadb-dump', ...options });
+    if (metadata) await writeFile(join(result.path, 'SUPERVISOR-METADATA.json'), `${JSON.stringify(metadata, null, 2)}\n`, { mode: 0o600 });
+    return result;
+  });
 }
 
 export function verifyBackupFromBundle({ bundle, backupPath, databases, ...options }) {

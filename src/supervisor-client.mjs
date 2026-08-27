@@ -45,6 +45,8 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async provisionAccount(input) { return request('/api/v1/accounts/provision', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
     async revokeAccount(input) { return request('/api/v1/accounts/revoke', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
     async verifyAccount(input) { return request('/api/v1/accounts/verify', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
+    async exportAccounts() { return request('/api/v1/accounts/export', { method: 'POST' }); },
+    async metadataExport() { return request('/api/v1/metadata/export'); },
     async reconcilePlan(desired) { return request('/api/v1/reconcile/plan', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); },
     async reconcileApply(desired) { return request('/api/v1/reconcile/apply', { method: 'POST', body: JSON.stringify({ desired, confirm: true }), headers: { 'content-type': 'application/json' } }); },
     async reconcileVerify(desired) { return request('/api/v1/reconcile/verify', { method: 'POST', body: JSON.stringify({ desired }), headers: { 'content-type': 'application/json' } }); },
