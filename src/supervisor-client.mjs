@@ -16,6 +16,9 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async plan(intent) { return request('/api/v1/config/plan', { method: 'POST', body: JSON.stringify({ intent }), headers: { 'content-type': 'application/json' } }); },
     async apply(intent) { return request('/api/v1/config/apply', { method: 'POST', body: JSON.stringify({ intent, confirm: true }), headers: { 'content-type': 'application/json' } }); },
     async verify() { return request('/api/v1/config/verify', { method: 'POST' }); },
+    async metadataStatus() { return request('/api/v1/metadata/status'); },
+    async metadataInitialize() { return request('/api/v1/metadata/initialize', { method: 'POST', body: JSON.stringify({ confirm: true }), headers: { 'content-type': 'application/json' } }); },
+    async metadataVerify() { return request('/api/v1/metadata/verify', { method: 'POST' }); },
     async health() { return request('/healthz'); },
     async ready() { return request('/readyz'); },
     async lease(database, identity, routes = ['primary', 'balanced']) { const body = await request('/api/v1/credentials/lease', { method: 'POST', body: JSON.stringify({ database, identity, routes }), headers: { 'content-type': 'application/json' } }); return validateBundle(body.data ?? body); }

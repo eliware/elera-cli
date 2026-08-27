@@ -34,3 +34,6 @@ npm run pack
 
 Do not commit API tokens, age keys, database passwords, dumps, or decrypted
 artifacts.
+Metadata initialization is explicit and requires `elera-cli metadata-init
+--confirm`; status and verification use `metadata-status` and
+`metadata-verify`.

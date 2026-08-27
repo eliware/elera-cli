@@ -7,6 +7,7 @@ test('prints help and version without requiring configuration', async () => {
   const help = stream(); expect(await runCli({ argv: ['--help'], output: help, errorOutput: stream() })).toBe(0); expect(help.value).toContain('elera-cli');
   const version = stream(); expect(await runCli({ argv: ['--version'], output: version, errorOutput: stream() })).toBe(0); expect(version.value).toBe('0.1.0\n');
 });
+test('requires explicit confirmation for metadata initialization', async () => { const error = stream(); expect(await runCli({ argv: ['metadata-init'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('--confirm'); });
 
 test('returns stable invalid-command exit code and writes an actionable error', async () => {
   const error = stream(); expect(await runCli({ argv: ['nope'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('unknown command');
