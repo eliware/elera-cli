@@ -30,7 +30,7 @@
   "dependencies": {
     "@eliware/ssh-client": "^2.0.0",
     "@eliware/common": "^2.0.0",
-    "@eliware/elera-lib": "file:../elera-lib"
+    "@eliware/elera-lib": "0.1.0"
   },
   "devDependencies": {
     "@eliware/test": "^2.0.0",
@@ -38,7 +38,5 @@
     "ajv-formats": "^3.0.1"
   },
   "private": true,
-  "jest": {
-    "coveragePathIgnorePatterns": ["/elera-lib/"]
-  }
+  "jest": {}
 }

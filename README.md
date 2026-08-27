@@ -1,7 +1,7 @@
 # @eliware/elera-cli
 
-Agent-friendly Elera database operations CLI. The package is developed with a
-local `file:../elera-lib` dependency until both packages are published.
+Agent-friendly Elera database operations CLI. The package consumes the
+published `@eliware/elera-lib@0.1.0` client.
 
 The CLI will authenticate to the supervisor API with a scoped bearer token and
 use `@eliware/elera-lib` for SQL metadata operations. Large backup and restore
@@ -41,8 +41,6 @@ mounts using `ELERA_SSH_KEY_PATH`, `ELERA_KNOWN_HOSTS_PATH`,
 paths but does not log or copy their contents.
 
 ## Development
-
-The sibling repository must be available at `../elera-lib` for the local link:
 
 ```bash
 npm ci
