@@ -7,10 +7,10 @@ const exitCodes = { invalid: 2, auth: 3, network: 4 };
 
 export async function runCli({ argv = process.argv.slice(2), environment = process.env, output = process.stdout, errorOutput = process.stderr } = {}) {
   const command = argv[0]; const jsonOutput = argv.includes('--json'); const emit = (value) => output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
-  if (command === '--help' || command === undefined) { emit('elera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|database-list|database-create|identity-list|identity-create|identity-rotate|token-create|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]'); return 0; }
+  if (command === '--help' || command === undefined) { emit('elera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]'); return 0; }
   if (command === '--version') { output.write('0.1.0\n'); return 0; }
   const lifecycleCommands = { 'cluster-bootstrap': 'bootstrap', 'cluster-join': 'join', 'cluster-leave': 'leave', 'cluster-recover': 'recover' };
-  if (!['health', 'ready', 'status', 'config-inspect', 'config-plan', 'config-apply', 'config-verify', 'metadata-status', 'metadata-init', 'metadata-verify', 'database-list', 'database-create', 'identity-list', 'identity-create', 'identity-rotate', 'token-create', 'cluster-status', 'cluster-observations', 'cluster-quorum', 'cluster-plan', ...Object.keys(lifecycleCommands), 'sql-smoke'].includes(command)) { errorOutput.write(`unknown command: ${command}\n`); return exitCodes.invalid; }
+  if (!['health', 'ready', 'status', 'config-inspect', 'config-plan', 'config-apply', 'config-verify', 'metadata-status', 'metadata-init', 'metadata-verify', 'database-list', 'database-create', 'identity-list', 'identity-create', 'identity-rotate', 'account-create', 'account-revoke', 'account-verify', 'token-create', 'cluster-status', 'cluster-observations', 'cluster-quorum', 'cluster-plan', ...Object.keys(lifecycleCommands), 'sql-smoke'].includes(command)) { errorOutput.write(`unknown command: ${command}\n`); return exitCodes.invalid; }
   if (command === 'metadata-init' && !argv.includes('--confirm')) { errorOutput.write('metadata-init requires --confirm\n'); return exitCodes.invalid; }
   if (lifecycleCommands[command] && !argv.includes('--confirm')) { errorOutput.write(`${command} requires --confirm\n`); return exitCodes.invalid; }
   try {
@@ -29,6 +29,9 @@ export async function runCli({ argv = process.argv.slice(2), environment = proce
     if (command === 'identity-list') { emit(await client.identities(argv[1])); return 0; }
     if (command === 'identity-create') { emit(await client.provisionIdentity({ application: argv[1], database: argv[2], identity: argv[3], purpose: argv[4] ?? 'runtime', grants: (argv[5] ?? 'SELECT').split(',') })); return 0; }
     if (command === 'identity-rotate') { emit(await client.rotateIdentity(argv[1])); return 0; }
+    if (command === 'account-create') { emit(await client.provisionAccount({ user: argv[1], database: argv[2], host: argv[3] ?? '%', grants: (argv[4] ?? 'SELECT').split(',') })); return 0; }
+    if (command === 'account-revoke') { emit(await client.revokeAccount({ user: argv[1], host: argv[2] ?? '%' })); return 0; }
+    if (command === 'account-verify') { emit(await client.verifyAccount({ user: argv[1], host: argv[2] ?? '%' })); return 0; }
     if (command === 'token-create') { emit(await client.createToken({ tokenName: argv[1], application: argv[2], identity: argv[3], scopes: (argv[4] ?? 'credential:issue').split(',') })); return 0; }
     if (command === 'cluster-status') { emit(await client.status()); return 0; }
     if (command === 'cluster-observations') { emit(await client.observations()); return 0; }

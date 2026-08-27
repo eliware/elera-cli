@@ -33,5 +33,8 @@ export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
     async provisionIdentity(input) { return request('/api/v1/identities', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); },
     async rotateIdentity(identity) { return request('/api/v1/identities/rotate', { method: 'POST', body: JSON.stringify({ identity }), headers: { 'content-type': 'application/json' } }); },
     async createToken(input) { return request('/api/v1/tokens', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
+    ,async provisionAccount(input) { return request('/api/v1/accounts/provision', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
+    ,async revokeAccount(input) { return request('/api/v1/accounts/revoke', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
+    ,async verifyAccount(input) { return request('/api/v1/accounts/verify', { method: 'POST', body: JSON.stringify(input), headers: { 'content-type': 'application/json' } }); }
   };
 }
