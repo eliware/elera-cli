@@ -18,6 +18,7 @@ function run(command, args, { env, input, output } = {}) {
 }
 
 export function dumpDatabase(bundle, destination) {
+  credentials(bundle);
   const file = typeof destination === 'string' ? createWriteStream(destination) : destination;
   return run('mariadb-dump', ['--host', bundle.host, '--port', String(bundle.port ?? 3306), '--user', bundle.username, '--single-transaction', '--routines', '--events', bundle.database], { env: credentials(bundle), output: file });
 }
