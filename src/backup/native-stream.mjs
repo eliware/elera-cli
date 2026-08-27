@@ -3,8 +3,9 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { spawn } from 'node:child_process';
 
 function credentials(bundle) {
-  if (!bundle?.username || !bundle.password || !bundle.database) throw new TypeError('connection bundle credentials are required');
-  return { MYSQL_PWD: bundle.password };
+  const profile = { ...bundle, ...(bundle?.credentials ?? {}), host: bundle?.host ?? bundle?.routes?.primary?.[0]?.host };
+  if (!profile.username || !profile.password || !profile.database || !profile.host) throw new TypeError('connection bundle credentials are required');
+  return { MYSQL_PWD: profile.password };
 }
 
 function run(command, args, { env, input, output } = {}) {
@@ -20,11 +21,13 @@ function run(command, args, { env, input, output } = {}) {
 export function dumpDatabase(bundle, destination) {
   credentials(bundle);
   const file = typeof destination === 'string' ? createWriteStream(destination) : destination;
-  return run('mariadb-dump', ['--host', bundle.host, '--port', String(bundle.port ?? 3306), '--user', bundle.username, '--single-transaction', '--routines', '--events', bundle.database], { env: credentials(bundle), output: file });
+  const profile = { ...bundle, ...(bundle?.credentials ?? {}), host: bundle?.host ?? bundle?.routes?.primary?.[0]?.host, port: bundle?.port ?? bundle?.routes?.primary?.[0]?.port };
+  return run('mariadb-dump', ['--host', profile.host, '--port', String(profile.port ?? 3306), '--user', profile.username, '--single-transaction', '--routines', '--events', profile.database], { env: credentials(bundle), output: file });
 }
 
 export function restoreDatabase(bundle, source) {
   credentials(bundle);
   const file = typeof source === 'string' ? createReadStream(source) : source;
-  return run('mariadb', ['--host', bundle.host, '--port', String(bundle.port ?? 3306), '--user', bundle.username, bundle.database], { env: credentials(bundle), input: file });
+  const profile = { ...bundle, ...(bundle?.credentials ?? {}), host: bundle?.host ?? bundle?.routes?.primary?.[0]?.host, port: bundle?.port ?? bundle?.routes?.primary?.[0]?.port };
+  return run('mariadb', ['--host', profile.host, '--port', String(profile.port ?? 3306), '--user', profile.username, profile.database], { env: credentials(bundle), input: file });
 }

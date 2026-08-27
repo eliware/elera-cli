@@ -12,11 +12,12 @@ export async function restoreArtifact({ root, client, bundle, confirm = false, r
   const accounts = metadata.accounts ?? [];
   await client.restoreMetadataApply({ databases: metadata.databases ?? [], identities: metadata.identities ?? [] });
   if (accounts.length) await client.restoreAccountsApply(accounts);
+  const profile = { ...bundle, ...(bundle.credentials ?? {}), host: bundle.host ?? bundle.routes?.primary?.[0]?.host, port: bundle.port ?? bundle.routes?.primary?.[0]?.port };
   const databases = await readNames(root, read);
   const restored = [];
   for (const database of databases) {
     if (['mysql', 'sys', 'information_schema', 'performance_schema'].includes(database)) continue;
-    await restore('mariadb', ['--host', bundle.host, '--port', String(bundle.port ?? 3306), '--user', bundle.username, database], createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()), { env: { MYSQL_PWD: bundle.password } });
+    await restore('mariadb', ['--host', profile.host, '--port', String(profile.port ?? 3306), '--user', profile.username, database], createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()), { env: { MYSQL_PWD: profile.password } });
     restored.push(database);
   }
   return { metadata: { databases: metadata.databases?.length ?? 0, identities: metadata.identities?.length ?? 0, accounts: accounts.length }, restored };
