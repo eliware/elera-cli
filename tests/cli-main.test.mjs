@@ -21,6 +21,22 @@ test('returns stable invalid-command exit code and writes an actionable error', 
   const error = stream(); expect(await runCli({ argv: ['nope'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('unknown command');
 });
 
+test('supports lifecycle inspection, stop, and explicit recovery confirmation', async () => {
+  const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = jest.fn(async (url, options = {}) => {
+    const path = new URL(url).pathname;
+    const data = path.endsWith('/traffic/status') ? { drained: true, active: 0, lifecycle: 'draining' } : path.endsWith('/cluster/lifecycle/plan') ? { eligible: false, reason: 'quorum required' } : { ready: true, values: { wsrep_cluster_status: 'Primary' } };
+    return { ok: true, headers: { get: () => 'application/json' }, json: async () => ({ ok: true, data }) };
+  });
+  try {
+    for (const command of [['node-status'], ['stop'], ['recover'], ['recover', '--confirm']]) {
+      const errorOutput = stream(); const code = await runCli({ argv: [...command, '--json'], environment, output: stream(), errorOutput });
+      expect(code).toBe(command[0] === 'recover' && !command.includes('--confirm') ? 2 : command[0] === 'recover' ? 5 : 0);
+    }
+  } finally { globalThis.fetch = originalFetch; }
+});
+
 test('executes health, ready, and status commands with JSON output', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = jest.fn(async (url) => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ ok: true, status: 'ok', url }) }));

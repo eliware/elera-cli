@@ -13,8 +13,9 @@ import { createAgeProcess } from "../artifacts/age-process.mjs";
 import { createMigrationDiagnostics } from "../migration/diagnostics.mjs";
 import { createLiveDb } from "../routing/live-db.mjs";
 import { readFile } from "node:fs/promises";
-
-const exitCodes = { invalid: 2, auth: 3, network: 4 };
+import { createLifecycleCommands } from "../commands/lifecycle.mjs";
+import { exitCodes } from "../operations/exit-codes.mjs";
+import { formatHuman } from "../output/format.mjs";
 
 export async function runCli({
   argv = process.argv.slice(2),
@@ -40,10 +41,10 @@ export async function runCli({
   const command = argv[0];
   const jsonOutput = argv.includes("--json");
   const emit = (value) =>
-    output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
+    output.write(jsonOutput ? JSON.stringify(value) + "\n" : formatHuman(value) + "\n");
   if (command === "--help" || command === undefined) {
     emit(
-      "elera-cli <health|ready|status|preflight|routes|bundle|routing-resync|drain|undrain|drain-status|migration-check|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
+      "elera-cli <health|ready|status|node-status|routes|bundle|routing-resync|drain|drain-status|undrain|stop|recover|...> [--json]",
     );
     return 0;
   }
@@ -69,6 +70,9 @@ export async function runCli({
       "drain",
       "undrain",
       "drain-status",
+      "node-status",
+      "stop",
+      "recover",
       "migration-check",
       "config-inspect",
       "config-plan",
@@ -172,17 +176,15 @@ export async function runCli({
       emit(await client.resync(argv[1]));
       return 0;
     }
-    if (command === "drain") {
-      emit(await client.drain());
-      return 0;
-    }
-    if (command === "undrain") {
-      emit(await client.undrain());
-      return 0;
-    }
-    if (command === "drain-status") {
-      emit(await client.trafficStatus());
-      return 0;
+    const lifecycle = createLifecycleCommands({ client, timeoutMs: Number(environment.ELERA_DRAIN_TIMEOUT_MS ?? 60000) });
+    if (command === "drain") { const result = await lifecycle.drain(); emit(result); return lifecycle.classify(result); }
+    if (command === "undrain") { const result = await lifecycle.undrain(); emit(result); return lifecycle.classify(result); }
+    if (command === "drain-status") { const result = await lifecycle.drainStatus(); emit(result); return lifecycle.classify(result); }
+    if (command === "stop") { const result = await lifecycle.stop(); emit(result); return lifecycle.classify(result); }
+    if (command === "node-status") { const result = await lifecycle.nodeStatus(); emit(result); return lifecycle.classify(result); }
+    if (command === "recover") {
+      if (!argv.includes("--confirm")) { errorOutput.write("recover requires --confirm\n"); return exitCodes.invalid; }
+      const result = await lifecycle.recover(argv[1]); emit(result); return lifecycle.classify(result);
     }
     if (command === "config-inspect") {
       emit(await client.intent());

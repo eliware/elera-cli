@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
-    "@eliware/elera-lib": "0.1.2",
+    "@eliware/elera-lib": "0.1.3",
     "@eliware/ssh-client": "^2.0.0"
   },
   "devDependencies": {
