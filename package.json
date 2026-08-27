@@ -21,7 +21,6 @@
   ],
   "scripts": {
     "test": "eliware-test",
-    "test:ci": "eliware-test --coveragePathIgnorePatterns=elera-lib",
     "lint": "eliware-test --lint",
     "check": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
@@ -37,5 +36,8 @@
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "coveragePathIgnorePatterns": ["/elera-lib/"]
+  }
 }
