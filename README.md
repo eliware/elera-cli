@@ -24,8 +24,11 @@ backup/restore verification. Metadata-first artifact restore reads the local
 through the supervisor API, and streams application SQL with native MariaDB
 commands.
 
-Encrypted artifact storage and broader GitOps secret orchestration remain
-Sprint 9 work; the CLI does not persist age private keys or plaintext secrets.
+Encrypted artifact commands are available for listing, retrieval of ciphertext,
+verification, replacement, and deletion. `AGE_RECIPIENT` configures native age
+encryption for `secret-put`; `AGE_IDENTITY_FILE` is used only for local
+decryption by library workflows. Neither key is sent to the supervisor or
+persisted by the CLI.
 
 ## Development
 

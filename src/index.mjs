@@ -7,3 +7,6 @@ export { createBackup, dumpToGzip } from './backup/create-backup.mjs';
 export { verifyBackup, backupExists } from './backup/verify-backup.mjs';
 export { restoreVerify, runRestore, runSql } from './restore/restore-verify.mjs';
 export { restoreArtifact } from './restore/artifact-restore.mjs';
+export { createEncryptedArtifactStore } from './artifacts/encrypted-store.mjs';
+export { createAgeProcess } from './artifacts/age-process.mjs';
+export { createArtifactCommands } from './artifacts/commands.mjs';

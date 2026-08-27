@@ -8,6 +8,8 @@ import {
   restoreVerifyFromBundle,
 } from "../backup/db-backups-adapter.mjs";
 import { restoreArtifact } from "../restore/artifact-restore.mjs";
+import { createArtifactCommands } from "../artifacts/commands.mjs";
+import { createAgeProcess } from "../artifacts/age-process.mjs";
 
 const exitCodes = { invalid: 2, auth: 3, network: 4 };
 
@@ -37,7 +39,7 @@ export async function runCli({
     output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
   if (command === "--help" || command === undefined) {
     emit(
-      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
+      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
     );
     return 0;
   }
@@ -81,6 +83,11 @@ export async function runCli({
       "verify-backup",
       "restore-verify",
       "restore-artifact",
+      "secret-list",
+      "secret-get",
+      "secret-put",
+      "secret-verify",
+      "secret-delete",
       "dump",
       "restore",
       "database-list",
@@ -115,6 +122,15 @@ export async function runCli({
   try {
     const config = loadCliConfig(environment);
     const client = supervisorClient(config);
+    const artifactCommands = createArtifactCommands({
+      client,
+      age: dependencies.age ?? createAgeProcess({ environment }),
+      emit,
+    });
+    if (command.startsWith("secret-")) {
+      await artifactCommands(command, argv.slice(1));
+      return 0;
+    }
     if (command === "health") {
       const result = await client.health();
       emit(result);
