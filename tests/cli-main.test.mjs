@@ -69,6 +69,14 @@ test('returns success when migration diagnostics pass', async () => {
   expect(await runCli({ argv: ['migration-check'], environment, output: stream(), errorOutput: stream(), dependencies: { migrationDiagnostics: async () => ({ ok: true, checks: {} }) } })).toBe(0);
 });
 
+test('preflight is an agent-friendly alias for migration diagnostics', async () => {
+  const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
+  const output = stream(); const diagnose = jest.fn().mockResolvedValue({ ok: true, checks: { httpOnly: true } });
+  expect(await runCli({ argv: ['preflight', '--json'], environment, output, errorOutput: stream(), dependencies: { migrationDiagnostics: diagnose } })).toBe(0);
+  expect(diagnose).toHaveBeenCalledWith({ endpoint: 'http://supervisor', configPath: undefined });
+  expect(output.value).toContain('httpOnly');
+});
+
 test('dispatches streaming, backup, artifact, and SQL smoke operations through injected adapters', async () => {
   const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
   const bundle = { database: 'app', credentials: { username: 'u', password: 'p' }, routes: { primary: [{ host: 'db', port: 3306 }] }, expiresAt: '2099-01-01' };
@@ -78,7 +86,7 @@ test('dispatches streaming, backup, artifact, and SQL smoke operations through i
     createSupervisorClient: () => client,
     dumpDatabase: async () => calls.push('dump'), restoreDatabase: async () => calls.push('restore'),
     createBackupFromBundle: async () => calls.push('backup'), verifyBackupFromBundle: async () => calls.push('verify'), restoreVerifyFromBundle: async () => calls.push('restore-verify'),
-    restoreArtifact: async () => calls.push('artifact'), createDbFromBundle: async () => ({ query: async () => [[{ healthy: 1 }]], close: async () => calls.push('close') })
+    restoreArtifact: async () => calls.push('artifact'), createDbFromBundle: async () => ({ query: async () => [[{ healthy: 1 }]], close: async () => calls.push('close') }), createLiveDb: async ({ createDb: makeDb, fetchBundle }) => { await fetchBundle(); return { db: await makeDb(), close: async () => calls.push('close') }; }
   };
   for (const argv of [['dump', 'file'], ['restore', 'file'], ['backup', 'root'], ['verify-backup', 'root'], ['restore-verify', 'root'], ['restore-artifact', 'root', '--confirm'], ['sql-smoke']]) await expect(runCli({ argv, environment, output: stream(), errorOutput: stream(), dependencies })).resolves.toBe(0);
   expect(calls).toEqual(['dump', 'restore', 'backup', 'verify', 'restore-verify', 'artifact', 'close']);
@@ -93,7 +101,7 @@ test('covers command defaults, negative results, and operation errors', async ()
     intent: async () => ({}), metadataExport: async () => ({}), exportAccounts: async () => ({}),
     lease: async () => ({})
   }, { get: (target, name) => target[name] ?? (async () => ({ ok: false })) });
-  const dependencies = { createSupervisorClient: () => client, dumpDatabase: async () => { throw new Error('dump failed'); }, createBackupFromBundle: async () => ({ ok: true }), createDbFromBundle: async () => ({ query: async () => [[{ healthy: 0 }]], close: async () => {} }) };
+  const dependencies = { createSupervisorClient: () => client, dumpDatabase: async () => { throw new Error('dump failed'); }, createBackupFromBundle: async () => ({ ok: true }), createDbFromBundle: async () => ({ query: async () => [[{ healthy: 0 }]], close: async () => {} }), createLiveDb: async ({ createDb: makeDb, fetchBundle }) => { await fetchBundle(); return { db: await makeDb(), close: async () => {} }; } };
   expect(await runCli({ argv: ['health'], environment, output: stream(), errorOutput: stream(), dependencies })).toBe(1);
   expect(await runCli({ argv: ['ready'], environment, output: stream(), errorOutput: stream(), dependencies })).toBe(1);
   expect(await runCli({ argv: ['metadata-verify'], environment, output: stream(), errorOutput: stream(), dependencies })).toBe(1);

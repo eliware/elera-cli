@@ -13,3 +13,4 @@ export { createArtifactCommands } from './artifacts/commands.mjs';
 export { createGitOpsInputs } from './artifacts/gitops-inputs.mjs';
 export { createMaterializeCommand } from './artifacts/materialize-command.mjs';
 export { createMigrationDiagnostics } from './migration/diagnostics.mjs';
+export { createLiveDb } from './routing/live-db.mjs';

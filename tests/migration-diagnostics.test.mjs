@@ -22,6 +22,11 @@ test("passes when both probes are healthy and no config is supplied", async () =
   });
 });
 
+test("uses the default config reader when preflight receives a config path", async () => {
+  const diagnose = createMigrationDiagnostics({ fetchImpl: async () => ({ status: 200 }) });
+  await expect(diagnose({ endpoint: "http://vip", configPath: "missing-config" })).resolves.toMatchObject({ ok: true, checks: { httpOnly: true } });
+});
+
 test("reports unreachable endpoints", async () => {
   const diagnose = createMigrationDiagnostics({ fetchImpl: async () => { throw new Error("offline"); } });
   await expect(diagnose({ endpoint: "http://vip" })).resolves.toMatchObject({ ok: false });

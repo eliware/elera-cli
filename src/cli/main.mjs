@@ -11,6 +11,7 @@ import { restoreArtifact } from "../restore/artifact-restore.mjs";
 import { createArtifactCommands } from "../artifacts/commands.mjs";
 import { createAgeProcess } from "../artifacts/age-process.mjs";
 import { createMigrationDiagnostics } from "../migration/diagnostics.mjs";
+import { createLiveDb } from "../routing/live-db.mjs";
 import { readFile } from "node:fs/promises";
 
 const exitCodes = { invalid: 2, auth: 3, network: 4 };
@@ -35,13 +36,14 @@ export async function runCli({
   const restoreArtifactOperation =
     dependencies.restoreArtifact ?? restoreArtifact;
   const createDb = dependencies.createDbFromBundle ?? createDbFromBundle;
+  const createLive = dependencies.createLiveDb ?? createLiveDb;
   const command = argv[0];
   const jsonOutput = argv.includes("--json");
   const emit = (value) =>
     output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
   if (command === "--help" || command === undefined) {
     emit(
-      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|migration-check|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
+      "elera-cli <health|ready|status|preflight|routes|bundle|routing-resync|drain|undrain|drain-status|migration-check|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
     );
     return 0;
   }
@@ -60,6 +62,7 @@ export async function runCli({
       "health",
       "ready",
       "status",
+      "preflight",
       "routes",
       "bundle",
       "routing-resync",
@@ -136,9 +139,10 @@ export async function runCli({
       await artifactCommands(command, argv.slice(1));
       return 0;
     }
-    if (command === "migration-check") {
+    if (command === "migration-check" || command === "preflight") {
       const diagnose = dependencies.migrationDiagnostics ?? createMigrationDiagnostics();
-      const result = await diagnose({ endpoint: config.endpoint, configPath: argv[1] });
+      const configPath = argv.slice(1).find((argument) => !argument.startsWith("--"));
+      const result = await diagnose({ endpoint: config.endpoint, configPath });
       emit(result);
       return result.ok ? 0 : 1;
     }
@@ -395,13 +399,20 @@ export async function runCli({
     }
     {
       const bundle = await client.lease(config.database, config.identity);
-      const db = await createDb({ bundle });
+      const live = await createLive({
+        bundle,
+        endpoint: config.endpoint,
+        token: config.token,
+        application: config.database,
+        fetchBundle: async () => client.routingBundle(config.identity),
+        createDb,
+      });
       try {
-        const [rows] = await db.query("SELECT 1 AS healthy");
+        const [rows] = await live.db.query("SELECT 1 AS healthy");
         emit({ ok: rows[0]?.healthy === 1 });
         return rows[0]?.healthy === 1 ? 0 : 1;
       } finally {
-        await db.close();
+        await live.close();
       }
     }
   } catch (error) {
