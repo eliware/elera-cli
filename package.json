@@ -42,6 +42,7 @@
     "test": "eliware-test",
     "lint": "eliware-test --lint",
     "check": "node --check src/elera-cli.mjs",
+    "typecheck": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
     "pack": "npm pack --dry-run",
     "audit": "npm audit --omit=dev --audit-level=moderate"
