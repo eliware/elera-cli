@@ -39,3 +39,11 @@ test('returns failure for unhealthy and not-ready responses', async () => {
   expect(await runCli({ argv: ['ready'], environment, output: stream(), errorOutput: stream() })).toBe(1);
   globalThis.fetch = originalFetch;
 });
+
+test('executes intent inspection, plan, apply, and verify commands', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = jest.fn(async (url, options = {}) => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => url.endsWith('/config/intent') ? { ok: true, data: { intent: { apiVersion: 'galera.eliware.dev/v1alpha1', kind: 'SupervisorIntent' }, desiredHash: 'hash' } } : { ok: true, data: { change: 'no-op' } } }));
+  const environment = { GALERA_API_ENDPOINT: 'http://supervisor', GALERA_API_TOKEN: 'token', GALERA_DATABASE: 'app', GALERA_IDENTITY: 'runtime' };
+  for (const command of ['config-inspect', 'config-plan', 'config-apply', 'config-verify']) { const output = stream(); expect(await runCli({ argv: [command, '--json'], environment, output, errorOutput: stream() })).toBe(0); }
+  globalThis.fetch = originalFetch;
+});
