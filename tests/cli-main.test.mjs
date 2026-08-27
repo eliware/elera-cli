@@ -9,6 +9,14 @@ test('prints help and version without requiring configuration', async () => {
 });
 test('requires explicit confirmation for metadata initialization', async () => { const error = stream(); expect(await runCli({ argv: ['metadata-init'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('--confirm'); });
 
+test('passes a comma-separated grant policy as one supervisor value', async () => {
+  let request;
+  const client = { provisionIdentity: async (value) => { request = value; return { ok: true }; } };
+  const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
+  expect(await runCli({ argv: ['identity-create', 'app', 'app', 'backup', 'backup', 'SELECT,LOCK TABLES,SHOW VIEW'], environment, output: stream(), errorOutput: stream(), dependencies: { createSupervisorClient: () => client } })).toBe(0);
+  expect(request.grants).toBe('SELECT,LOCK TABLES,SHOW VIEW');
+});
+
 test('returns stable invalid-command exit code and writes an actionable error', async () => {
   const error = stream(); expect(await runCli({ argv: ['nope'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('unknown command');
 });

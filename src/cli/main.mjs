@@ -326,7 +326,7 @@ export async function runCli({
           database: argv[2],
           identity: argv[3],
           purpose: argv[4] ?? "runtime",
-          grants: (argv[5] ?? "SELECT").split(","),
+          grants: argv[5] ?? "SELECT",
         }),
       );
       return 0;
