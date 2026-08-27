@@ -2,6 +2,7 @@ import { expect, jest, test } from '@jest/globals';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { restoreArtifact } from '../src/restore/artifact-restore.mjs';
 
 test('artifact restore requires confirmation before reading or mutating state', async () => {
@@ -10,7 +11,7 @@ test('artifact restore requires confirmation before reading or mutating state', 
 
 test('artifact restore restores metadata before application SQL', async () => {
   const root = await mkdtemp(join(tmpdir(), 'elera-artifact-'));
-  await writeFile(join(root, 'app.sql.gz'), 'unused');
+  await writeFile(join(root, 'app.sql.gz'), gzipSync('unused'));
   const read = jest.fn(async (path) => path.endsWith('SUPERVISOR-METADATA.json') ? JSON.stringify({ databases: [], identities: [], accounts: [{ user: 'app', host: '%' }] }) : 'app\n');
   const client = { restoreMetadataApply: jest.fn(), restoreAccountsApply: jest.fn() };
   const restore = jest.fn();
