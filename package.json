@@ -6,7 +6,7 @@
   "engines": { "node": ">=26" },
   "bin": { "galera-cli": "./src/galera-cli.mjs" },
   "exports": { ".": "./src/index.mjs" },
-  "files": ["src", "README.md", "RELEASE_NOTES.md", "LICENSE"],
+  "files": ["src", "README.md", "RELEASE_NOTES.md", "LICENSE", "THIRD-PARTY-NOTICES.md"],
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
