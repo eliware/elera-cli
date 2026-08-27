@@ -52,11 +52,21 @@ test('dispatches the management, routing, identity, and cluster command families
   const originalFetch = globalThis.fetch; const bundle = { database: 'app', identity: 'runtime', credentials: { username: 'u', password: 'p' }, routes: { primary: [{ host: 'db', port: 3306 }] }, expiresAt: '2099-01-01' };
   globalThis.fetch = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ ok: true, status: 'ok', data: bundle }) }));
   const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
-  const commands = [['routes', 'app'], ['bundle'], ['routing-resync', 'app'], ['drain'], ['undrain'], ['drain-status'], ['metadata-init', '--confirm'], ['metadata-status'], ['metadata-verify'], ['reconcile-plan', '{}'], ['reconcile-apply', '{}'], ['reconcile-verify', '{}'], ['restore-metadata-plan', '{}'], ['restore-metadata-apply', '{}'], ['restore-accounts-plan', '[]'], ['restore-accounts-apply', '[]'], ['restore-accounts-verify', '[]'], ['secret-list'], ['secret-get', 'x'], ['secret-verify', 'x'], ['secret-delete', 'x'], ['database-list'], ['database-create', 'app', 'db'], ['identity-list', 'app'], ['identity-create', 'app', 'db', 'id'], ['identity-rotate', 'id'], ['account-create', 'u', 'db'], ['account-revoke', 'u'], ['account-verify', 'u'], ['token-create', 't', 'app', 'id'], ['token-revoke', 't'], ['cluster-status'], ['cluster-observations'], ['cluster-quorum'], ['cluster-plan', 'drain'], ['cluster-bootstrap', '--confirm'], ['cluster-join', '--confirm'], ['cluster-leave', '--confirm'], ['cluster-recover', '--confirm']];
+  const commands = [['routes', 'app'], ['bundle'], ['routing-resync', 'app'], ['drain'], ['undrain'], ['drain-status'], ['migration-check'], ['metadata-init', '--confirm'], ['metadata-status'], ['metadata-verify'], ['reconcile-plan', '{}'], ['reconcile-apply', '{}'], ['reconcile-verify', '{}'], ['restore-metadata-plan', '{}'], ['restore-metadata-apply', '{}'], ['restore-accounts-plan', '[]'], ['restore-accounts-apply', '[]'], ['restore-accounts-verify', '[]'], ['secret-list'], ['secret-get', 'x'], ['secret-verify', 'x'], ['secret-delete', 'x'], ['database-list'], ['database-create', 'app', 'db'], ['identity-list', 'app'], ['identity-create', 'app', 'db', 'id'], ['identity-rotate', 'id'], ['account-create', 'u', 'db'], ['account-revoke', 'u'], ['account-verify', 'u'], ['token-create', 't', 'app', 'id'], ['token-revoke', 't'], ['cluster-status'], ['cluster-observations'], ['cluster-quorum'], ['cluster-plan', 'drain'], ['cluster-bootstrap', '--confirm'], ['cluster-join', '--confirm'], ['cluster-leave', '--confirm'], ['cluster-recover', '--confirm']];
   for (const argv of commands) expect(await runCli({ argv: [...argv, '--json'], environment, output: stream(), errorOutput: stream() })).toBeLessThanOrEqual(1);
   for (const command of ['dump', 'restore']) { const error = stream(); expect(await runCli({ argv: [command], environment, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('file path'); }
   const artifactError = stream(); expect(await runCli({ argv: ['restore-artifact', 'root'], environment, output: stream(), errorOutput: artifactError })).toBe(2); expect(artifactError.value).toContain('--confirm');
   globalThis.fetch = originalFetch;
+});
+test('returns failure when migration diagnostics find an unsafe state', async () => {
+  const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
+  const output = stream();
+  await expect(runCli({ argv: ['migration-check', '--json'], environment, output, errorOutput: stream(), dependencies: { migrationDiagnostics: async () => ({ ok: false, checks: {} }) } })).resolves.toBe(1);
+  expect(output.value).toContain('"ok":false');
+});
+test('returns success when migration diagnostics pass', async () => {
+  const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
+  expect(await runCli({ argv: ['migration-check'], environment, output: stream(), errorOutput: stream(), dependencies: { migrationDiagnostics: async () => ({ ok: true, checks: {} }) } })).toBe(0);
 });
 
 test('dispatches streaming, backup, artifact, and SQL smoke operations through injected adapters', async () => {

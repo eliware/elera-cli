@@ -12,3 +12,4 @@ export { createAgeProcess } from './artifacts/age-process.mjs';
 export { createArtifactCommands } from './artifacts/commands.mjs';
 export { createGitOpsInputs } from './artifacts/gitops-inputs.mjs';
 export { createMaterializeCommand } from './artifacts/materialize-command.mjs';
+export { createMigrationDiagnostics } from './migration/diagnostics.mjs';

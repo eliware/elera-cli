@@ -10,6 +10,8 @@ import {
 import { restoreArtifact } from "../restore/artifact-restore.mjs";
 import { createArtifactCommands } from "../artifacts/commands.mjs";
 import { createAgeProcess } from "../artifacts/age-process.mjs";
+import { createMigrationDiagnostics } from "../migration/diagnostics.mjs";
+import { readFile } from "node:fs/promises";
 
 const exitCodes = { invalid: 2, auth: 3, network: 4 };
 
@@ -39,7 +41,7 @@ export async function runCli({
     output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
   if (command === "--help" || command === undefined) {
     emit(
-      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
+      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|migration-check|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
     );
     return 0;
   }
@@ -64,6 +66,7 @@ export async function runCli({
       "drain",
       "undrain",
       "drain-status",
+      "migration-check",
       "config-inspect",
       "config-plan",
       "config-apply",
@@ -132,6 +135,12 @@ export async function runCli({
     if (command.startsWith("secret-")) {
       await artifactCommands(command, argv.slice(1));
       return 0;
+    }
+    if (command === "migration-check") {
+      const diagnose = dependencies.migrationDiagnostics ?? createMigrationDiagnostics();
+      const result = await diagnose({ endpoint: config.endpoint, configPath: argv[1] });
+      emit(result);
+      return result.ok ? 0 : 1;
     }
     if (command === "health") {
       const result = await client.health();
