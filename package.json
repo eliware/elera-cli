@@ -28,9 +28,9 @@
     "audit": "npm audit --omit=dev --audit-level=moderate"
   },
   "dependencies": {
-    "@eliware/ssh-client": "^2.0.0",
     "@eliware/common": "^2.0.0",
-    "@eliware/elera-lib": "0.1.0"
+    "@eliware/elera-lib": "0.1.0",
+    "@eliware/ssh-client": "^2.0.0"
   },
   "devDependencies": {
     "@eliware/test": "^2.0.0",
