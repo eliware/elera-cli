@@ -6,3 +6,4 @@ export { createBackupFromBundle, verifyBackupFromBundle, restoreVerifyFromBundle
 export { createBackup, dumpToGzip } from './backup/create-backup.mjs';
 export { verifyBackup, backupExists } from './backup/verify-backup.mjs';
 export { restoreVerify, runRestore, runSql } from './restore/restore-verify.mjs';
+export { restoreArtifact } from './restore/artifact-restore.mjs';
