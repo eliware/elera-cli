@@ -12,6 +12,8 @@ export async function restoreArtifact({ root, client, bundle, confirm = false, r
   const accounts = metadata.accounts ?? [];
   await client.restoreMetadataApply({ databases: metadata.databases ?? [], identities: metadata.identities ?? [] });
   if (accounts.length) await client.restoreAccountsApply(accounts);
+  for (const artifact of metadata.artifacts ?? [])
+    await client.putSecret(artifact.name, artifact);
   const profile = { ...bundle, ...(bundle.credentials ?? {}), host: bundle.host ?? bundle.routes?.primary?.[0]?.host, port: bundle.port ?? bundle.routes?.primary?.[0]?.port };
   const databases = await readNames(root, read);
   const restored = [];

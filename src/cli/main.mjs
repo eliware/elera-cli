@@ -39,7 +39,7 @@ export async function runCli({
     output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
   if (command === "--help" || command === undefined) {
     emit(
-      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
+      "elera-cli <health|ready|status|routes|bundle|routing-resync|drain|undrain|drain-status|config-inspect|config-plan|config-apply|config-verify|metadata-status|metadata-init|metadata-verify|reconcile-plan|reconcile-apply|reconcile-verify|restore-metadata-plan|restore-metadata-apply|restore-accounts-plan|restore-accounts-apply|restore-accounts-verify|secret-list|secret-get|secret-put|secret-verify|secret-delete|secret-materialize|backup|verify-backup|restore-verify|restore-artifact|dump|restore|database-list|database-create|identity-list|identity-create|identity-rotate|account-create|account-revoke|account-verify|token-create|token-revoke|cluster-status|cluster-observations|cluster-quorum|cluster-plan|cluster-bootstrap|cluster-join|cluster-leave|cluster-recover|sql-smoke> [--json]",
     );
     return 0;
   }
@@ -88,6 +88,7 @@ export async function runCli({
       "secret-put",
       "secret-verify",
       "secret-delete",
+      "secret-materialize",
       "dump",
       "restore",
       "database-list",
@@ -125,6 +126,7 @@ export async function runCli({
     const artifactCommands = createArtifactCommands({
       client,
       age: dependencies.age ?? createAgeProcess({ environment }),
+      materialize: dependencies.materialize,
       emit,
     });
     if (command.startsWith("secret-")) {

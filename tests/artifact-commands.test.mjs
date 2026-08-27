@@ -41,6 +41,29 @@ test("dispatches artifact commands and encrypts file content before put", async 
   ]);
   expect(await run("other", [])).toBe(false);
 });
+test("materializes through the injected operation without exposing plaintext", async () => {
+  const calls = [];
+  const run = createArtifactCommands({
+    client: {},
+    age: {},
+    materialize: async (...args) => calls.push(args),
+    emit: (value) => calls.push(value),
+  });
+  await expect(run("secret-materialize", ["name", "command", "--flag"])).resolves.toBe(true);
+  expect(calls).toEqual([["name", "command", ["--flag"]], { name: "name", materialized: true }]);
+  await expect(run("secret-materialize", ["name"])).rejects.toThrow("requires a command");
+});
+test("creates the default materializer lazily", async () => {
+  const calls = [];
+  const run = createArtifactCommands({
+    client: { putSecret: jest.fn(), getSecret: jest.fn() },
+    age: { encrypt: jest.fn(), decrypt: jest.fn() },
+    createMaterializer: () => async (...args) => calls.push(args),
+    emit: jest.fn(),
+  });
+  await expect(run("secret-materialize", ["name", "command"])).resolves.toBe(true);
+  expect(calls[0][0]).toBe("name");
+});
 test("validates artifact command arguments and dependencies", async () => {
   expect(() => createArtifactCommands()).toThrow("dependencies");
   const run = createArtifactCommands({ client: {}, age: {}, emit: jest.fn() });

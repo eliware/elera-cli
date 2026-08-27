@@ -30,6 +30,11 @@ encryption for `secret-put`; `AGE_IDENTITY_FILE` is used only for local
 decryption by library workflows. Neither key is sent to the supervisor or
 persisted by the CLI.
 
+`secret-materialize <name> <command> [args...]` decrypts an artifact into a
+mode-restricted temporary file, appends that path to the child command, and
+removes the temporary directory when the command exits. It never writes
+plaintext to CLI output.
+
 SSH, `known_hosts`, TLS, and backup inputs are resolved from GitOps/operator
 mounts using `ELERA_SSH_KEY_PATH`, `ELERA_KNOWN_HOSTS_PATH`,
 `ELERA_TLS_CERTIFICATE_PATH`, and `ELERA_BACKUP_CONFIG_PATH`. The CLI validates
