@@ -21,6 +21,7 @@
   ],
   "scripts": {
     "test": "eliware-test",
+    "test:ci": "eliware-test --coveragePathIgnorePatterns=elera-lib",
     "lint": "eliware-test --lint",
     "check": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
