@@ -1,4 +1,3 @@
-/* istanbul ignore file -- environment adapter is covered through CLI integration tests. */
 export function loadCliConfig(environment = process.env) {
   const endpoint = environment.ELERA_API_ENDPOINT;
   const token = environment.ELERA_API_TOKEN;

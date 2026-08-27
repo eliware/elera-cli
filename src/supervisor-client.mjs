@@ -1,4 +1,3 @@
-/* istanbul ignore file -- network adapter is covered through API integration tests. */
 import { validateBundle } from '@eliware/elera-lib';
 
 export function createSupervisorClient({ endpoint, token, fetchImpl = fetch }) {
