@@ -1,13 +1,13 @@
 {
-  "name": "@eliware/galera-cli",
+  "name": "@eliware/elera-cli",
   "version": "0.1.0",
-  "description": "Agent-friendly Galera database operations CLI",
+  "description": "Agent-friendly Elera database operations CLI",
   "type": "module",
   "engines": {
     "node": ">=26"
   },
   "bin": {
-    "galera-cli": "./src/galera-cli.mjs"
+    "elera-cli": "./src/elera-cli.mjs"
   },
   "exports": {
     ".": "./src/index.mjs"
@@ -22,14 +22,14 @@
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
-    "check": "node --check src/galera-cli.mjs",
+    "check": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
     "pack": "npm pack --dry-run",
     "audit": "npm audit --omit=dev --audit-level=moderate"
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
-    "@eliware/galera-lib": "file:../galera-lib"
+    "@eliware/elera-lib": "file:../elera-lib"
   },
   "devDependencies": {
     "@eliware/test": "^2.0.0",

@@ -1,15 +1,15 @@
-# @eliware/galera-cli
+# @eliware/elera-cli
 
-Agent-friendly Galera database operations CLI. The package is developed with a
-local `file:../galera-lib` dependency until both packages are published.
+Agent-friendly Elera database operations CLI. The package is developed with a
+local `file:../elera-lib` dependency until both packages are published.
 
 The CLI will authenticate to the supervisor API with a scoped bearer token and
-use `@eliware/galera-lib` for SQL metadata operations. Large backup and restore
+use `@eliware/elera-lib` for SQL metadata operations. Large backup and restore
 streams will continue to use native `mariadb-dump` and `mariadb` subprocesses;
 they will not pass through the supervisor API as JSON.
 
 The supervisor REST API remains the CLI’s primary control interface. The
-optional WebSocket routing stream belongs inside `@eliware/galera-lib`: it
+optional WebSocket routing stream belongs inside `@eliware/elera-lib`: it
 delivers versioned routing snapshots and topology events while the library
 maintains direct MariaDB connections on port `3306`. If that stream is
 unavailable, the library refreshes its bundle through the supervisor REST API.
@@ -22,7 +22,7 @@ encrypted artifacts, reconciliation, and backup/restore commands are planned.
 
 ## Development
 
-The sibling repository must be available at `../galera-lib` for the local link:
+The sibling repository must be available at `../elera-lib` for the local link:
 
 ```bash
 npm ci

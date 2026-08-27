@@ -1,13 +1,13 @@
 /* istanbul ignore file -- command wiring is covered by CLI contract and live SQL integration tests. */
 import { loadCliConfig } from '../config.mjs';
 import { createSupervisorClient } from '../supervisor-client.mjs';
-import { createDb } from '@eliware/galera-lib';
+import { createDb } from '@eliware/elera-lib';
 
 const exitCodes = { invalid: 2, auth: 3, network: 4 };
 
 export async function runCli({ argv = process.argv.slice(2), environment = process.env, output = process.stdout, errorOutput = process.stderr } = {}) {
   const command = argv[0]; const jsonOutput = argv.includes('--json'); const emit = (value) => output.write(jsonOutput ? `${JSON.stringify(value)}\n` : `${value}\n`);
-  if (command === '--help' || command === undefined) { emit('galera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|sql-smoke> [--json]'); return 0; }
+  if (command === '--help' || command === undefined) { emit('elera-cli <health|ready|status|config-inspect|config-plan|config-apply|config-verify|sql-smoke> [--json]'); return 0; }
   if (command === '--version') { output.write('0.1.0\n'); return 0; }
   if (!['health', 'ready', 'status', 'config-inspect', 'config-plan', 'config-apply', 'config-verify', 'sql-smoke'].includes(command)) { errorOutput.write(`unknown command: ${command}\n`); return exitCodes.invalid; }
   try {
