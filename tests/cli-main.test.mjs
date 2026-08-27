@@ -14,7 +14,7 @@ test('passes a comma-separated grant policy as one supervisor value', async () =
   const client = { provisionIdentity: async (value) => { request = value; return { ok: true }; } };
   const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' };
   expect(await runCli({ argv: ['identity-create', 'app', 'app', 'backup', 'backup', 'SELECT,LOCK TABLES,SHOW VIEW'], environment, output: stream(), errorOutput: stream(), dependencies: { createSupervisorClient: () => client } })).toBe(0);
-  expect(request.grants).toBe('SELECT,LOCK TABLES,SHOW VIEW');
+  expect(request.grants).toEqual(['SELECT', 'LOCK TABLES', 'SHOW VIEW']);
 });
 
 test('returns stable invalid-command exit code and writes an actionable error', async () => {
