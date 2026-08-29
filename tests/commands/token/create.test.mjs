@@ -1,0 +1,2 @@
+import { jest } from '@jest/globals'; import { runTokenCreate } from '../../../src/commands/token/create.mjs';
+test('creates a scoped token', async () => { const createToken = jest.fn(async () => ({ ok: true })); await runTokenCreate({ client: { createToken }, emit: jest.fn(), tokenName: 't', application: 'app', identity: 'id', scopes: 'read,write' }); expect(createToken.mock.calls[0][0].scopes).toEqual(['read', 'write']); });

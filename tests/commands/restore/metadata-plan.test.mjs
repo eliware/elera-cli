@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestoreMetadataPlan } from '../../../src/commands/restore/metadata-plan.mjs'; test('plans metadata restore', async () => { const emit = jest.fn(); await runRestoreMetadataPlan({ client: { restoreMetadataPlan: async (value) => value }, emit, value: '{}' }); expect(emit).toHaveBeenCalledWith({}); });

@@ -1,0 +1,3 @@
+import { expect, jest, test } from '@jest/globals'; import { runRoutingValidate } from '../../../src/commands/routing/validate.mjs';
+test('validates routing', async () => { const emit = jest.fn(); const client = { routingValidate: jest.fn(async () => ({ ok: true })) }; await expect(runRoutingValidate({ client, emit, application: 'app' })).resolves.toBe(0); expect(client.routingValidate).toHaveBeenCalledWith('app'); });
+test('returns failure status', async () => { await expect(runRoutingValidate({ client: { routingValidate: async () => ({ ok: false }) }, emit: jest.fn() })).resolves.toBe(1); });

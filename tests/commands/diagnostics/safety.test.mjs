@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runDiagnosticsSafety } from '../../../src/commands/diagnostics/safety.mjs'; test('emits diagnostics safety', async () => { const emit = jest.fn(); await runDiagnosticsSafety({ client: { safety: async () => ({ ok: true }) }, emit }); expect(emit).toHaveBeenCalledWith({ ok: true }); });

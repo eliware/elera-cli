@@ -1,0 +1,3 @@
+import { jest } from '@jest/globals'; import { runClusterPlan, runClusterAction } from '../../../src/commands/cluster/lifecycle.mjs';
+test('plans and executes cluster actions', async () => { const emit = jest.fn(); const client = { lifecyclePlan: async (action, options) => ({ action, options }), lifecycle: async (action, options) => ({ action, options }) }; await runClusterPlan({ client, emit, action: 'join', target: 'elera-1' }); await runClusterAction({ client, emit, action: 'join', target: 'elera-1' }); expect(emit).toHaveBeenCalledTimes(2); });
+test('requires a cluster plan action', async () => { await expect(runClusterPlan({ client: {}, emit: jest.fn() })).rejects.toThrow('cluster-plan requires an action'); });

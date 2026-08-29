@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestoreAccountsPlan } from '../../../src/commands/restore/accounts-plan.mjs'; test('plans account restore', async () => { const emit = jest.fn(); await runRestoreAccountsPlan({ client: { restoreAccountsPlan: async (value) => value }, emit, value: '[]' }); expect(emit).toHaveBeenCalledWith([]); });

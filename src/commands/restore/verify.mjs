@@ -1,0 +1,1 @@
+export async function runRestoreVerify({ client, restoreVerify, emit, database, identity, root }) { const bundle = await client.lease(database, identity); const result = await restoreVerify({ bundle, restoreRoot: root }); emit({ ok: true, operation: 'restore-verify', data: result }); return 0; }

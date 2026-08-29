@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runMigrationDiagnostics } from '../../../src/commands/diagnostics/migration.mjs'; test('maps migration diagnostics', async () => { const emit = jest.fn(); await expect(runMigrationDiagnostics({ diagnose: async () => ({ ok: false }), emit, endpoint: 'x' })).resolves.toBe(1); });

@@ -1,0 +1,1 @@
+export async function runBackupVerify({ client, verifyBackup, emit, database, identity, root }) { const bundle = await client.lease(database, identity); const result = await verifyBackup({ bundle, backupPath: root }); emit({ ok: true, operation: 'verify-backup', data: result }); return 0; }

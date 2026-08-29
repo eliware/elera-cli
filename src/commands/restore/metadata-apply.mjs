@@ -1,0 +1,1 @@
+export async function runRestoreMetadataApply({ client, emit, value }) { const result = await client.restoreMetadataApply(JSON.parse(value ?? '{}')); emit(result); return result.ok === false ? 1 : 0; }

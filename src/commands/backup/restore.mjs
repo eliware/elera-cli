@@ -1,0 +1,1 @@
+export async function runRestore({ client, restore, emit, database, identity, file }) { const bundle = await client.lease(database, identity); await restore(bundle, file); emit({ ok: true, operation: 'restore' }); return 0; }

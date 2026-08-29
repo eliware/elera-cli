@@ -1,0 +1,2 @@
+import { jest } from '@jest/globals'; import { runAccountCreate } from '../../../src/commands/account/create.mjs';
+test('creates an account with grants', async () => { const provisionAccount = jest.fn(async () => ({ ok: true })); await runAccountCreate({ client: { provisionAccount }, emit: jest.fn(), user: 'u', database: 'db', grants: 'SELECT,INSERT' }); expect(provisionAccount.mock.calls[0][0].grants).toEqual(['SELECT', 'INSERT']); });

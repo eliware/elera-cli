@@ -1,0 +1,3 @@
+import { expect, jest, test } from '@jest/globals'; import { runRecoveryAcknowledge } from '../../../src/commands/recovery/acknowledge.mjs';
+test('acknowledges recovery', async () => { const emit = jest.fn(); const client = { recoveryAcknowledge: jest.fn(async () => ({ ok: true })) }; await expect(runRecoveryAcknowledge({ client, emit, reason: 'ok' })).resolves.toBe(0); expect(client.recoveryAcknowledge).toHaveBeenCalledWith('ok'); });
+test('returns failure status', async () => { await expect(runRecoveryAcknowledge({ client: { recoveryAcknowledge: async () => ({ ok: false }) }, emit: jest.fn() })).resolves.toBe(1); });

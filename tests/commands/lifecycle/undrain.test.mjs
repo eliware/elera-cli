@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runUndrain } from '../../../src/commands/lifecycle/undrain.mjs'; test('runs undrain', async () => { const emit = jest.fn(); const lifecycle = { undrain: async () => ({ ok: true }), classify: () => 0 }; await expect(runUndrain({ lifecycle, emit })).resolves.toBe(0); });

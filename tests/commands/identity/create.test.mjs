@@ -1,0 +1,2 @@
+import { jest } from '@jest/globals'; import { runIdentityCreate } from '../../../src/commands/identity/create.mjs';
+test('creates an identity with normalized grants', async () => { const provisionIdentity = jest.fn(async () => ({ ok: true })); await runIdentityCreate({ client: { provisionIdentity }, emit: jest.fn(), application: 'app', database: 'db', identity: 'runtime', grants: 'SELECT, INSERT' }); expect(provisionIdentity.mock.calls[0][0].grants).toEqual(['SELECT', 'INSERT']); });

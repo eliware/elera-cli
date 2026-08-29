@@ -1,0 +1,1 @@
+export async function runDump({ client, dump, emit, database, identity, file }) { const bundle = await client.lease(database, identity); await dump(bundle, file); emit({ ok: true, operation: 'dump' }); return 0; }

@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
+import { generate as generateSnowflake } from "@eliware/snowflake";
 import { connect, sshExec } from "@eliware/ssh-client";
 
 const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
@@ -32,7 +32,7 @@ export async function syncToNas({
   prepareRemote = true,
   finalizeRemote = true,
   notify = async () => {},
-  stagePath = `${remotePath}.staging-${process.pid}-${randomUUID()}`,
+  stagePath = `${remotePath}.staging-${process.pid}-${generateSnowflake()}`,
 }) {
   if (dryRun) return remotePath;
   try {

@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runLifecycleStatus } from '../../../src/commands/lifecycle/status.mjs'; test('reads lifecycle status', async () => { const lifecycle = { nodeStatus: async () => ({ ok: true }), classify: () => 0 }; await expect(runLifecycleStatus({ lifecycle, emit: jest.fn() })).resolves.toBe(0); });

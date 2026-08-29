@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestore } from '../../../src/commands/backup/restore.mjs'; test('streams a database restore', async () => { const restore = jest.fn(); await runRestore({ client: { lease: async () => ({}) }, restore, emit: jest.fn(), database: 'db', identity: 'id', file: 'x' }); expect(restore).toHaveBeenCalledWith({}, 'x'); });

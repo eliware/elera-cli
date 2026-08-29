@@ -1,0 +1,3 @@
+import { expect, jest, test } from '@jest/globals'; import { runRoutingRebalance } from '../../../src/commands/routing/rebalance.mjs';
+test('rebalances routing', async () => { const emit = jest.fn(); const client = { routingRebalance: jest.fn(async () => ({ ok: true })) }; await expect(runRoutingRebalance({ client, emit, application: 'app' })).resolves.toBe(0); expect(client.routingRebalance).toHaveBeenCalledWith('app'); });
+test('returns failure status', async () => { await expect(runRoutingRebalance({ client: { routingRebalance: async () => ({ ok: false }) }, emit: jest.fn() })).resolves.toBe(1); });

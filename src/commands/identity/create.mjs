@@ -1,0 +1,1 @@
+export async function runIdentityCreate({ client, emit, application, database, identity, purpose = 'runtime', grants = 'SELECT' }) { emit(await client.provisionIdentity({ application, database, identity, purpose, grants: grants.split(',').map((grant) => grant.trim()).filter(Boolean) })); return 0; }

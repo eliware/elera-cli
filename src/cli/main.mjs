@@ -16,6 +16,94 @@ import { readFile } from "node:fs/promises";
 import { createLifecycleCommands } from "../commands/lifecycle.mjs";
 import { exitCodes } from "../operations/exit-codes.mjs";
 import { formatHuman } from "../output/format.mjs";
+import { runColdBootstrap } from "../commands/cold-bootstrap.mjs";
+import { parseArguments, helpPaths } from "./parser.mjs";
+import {
+  confirmationCommands,
+  directedCommands,
+  mutatingCommands,
+  schemaFor,
+} from "./command-spec.mjs";
+import { runHealthStatus } from "../commands/health/status.mjs";
+import { runHealthReady } from "../commands/health/ready.mjs";
+import { runTelemetrySummary } from "../commands/telemetry/summary.mjs";
+import { runTelemetryDetail } from "../commands/telemetry/detail.mjs";
+import { runTelemetryConnections } from "../commands/telemetry/connections.mjs";
+import { runAssignment, runBundleVersion } from "../commands/routing/assignment.mjs";
+import { runRoutes } from "../commands/routing/routes.mjs";
+import { runBundle } from "../commands/routing/bundle.mjs";
+import { runResync } from "../commands/routing/resync.mjs";
+import { runRoutingValidate } from "../commands/routing/validate.mjs";
+import { runRoutingEvents } from "../commands/routing/events.mjs";
+import { runRoutingRebalance } from "../commands/routing/rebalance.mjs";
+import { runRecoveryStatus } from "../commands/recovery/status.mjs";
+import { runRecoveryEvents } from "../commands/recovery/events.mjs";
+import { runRecoveryAcknowledge } from "../commands/recovery/acknowledge.mjs";
+import { runRecoveryAbort } from "../commands/recovery/abort.mjs";
+import { runRoutingWatch } from "../commands/routing/watch.mjs";
+import { runTelemetryWatch } from "../commands/telemetry/watch.mjs";
+import { runInitializationStatus } from "../commands/initialization/status.mjs";
+import { runInitializationPlan } from "../commands/initialization/plan.mjs";
+import { runInitializationApply } from "../commands/initialization/apply.mjs";
+import { runInitializationVerify } from "../commands/initialization/verify.mjs";
+import { runClusterStatus, runClusterObservations, runClusterQuorum } from "../commands/cluster/status.mjs";
+import { runClusterPlan, runClusterAction } from "../commands/cluster/lifecycle.mjs";
+import { runClusterBootstrap } from "../commands/cluster/bootstrap.mjs";
+import { runClusterJoin } from "../commands/cluster/join.mjs";
+import { runConfigInspect } from "../commands/configuration/inspect.mjs";
+import { runConfigPlan } from "../commands/configuration/plan.mjs";
+import { runConfigApply } from "../commands/configuration/apply.mjs";
+import { runConfigVerify } from "../commands/configuration/verify.mjs";
+import { runMetadataStatus } from "../commands/metadata/status.mjs";
+import { runMetadataInitialize } from "../commands/metadata/initialize.mjs";
+import { runMetadataVerify } from "../commands/metadata/verify.mjs";
+import { runReconcile } from "../commands/metadata/reconcile.mjs";
+import { runDatabaseList } from "../commands/database/list.mjs";
+import { runDatabaseCreate } from "../commands/database/create.mjs";
+import { runDatabasePlan } from "../commands/database/plan.mjs";
+import { runDatabaseVerify } from "../commands/database/verify.mjs";
+import { runIdentityList } from "../commands/identity/list.mjs";
+import { runIdentityCreate } from "../commands/identity/create.mjs";
+import { runIdentityRotate } from "../commands/identity/rotate.mjs";
+import { runAccountCreate } from "../commands/account/create.mjs";
+import { runAccountList } from "../commands/account/list.mjs";
+import { runAccountRevoke } from "../commands/account/revoke.mjs";
+import { runAccountVerify } from "../commands/account/verify.mjs";
+import { runTokenCreate } from "../commands/token/create.mjs";
+import { runTokenList } from "../commands/token/list.mjs";
+import { runTokenRevoke } from "../commands/token/revoke.mjs";
+import { runTokenRotate } from "../commands/token/rotate.mjs";
+import { runSecretList } from "../commands/secrets/list.mjs";
+import { runSecretGet } from "../commands/secrets/get.mjs";
+import { runSecretVerify } from "../commands/secrets/verify.mjs";
+import { runSecretDelete } from "../commands/secrets/delete.mjs";
+import { runDump } from "../commands/backup/dump.mjs";
+import { runRestore } from "../commands/backup/restore.mjs";
+import { runBackup } from "../commands/backup/create.mjs";
+import { runBackupVerify } from "../commands/backup/verify.mjs";
+import { runBackupPlan } from "../commands/backup/plan.mjs";
+import { runRestoreVerify } from "../commands/restore/verify.mjs";
+import { runRestorePlan } from "../commands/restore/plan.mjs";
+import { runRestoreArtifact } from "../commands/restore/artifact.mjs";
+import { runRestoreMetadataPlan } from "../commands/restore/metadata-plan.mjs";
+import { runRestoreMetadataApply } from "../commands/restore/metadata-apply.mjs";
+import { runRestoreAccountsPlan } from "../commands/restore/accounts-plan.mjs";
+import { runRestoreAccountsApply } from "../commands/restore/accounts-apply.mjs";
+import { runRestoreAccountsVerify } from "../commands/restore/accounts-verify.mjs";
+import { runDrain } from "../commands/lifecycle/drain.mjs";
+import { runUndrain } from "../commands/lifecycle/undrain.mjs";
+import { runDrainStatus } from "../commands/lifecycle/drain-status.mjs";
+import { runStop } from "../commands/lifecycle/stop.mjs";
+import { runLifecycleStatus } from "../commands/lifecycle/status.mjs";
+import { runLifecycleRecover } from "../commands/lifecycle/recover.mjs";
+import { runMigrationDiagnostics } from "../commands/diagnostics/migration.mjs";
+import { runSqlSmoke } from "../commands/smoke/sql.mjs";
+import { handleEarlyExit } from "./early-exit.mjs";
+import { createClientContext, resolveTargetEndpoint } from "./client-context.mjs";
+import { dispatchLifecycle } from "./dispatch/lifecycle.mjs";
+import { dispatchReadOnly } from "./dispatch/read-only.mjs";
+import { dispatchManagement } from "./dispatch/management.mjs";
+import { dispatchBackupRestore } from "./dispatch/backup-restore.mjs";
 
 export async function runCli({
   argv = process.argv.slice(2),
@@ -38,385 +126,72 @@ export async function runCli({
     dependencies.restoreArtifact ?? restoreArtifact;
   const createDb = dependencies.createDbFromBundle ?? createDbFromBundle;
   const createLive = dependencies.createLiveDb ?? createLiveDb;
-  const command = argv[0];
+  const parsed = parseArguments(argv);
+  const command = parsed.command;
+  const commandArgv = parsed.argv;
   const jsonOutput = argv.includes("--json");
+  const operationId = commandArgv.find((value) => value.startsWith("--operation-id="))?.slice("--operation-id=".length);
+  const explicitTarget = commandArgv.find((value) => value.startsWith("--target-endpoint="))?.slice("--target-endpoint=".length);
+  const targetHost = directedCommands.has(command) && commandArgv[1] && !commandArgv[1].startsWith("--") ? commandArgv[1] : undefined;
   const emit = (value) =>
     output.write(jsonOutput ? JSON.stringify(value) + "\n" : formatHuman(value) + "\n");
-  if (command === "--help" || command === undefined) {
-    emit(
-      "elera-cli <health|ready|status|node-status|routes|bundle|routing-resync|drain|drain-status|undrain|stop|recover|...> [--json]",
-    );
-    return 0;
-  }
-  if (command === "--version") {
-    output.write("0.1.0\n");
-    return 0;
-  }
+  const earlyExit = handleEarlyExit({ argv, parsed, emit, output, errorOutput });
+  if (earlyExit !== undefined) return earlyExit;
+  argv = commandArgv;
   const lifecycleCommands = {
     "cluster-bootstrap": "bootstrap",
     "cluster-join": "join",
     "cluster-leave": "leave",
     "cluster-recover": "recover",
   };
-  if (
-    ![
-      "health",
-      "ready",
-      "status",
-      "preflight",
-      "routes",
-      "bundle",
-      "routing-resync",
-      "drain",
-      "undrain",
-      "drain-status",
-      "node-status",
-      "stop",
-      "recover",
-      "migration-check",
-      "config-inspect",
-      "config-plan",
-      "config-apply",
-      "config-verify",
-      "metadata-status",
-      "metadata-init",
-      "metadata-verify",
-      "reconcile-plan",
-      "reconcile-apply",
-      "reconcile-verify",
-      "restore-metadata-plan",
-      "restore-metadata-apply",
-      "restore-accounts-plan",
-      "restore-accounts-apply",
-      "restore-accounts-verify",
-      "backup",
-      "verify-backup",
-      "restore-verify",
-      "restore-artifact",
-      "secret-list",
-      "secret-get",
-      "secret-put",
-      "secret-verify",
-      "secret-delete",
-      "secret-materialize",
-      "dump",
-      "restore",
-      "database-list",
-      "database-create",
-      "identity-list",
-      "identity-create",
-      "identity-rotate",
-      "account-create",
-      "account-revoke",
-      "account-verify",
-      "token-create",
-      "token-revoke",
-      "cluster-status",
-      "cluster-observations",
-      "cluster-quorum",
-      "cluster-plan",
-      ...Object.keys(lifecycleCommands),
-      "sql-smoke",
-    ].includes(command)
-  ) {
-    errorOutput.write(`unknown command: ${command}\n`);
-    return exitCodes.invalid;
+  if ((command === "cold-bootstrap" || command === "cold-recover") && commandArgv.includes("--confirm") === false && commandArgv.includes("--dry-run") === false) {
+    errorOutput.write(`${command} requires --confirm or --dry-run\n`);
   }
-  if (command === "metadata-init" && !argv.includes("--confirm")) {
-    errorOutput.write("metadata-init requires --confirm\n");
-    return exitCodes.invalid;
+  if (mutatingCommands.has(command) && argv.includes("--dry-run")) {
+    emit({ ok: true, operation: command, status: "planned", operationId: operationId ?? null, data: { arguments: argv.slice(1).filter((value) => !value.startsWith("--")) } });
+    return 0;
   }
-  if (lifecycleCommands[command] && !argv.includes("--confirm")) {
+  if (confirmationCommands.has(command) && !argv.includes("--confirm") && !argv.includes("--dry-run")) {
     errorOutput.write(`${command} requires --confirm\n`);
     return exitCodes.invalid;
   }
   try {
     const config = loadCliConfig(environment);
-    const client = supervisorClient(config);
+    const targetEndpoint = resolveTargetEndpoint({ config, explicitTarget, targetHost });
+    const { client, controlClient } = createClientContext({ config, createClient: supervisorClient, targetEndpoint, operationId });
     const artifactCommands = createArtifactCommands({
       client,
       age: dependencies.age ?? createAgeProcess({ environment }),
       materialize: dependencies.materialize,
       emit,
     });
-    if (command.startsWith("secret-")) {
-      await artifactCommands(command, argv.slice(1));
-      return 0;
-    }
+    if (command === "restore-artifact" && (!argv[1] || !argv.includes("--confirm"))) { errorOutput.write("restore-artifact requires a path and --confirm\n"); return exitCodes.invalid; }
+    const backupRestoreResult = await dispatchBackupRestore({ command, client, emit, args: argv.slice(1), config, artifactCommands: async (name, args) => { const secretHandlers = { "secret-list": runSecretList, "secret-get": runSecretGet, "secret-verify": runSecretVerify, "secret-delete": runSecretDelete }; if (secretHandlers[name]) return secretHandlers[name]({ client, emit, name: args[0] }); await artifactCommands(name, args); return 0; }, operations: { native: ({ client: targetClient, emit: targetEmit, database, identity, file }) => (command === "dump" ? runDump : runRestore)({ client: targetClient, dump, restore, emit: targetEmit, database, identity, file }), backup: ({ client: targetClient, emit: targetEmit, database, identity, root, databases }) => runBackup({ client: targetClient, createBackup, emit: targetEmit, database, identity, root, databases }), verify: ({ client: targetClient, emit: targetEmit, database, identity, root }) => runBackupVerify({ client: targetClient, verifyBackup, emit: targetEmit, database, identity, root }), restoreVerify: ({ client: targetClient, emit: targetEmit, database, identity, root }) => runRestoreVerify({ client: targetClient, restoreVerify, emit: targetEmit, database, identity, root }), artifact: ({ client: targetClient, emit: targetEmit, database, identity, root }) => runRestoreArtifact({ client: targetClient, restoreArtifact: restoreArtifactOperation, emit: targetEmit, database, identity, root }), metadata: ({ client: targetClient, emit: targetEmit, command: operation, value }) => (operation === "restore-metadata-plan" ? runRestoreMetadataPlan : runRestoreMetadataApply)({ client: targetClient, emit: targetEmit, value }), accounts: ({ client: targetClient, emit: targetEmit, command: operation, value }) => (operation === "restore-accounts-plan" ? runRestoreAccountsPlan : operation === "restore-accounts-apply" ? runRestoreAccountsApply : runRestoreAccountsVerify)({ client: targetClient, emit: targetEmit, value }) } });
+    if (backupRestoreResult !== undefined) return backupRestoreResult;
     if (command === "migration-check" || command === "preflight") {
       const diagnose = dependencies.migrationDiagnostics ?? createMigrationDiagnostics();
       const configPath = argv.slice(1).find((argument) => !argument.startsWith("--"));
-      const result = await diagnose({ endpoint: config.endpoint, configPath });
+      return await runMigrationDiagnostics({ diagnose, emit, endpoint: config.endpoint, configPath });
+    }
+    const readOnlyResult = await dispatchReadOnly({ command, client, emit, application: argv[1], identity: config.identity, handlers: { health: runHealthStatus, ready: runHealthReady, initializationStatus: runInitializationStatus, initializationVerify: runInitializationVerify, initializationPlan: runInitializationPlan, telemetry: runTelemetrySummary, telemetryDetail: runTelemetryDetail, connections: runTelemetryConnections, telemetryWatch: (value) => runTelemetryWatch({ ...value, endpoint: config.endpoint, token: config.token, identity: config.identity, once: argv.includes('--once') }), clusterStatus: runClusterStatus, clusterObservations: runClusterObservations, nodeEvidence: async ({ client: targetClient, emit: targetEmit }) => { targetEmit(await targetClient.coldBootstrapEvidence()); return 0; }, clusterQuorum: runClusterQuorum, assignment: runAssignment, bundleVersion: runBundleVersion, routes: runRoutes, bundle: runBundle, resync: runResync, routingValidate: runRoutingValidate, routingEvents: runRoutingEvents, routingWatch: (value) => runRoutingWatch({ ...value, endpoint: config.endpoint, token: config.token, identity: config.identity, once: argv.includes('--once') }), recoveryStatus: runRecoveryStatus, recoveryEvents: runRecoveryEvents, configInspect: runConfigInspect, configVerify: runConfigVerify, metadataStatus: runMetadataStatus, metadataVerify: runMetadataVerify, databaseList: runDatabaseList, identityList: runIdentityList, accountList: runAccountList, tokenList: runTokenList } });
+    if (readOnlyResult !== undefined) return readOnlyResult;
+    const managementResult = await dispatchManagement({ command, client, controlClient, emit, args: argv.slice(1), handlers: { initializationApply: runInitializationApply, standaloneInit: async ({ client: targetClient, emit: targetEmit }) => { const plan = await targetClient.initializationPlan(); if (argv.includes("--dry-run")) { targetEmit({ ok: plan.data?.database === "elera_meta", operation: "standalone-init", status: "planned", data: plan.data ?? plan }); return plan.data?.database === "elera_meta" ? 0 : 1; } targetEmit(await targetClient.initializationApply()); return 0; }, configApply: runConfigApply, metadataInitialize: runMetadataInitialize, reconcile: runReconcile, databaseCreate: runDatabaseCreate, databasePlan: runDatabasePlan, databaseVerify: runDatabaseVerify, identityCreate: runIdentityCreate, identityRotate: runIdentityRotate, accountCreate: runAccountCreate, accountRevoke: runAccountRevoke, accountVerify: runAccountVerify, tokenCreate: runTokenCreate, tokenRevoke: runTokenRevoke, tokenRotate: runTokenRotate, recoveryAcknowledge: runRecoveryAcknowledge, recoveryAbort: runRecoveryAbort, routingRebalance: runRoutingRebalance } });
+    if (managementResult !== undefined) return managementResult;
+    if (command === "cold-bootstrap" || command === "cold-recover") {
+      const result = await runColdBootstrap({ client: controlClient, confirm: argv.includes("--confirm"), dryRun: argv.includes("--dry-run"), operationId: argv.find((value) => value.startsWith("--operation-id="))?.split("=")[1] });
       emit(result);
-      return result.ok ? 0 : 1;
-    }
-    if (command === "health") {
-      const result = await client.health();
-      emit(result);
-      return result.ok ? 0 : 1;
-    }
-    if (command === "ready") {
-      const result = await client.ready();
-      emit(result);
-      return result.ok && result.status === "ok" ? 0 : 1;
-    }
-    if (command === "status") {
-      emit(await client.status());
-      return 0;
-    }
-    if (command === "routes") {
-      emit(await client.routes(argv[1]));
-      return 0;
-    }
-    if (command === "bundle") {
-      emit(await client.routingBundle(argv[1] ?? config.identity));
-      return 0;
-    }
-    if (command === "routing-resync") {
-      emit(await client.resync(argv[1]));
-      return 0;
+      return result.ok === false ? 1 : 0;
     }
     const lifecycle = createLifecycleCommands({ client, timeoutMs: Number(environment.ELERA_DRAIN_TIMEOUT_MS ?? 60000) });
-    if (command === "drain") { const result = await lifecycle.drain(); emit(result); return lifecycle.classify(result); }
-    if (command === "undrain") { const result = await lifecycle.undrain(); emit(result); return lifecycle.classify(result); }
-    if (command === "drain-status") { const result = await lifecycle.drainStatus(); emit(result); return lifecycle.classify(result); }
-    if (command === "stop") { const result = await lifecycle.stop(); emit(result); return lifecycle.classify(result); }
-    if (command === "node-status") { const result = await lifecycle.nodeStatus(); emit(result); return lifecycle.classify(result); }
-    if (command === "recover") {
-      if (!argv.includes("--confirm")) { errorOutput.write("recover requires --confirm\n"); return exitCodes.invalid; }
-      const result = await lifecycle.recover(argv[1]); emit(result); return lifecycle.classify(result);
-    }
-    if (command === "config-inspect") {
-      emit(await client.intent());
-      return 0;
-    }
-    if (command === "config-plan" || command === "config-apply") {
-      const result = await client.intent();
-      emit(
-        command === "config-apply"
-          ? await client.apply(result.data?.intent)
-          : await client.plan(result.data?.intent),
-      );
-      return 0;
-    }
-    if (command === "config-verify") {
-      emit(await client.verify());
-      return 0;
-    }
-    if (command === "metadata-status") {
-      emit(await client.metadataStatus());
-      return 0;
-    }
-    if (command === "metadata-init") {
-      emit(await client.metadataInitialize());
-      return 0;
-    }
-    if (command === "metadata-verify") {
-      const result = await client.metadataVerify();
-      emit(result);
-      return result.ok ? 0 : 1;
-    }
-    if (command.startsWith("reconcile-")) {
-      const desired = JSON.parse(argv[1] ?? "{}");
-      const result =
-        command === "reconcile-plan"
-          ? await client.reconcilePlan(desired)
-          : command === "reconcile-apply"
-            ? await client.reconcileApply(desired)
-            : await client.reconcileVerify(desired);
-      emit(result);
-      return result.ok === false ? 1 : 0;
-    }
-    if (command.startsWith("restore-metadata-")) {
-      const desired = JSON.parse(argv[1] ?? "{}");
-      const result =
-        command === "restore-metadata-plan"
-          ? await client.restoreMetadataPlan(desired)
-          : await client.restoreMetadataApply(desired);
-      emit(result);
-      return result.ok === false ? 1 : 0;
-    }
-    if (command.startsWith("restore-accounts-")) {
-      const accounts = JSON.parse(argv[1] ?? "[]");
-      const result =
-        command === "restore-accounts-plan"
-          ? await client.restoreAccountsPlan(accounts)
-          : command === "restore-accounts-apply"
-            ? await client.restoreAccountsApply(accounts)
-            : await client.restoreAccountsVerify(accounts);
-      emit(result);
-      return result.ok === false ? 1 : 0;
-    }
-    if (command === "dump" || command === "restore") {
-      const bundle = await client.lease(config.database, config.identity);
-      const file = argv[1];
-      if (!file) {
-        errorOutput.write(`${command} requires a file path\n`);
-        return exitCodes.invalid;
-      }
-      await (command === "dump" ? dump(bundle, file) : restore(bundle, file));
-      emit({ ok: true, operation: command });
-      return 0;
-    }
-    if (
-      command === "backup" ||
-      command === "verify-backup" ||
-      command === "restore-verify"
-    ) {
-      const root = argv[1];
-      if (!root) {
-        errorOutput.write(`${command} requires a backup path\n`);
-        return exitCodes.invalid;
-      }
-      const bundle = await client.lease(config.database, config.identity);
-      const metadata =
-        command === "backup"
-          ? {
-              ...(await client.metadataExport()).data,
-              accounts: (await client.exportAccounts()).accounts ?? [],
-            }
-          : undefined;
-      const result =
-        command === "backup"
-          ? await createBackup({
-              bundle,
-              backupRoot: root,
-              databases: (argv.slice(2).find((value) => !value.startsWith("--")) ?? config.database).split(","),
-              metadata,
-            })
-          : command === "verify-backup"
-            ? await verifyBackup({ bundle, backupPath: root })
-            : await restoreVerify({ bundle, restoreRoot: root });
-      emit({ ok: true, operation: command, data: result });
-      return 0;
-    }
-    if (command === "restore-artifact") {
-      const root = argv[1];
-      if (!root || !argv.includes("--confirm")) {
-        errorOutput.write("restore-artifact requires a path and --confirm\n");
-        return exitCodes.invalid;
-      }
-      const bundle = await client.lease(config.database, config.identity);
-      emit({
-        ok: true,
-        operation: command,
-        data: await restoreArtifactOperation({
-          root,
-          client,
-          bundle,
-          confirm: true,
-        }),
-      });
-      return 0;
-    }
-    if (command === "database-list") {
-      emit(await client.databases());
-      return 0;
-    }
-    if (command === "database-create") {
-      emit(await client.provisionDatabase(argv[1], argv[2]));
-      return 0;
-    }
-    if (command === "identity-list") {
-      emit(await client.identities(argv[1]));
-      return 0;
-    }
-    if (command === "identity-create") {
-      emit(
-        await client.provisionIdentity({
-          application: argv[1],
-          database: argv[2],
-          identity: argv[3],
-          purpose: argv[4] ?? "runtime",
-          grants: (argv[5] ?? "SELECT").split(",").map((grant) => grant.trim()).filter(Boolean),
-        }),
-      );
-      return 0;
-    }
-    if (command === "identity-rotate") {
-      emit(await client.rotateIdentity(argv[1]));
-      return 0;
-    }
-    if (command === "account-create") {
-      emit(
-        await client.provisionAccount({
-          user: argv[1],
-          database: argv[2],
-          host: argv[3] ?? "%",
-          grants: (argv[4] ?? "SELECT").split(","),
-        }),
-      );
-      return 0;
-    }
-    if (command === "account-revoke") {
-      emit(await client.revokeAccount({ user: argv[1], host: argv[2] ?? "%" }));
-      return 0;
-    }
-    if (command === "account-verify") {
-      emit(await client.verifyAccount({ user: argv[1], host: argv[2] ?? "%" }));
-      return 0;
-    }
-    if (command === "token-create") {
-      emit(
-        await client.createToken({
-          tokenName: argv[1],
-          application: argv[2],
-          identity: argv[3],
-          scopes: (argv[4] ?? "credential:issue").split(","),
-        }),
-      );
-      return 0;
-    }
-    if (command === "token-revoke") {
-      emit(await client.revokeToken(argv[1]));
-      return 0;
-    }
-    if (command === "cluster-status") {
-      emit(await client.status());
-      return 0;
-    }
-    if (command === "cluster-observations") {
-      emit(await client.observations());
-      return 0;
-    }
-    if (command === "cluster-quorum") {
-      const result = await client.quorum();
-      emit(result);
-      return result.data?.quorum ? 0 : 1;
-    }
+    const lifecycleResult = await dispatchLifecycle({ command, client, controlClient, lifecycle, emit, target: targetHost ?? argv[1], lifecycleCommands, handlers: { bootstrap: runClusterBootstrap, join: runClusterJoin, rejoin: async ({ client: targetClient, emit: targetEmit }) => { targetEmit(await targetClient.rejoin()); return 0; }, drain: runDrain, undrain: runUndrain, drainStatus: runDrainStatus, stop: runStop, status: runLifecycleStatus, recover: runLifecycleRecover } });
+    if (lifecycleResult !== undefined) return lifecycleResult;
+    if (command === "config-plan") return await runConfigPlan({ client, emit });
+    if (command === "backup-plan") return await runBackupPlan({ client, emit, value: argv[1] });
+    if (command === "restore-plan") return await runRestorePlan({ client, emit, value: argv[1] });
     if (command === "cluster-plan") {
-      const action = argv[1];
-      if (!action) {
-        errorOutput.write("cluster-plan requires an action\n");
-        return exitCodes.invalid;
-      }
-      emit(await client.lifecyclePlan(action, { target: argv[2] }));
-      return 0;
+      try { return await runClusterPlan({ client, emit, action: argv[1], target: argv[2] }); } catch (error) { errorOutput.write(`${error.message}\n`); return error.exitCode; }
     }
-    if (lifecycleCommands[command]) {
-      emit(
-        await client.lifecycle(lifecycleCommands[command], { target: argv[1] }),
-      );
-      return 0;
-    }
-    {
-      const bundle = await client.lease(config.database, config.identity);
-      const live = await createLive({
-        bundle,
-        endpoint: config.endpoint,
-        token: config.token,
-        application: config.database,
-        fetchBundle: async () => client.routingBundle(config.identity),
-        createDb,
-      });
-      try {
-        const [rows] = await live.db.query("SELECT 1 AS healthy");
-        emit({ ok: rows[0]?.healthy === 1 });
-        return rows[0]?.healthy === 1 ? 0 : 1;
-      } finally {
-        await live.close();
-      }
-    }
+    return await runSqlSmoke({ client, createLive, createDb, emit, config });
   } catch (error) {
     errorOutput.write(`${error.message}\n`);
     return error.statusCode === 401 || error.statusCode === 403

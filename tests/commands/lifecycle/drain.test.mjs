@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runDrain } from '../../../src/commands/lifecycle/drain.mjs'; test('runs drain', async () => { const emit = jest.fn(); const lifecycle = { drain: async () => ({ ok: true }), classify: () => 0 }; await expect(runDrain({ lifecycle, emit })).resolves.toBe(0); });

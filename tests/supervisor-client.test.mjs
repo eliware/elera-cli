@@ -28,6 +28,16 @@ test("sends bearer authentication and validates lease bundles", async () => {
     "Bearer secret",
   );
 });
+test("requires an application for telemetry details", async () => {
+  const client = createSupervisorClient({ endpoint: "https://db", token: "secret", fetchImpl: jest.fn() });
+  await expect(client.telemetryDetails()).rejects.toThrow("application is required");
+});
+test("includes an operation id when configured", async () => {
+  const fetchImpl = jest.fn(async () => ({ ok: true, json: async () => ({ ok: true }) }));
+  const client = createSupervisorClient({ endpoint: "https://db", token: "secret", operationId: "op-1", fetchImpl });
+  await client.status();
+  expect(fetchImpl.mock.calls[0][1].headers["x-elera-operation-id"]).toBe("op-1");
+});
 test("exposes the complete REST command surface and handles text errors", async () => {
   const fetchImpl = jest.fn(async () => ({
     ok: true,
@@ -48,6 +58,8 @@ test("exposes the complete REST command surface and handles text errors", async 
     fetchImpl,
   });
   await client.status();
+  await client.telemetry();
+  await client.telemetryDetails("app");
   await client.intent();
   await client.plan({});
   await client.apply({});
@@ -57,11 +69,18 @@ test("exposes the complete REST command surface and handles text errors", async 
   await client.metadataVerify();
   await client.observations();
   await client.quorum();
+  await client.coldBootstrapPlan();
+  await client.coldBootstrap({ confirm: true, idempotencyKey: "op" });
+  await client.coldBootstrapEvidence();
   await client.lifecyclePlan("drain");
   await client.lifecycleApply("drain");
   await client.lifecycle("drain");
   await client.health();
   await client.ready();
+  await client.initializationStatus();
+  await client.initializationPlan();
+  await client.initializationApply();
+  await client.initializationVerify();
   await client.routes("app");
   await client.routingBundle("runtime");
   await client.refreshRoutes({});
@@ -96,7 +115,7 @@ test("exposes the complete REST command surface and handles text errors", async 
   await client.getSecret("x");
   await client.verifySecret("x");
   await client.removeSecret("x");
-  expect(fetchImpl).toHaveBeenCalledTimes(49);
+  expect(fetchImpl).toHaveBeenCalledTimes(58);
   const fail = createSupervisorClient({
     endpoint: "https://db",
     token: "secret",

@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestoreAccountsVerify } from '../../../src/commands/restore/accounts-verify.mjs'; test('verifies account restore', async () => { const emit = jest.fn(); await expect(runRestoreAccountsVerify({ client: { restoreAccountsVerify: async () => ({ ok: true }) }, emit, value: '[]' })).resolves.toBe(0); });

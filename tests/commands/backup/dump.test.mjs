@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runDump } from '../../../src/commands/backup/dump.mjs'; test('streams a database dump', async () => { const dump = jest.fn(); await runDump({ client: { lease: async () => ({}) }, dump, emit: jest.fn(), database: 'db', identity: 'id', file: 'x' }); expect(dump).toHaveBeenCalledWith({}, 'x'); });

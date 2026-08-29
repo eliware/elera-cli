@@ -1,7 +1,7 @@
-import { randomUUID } from 'node:crypto';
+import { generate as generateSnowflake } from '@eliware/snowflake';
 
 export function createOperationRecord(action, input = {}, now = () => new Date().toISOString()) {
-  return { operationId: randomUUID(), action, requestedAt: now(), input };
+  return { operationId: generateSnowflake(), action, requestedAt: now(), input };
 }
 
 export function completeOperation(record, outcome, now = () => new Date().toISOString()) {

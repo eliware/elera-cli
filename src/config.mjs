@@ -5,9 +5,15 @@ export function loadCliConfig(environment = process.env) {
   const identity = environment.ELERA_IDENTITY;
   if (!endpoint || !/^https?:\/\//i.test(endpoint)) throw new TypeError('ELERA_API_ENDPOINT must be an HTTP(S) URL');
   if (!token) throw new TypeError('ELERA_API_TOKEN is required');
-  if (!database) throw new TypeError('ELERA_DATABASE is required');
-  if (!identity) throw new TypeError('ELERA_IDENTITY is required');
-  return { endpoint: endpoint.replace(/\/$/, ''), token, database, identity };
+  const parsed = new URL(endpoint);
+  return {
+    endpoint: endpoint.replace(/\/$/, ''),
+    protocol: environment.ELERA_API_PROTOCOL ?? parsed.protocol.replace(':', ''),
+    port: Number(environment.ELERA_API_PORT || parsed.port || (parsed.protocol === 'https:' ? 443 : 80)),
+    token,
+    ...(database ? { database } : {}),
+    ...(identity ? { identity } : {}),
+  };
 }
 
 export function redactCliConfig(config) { return { ...config, token: config?.token ? '[redacted]' : config?.token }; }

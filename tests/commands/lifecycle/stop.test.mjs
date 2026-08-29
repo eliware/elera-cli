@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runStop } from '../../../src/commands/lifecycle/stop.mjs'; test('stops through lifecycle service', async () => { const lifecycle = { stop: async () => ({ ok: true }), classify: () => 0 }; await expect(runStop({ lifecycle, emit: jest.fn() })).resolves.toBe(0); });

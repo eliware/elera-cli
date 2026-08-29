@@ -1,0 +1,1 @@
+export async function runRestoreArtifact({ client, restoreArtifact, emit, database, identity, root }) { const bundle = await client.lease(database, identity); const result = await restoreArtifact({ root, client, bundle, confirm: true }); emit({ ok: true, operation: 'restore-artifact', data: result }); return 0; }

@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestoreAccountsApply } from '../../../src/commands/restore/accounts-apply.mjs'; test('applies account restore', async () => { const emit = jest.fn(); await expect(runRestoreAccountsApply({ client: { restoreAccountsApply: async () => ({ ok: false }) }, emit, value: '[]' })).resolves.toBe(1); });

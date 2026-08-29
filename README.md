@@ -1,18 +1,39 @@
 # @eliware/elera-cli
 
 Agent-friendly Elera database operations CLI. The package consumes the
-published `@eliware/elera-lib@0.1.0` client.
+published `@eliware/elera-lib` client.
 
 The CLI will authenticate to the supervisor API with a scoped bearer token and
 use `@eliware/elera-lib` for SQL metadata operations. Large backup and restore
 streams will continue to use native `mariadb-dump` and `mariadb` subprocesses;
 they will not pass through the supervisor API as JSON.
 
-The supervisor REST API remains the CLI’s primary control interface. The
+The supervisor REST API remains the CLI's primary control interface. The
 optional WebSocket routing stream belongs inside `@eliware/elera-lib`: it
 delivers versioned routing snapshots and topology events while the library
 maintains direct MariaDB connections on port `3306`. If that stream is
 unavailable, the library refreshes its bundle through the supervisor REST API.
+
+## Command model
+
+Commands use a family/action hierarchy. Use `elera-cli --help` for families,
+`elera-cli cluster --help` for family actions, and
+`elera-cli cluster join --help` for command-specific usage and options.
+
+Examples:
+
+```text
+elera-cli health status
+elera-cli cluster status --json
+elera-cli routing bundle --target node-1
+elera-cli telemetry detail app-name
+elera-cli cluster bootstrap --confirm --operation-id bootstrap-1
+```
+
+The load-balancer endpoint is the default for ordinary API operations. Commands
+that affect a specific node require an explicit direct target. Bootstrap,
+recovery, drain, restore, and credential-destructive operations require
+`--confirm`; `--dry-run` plans without changing state.
 
 ## Current status
 
@@ -30,7 +51,7 @@ encryption for `secret-put`; `AGE_IDENTITY_FILE` is used only for local
 decryption by library workflows. Neither key is sent to the supervisor or
 persisted by the CLI.
 
-`secret-materialize <name> <command> [args...]` decrypts an artifact into a
+`secrets materialize <name> <command> [args...]` decrypts an artifact into a
 mode-restricted temporary file, appends that path to the child command, and
 removes the temporary directory when the command exits. It never writes
 plaintext to CLI output.
@@ -52,6 +73,5 @@ npm run pack
 
 Do not commit API tokens, age keys, database passwords, dumps, or decrypted
 artifacts.
-Metadata initialization is explicit and requires `elera-cli metadata-init
---confirm`; status and verification use `metadata-status` and
-`metadata-verify`.
+Metadata initialization is explicit and requires `elera-cli metadata initialize
+--confirm`; status and verification use `metadata status` and `metadata verify`.

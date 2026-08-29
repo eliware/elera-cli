@@ -1,0 +1,1 @@
+export async function runAccountCreate({ client, emit, user, database, host = '%', grants = 'SELECT' }) { emit(await client.provisionAccount({ user, database, host, grants: grants.split(',') })); return 0; }

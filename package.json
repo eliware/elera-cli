@@ -41,15 +41,17 @@
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
+    "build": "node --check src/elera-cli.mjs",
     "check": "node --check src/elera-cli.mjs",
     "typecheck": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
     "pack": "npm pack --dry-run",
-    "audit": "npm audit --omit=dev --audit-level=moderate"
+    "audit": "npm audit --ignore-scripts --omit=dev --audit-level=moderate"
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
-    "@eliware/elera-lib": "0.1.3",
+    "@eliware/elera-lib": "0.1.11",
+    "@eliware/snowflake": "^2.0.0",
     "@eliware/ssh-client": "^2.0.0"
   },
   "devDependencies": {
@@ -58,5 +60,10 @@
     "ajv-formats": "^3.0.1"
   },
   "private": true,
+  "allowScripts": {
+    "ssh2": true,
+    "cpu-features": true,
+    "unrs-resolver": true
+  },
   "jest": {}
 }

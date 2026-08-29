@@ -1,0 +1,1 @@
+import { jest } from '@jest/globals'; import { runRestoreMetadataApply } from '../../../src/commands/restore/metadata-apply.mjs'; test('applies metadata restore', async () => { const emit = jest.fn(); await expect(runRestoreMetadataApply({ client: { restoreMetadataApply: async () => ({ ok: false }) }, emit, value: '{}' })).resolves.toBe(1); });
