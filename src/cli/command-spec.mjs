@@ -17,6 +17,7 @@ export const mutatingCommands = new Set([
   'account-create', 'account-revoke', 'token-create', 'token-revoke', 'token-rotate',
   'secret-put', 'secret-delete', 'secret-materialize', 'backup', 'restore',
   'recovery-acknowledge', 'recovery-abort', 'routing-rebalance',
+  'cold-recovery-authorize', 'cold-recovery-bootstrap', 'cold-recovery-complete',
 ]);
 
 // These are the operations whose confirmation behavior is currently enforced
@@ -26,6 +27,7 @@ export const confirmationCommands = new Set([
   'cluster-bootstrap', 'cluster-join', 'cluster-leave', 'cluster-recover',
   'cluster-rejoin', 'metadata-init', 'standalone-init', 'cold-bootstrap', 'cold-recover', 'recover', 'token-rotate',
   'recovery-acknowledge', 'recovery-abort', 'routing-rebalance',
+  'cold-recovery-authorize', 'cold-recovery-bootstrap', 'cold-recovery-complete',
 ]);
 
 export const commandRequirements = Object.freeze({
@@ -46,6 +48,9 @@ export const commandRequirements = Object.freeze({
   'account-revoke': { positional: 1, label: 'user' },
   'account-verify': { positional: 1, label: 'user' },
   'token-create': { positional: 3, label: 'token, application, and identity' },
+  'cold-recovery-authorize': { positional: 1, label: 'authorization JSON' },
+  'cold-recovery-bootstrap': { positional: 1, label: 'bootstrap JSON' },
+  'cold-recovery-complete': { positional: 1, label: 'completion JSON' },
   'token-revoke': { positional: 1, label: 'token' },
   'database-plan': { positional: 1, label: 'desired database JSON' },
   'database-verify': { positional: 1, label: 'desired database JSON' },

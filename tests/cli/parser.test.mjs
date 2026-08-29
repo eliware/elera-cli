@@ -8,7 +8,8 @@ test('parses hierarchical commands and common flags', () => {
 
 test('supports family and command help', () => {
   expect(parseArguments(['routing', '--help']).help).toBe(true);
-  expect(parseArguments(['recovery', 'plan', '--help']).command).toBe('cold-bootstrap');
+  expect(parseArguments(['recovery', 'plan', '--help']).command).toBe('cold-recovery-plan');
+  expect(parseArguments(['recovery', 'bootstrap', '{"epoch":"e","winner":"elera-0"}']).command).toBe('cold-recovery-bootstrap');
   expect(helpPaths(['cluster'])).toContain('join');
 });
 

@@ -5,6 +5,8 @@ test('builds recovery endpoint requests', async () => {
   const request = jest.fn(async (path, options) => ({ path, options }));
   const endpoints = createRecoveryEndpoints(request);
   await endpoints.recoveryStatus(); await endpoints.recoveryEvents(); await endpoints.recoveryAcknowledge('ok'); await endpoints.recoveryAbort('stop');
+  await endpoints.coldRecoveryEvidence(); await endpoints.coldRecoveryStatus(); await endpoints.coldRecoveryPlan();
+  await endpoints.coldRecoveryAuthorize({ epoch: 'e' }); await endpoints.coldRecoveryBootstrap({ epoch: 'e' }); await endpoints.coldRecoveryComplete({ epoch: 'e' });
   expect(request).toHaveBeenCalledWith('/api/v1/recovery/status');
   expect(request).toHaveBeenCalledWith('/api/v1/recovery/events');
   expect(request).toHaveBeenCalledWith('/api/v1/recovery/acknowledge', expect.objectContaining({ method: 'POST' }));

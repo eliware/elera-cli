@@ -21,6 +21,9 @@ export async function dispatchManagement({ command, client, controlClient, emit,
     'recovery-acknowledge': () => handlers.recoveryAcknowledge({ client, emit, reason: args[0] }),
     'recovery-abort': () => handlers.recoveryAbort({ client, emit, reason: args[0] }),
     'routing-rebalance': () => handlers.routingRebalance({ client, emit, application: args[0] }),
+    'cold-recovery-authorize': () => handlers.coldRecoveryAuthorize({ client, emit, input: JSON.parse(args[0] ?? '{}') }),
+    'cold-recovery-bootstrap': () => handlers.coldRecoveryBootstrap({ client, emit, input: JSON.parse(args[0] ?? '{}') }),
+    'cold-recovery-complete': () => handlers.coldRecoveryComplete({ client, emit, input: JSON.parse(args[0] ?? '{}') }),
   };
   return calls[command] ? calls[command]() : undefined;
 }

@@ -2,7 +2,7 @@ const families = {
   health: { status: 'health', ready: 'ready' },
   initialization: { status: 'initialization-status', plan: 'initialization-plan', apply: 'initialization-apply', verify: 'initialization-verify', standalone: 'standalone-init' },
   telemetry: { summary: 'telemetry', detail: 'telemetry-detail', connections: 'connections', watch: 'telemetry-watch' },
-  recovery: { status: 'recovery-status', events: 'recovery-events', acknowledge: 'recovery-acknowledge', abort: 'recovery-abort', evidence: 'node-evidence', plan: 'cold-bootstrap', apply: 'cold-bootstrap' },
+  recovery: { status: 'recovery-status', events: 'recovery-events', acknowledge: 'recovery-acknowledge', abort: 'recovery-abort', evidence: 'cold-recovery-evidence', plan: 'cold-recovery-plan', authorize: 'cold-recovery-authorize', bootstrap: 'cold-recovery-bootstrap', complete: 'cold-recovery-complete', apply: 'cold-bootstrap' },
   cluster: { status: 'cluster-status', observations: 'cluster-observations', evidence: 'node-evidence', quorum: 'cluster-quorum', plan: 'cluster-plan', bootstrap: 'cluster-bootstrap', join: 'cluster-join', leave: 'cluster-leave', rejoin: 'cluster-rejoin', recover: 'cluster-recover', 'startup-status': 'node-status' },
   routing: { status: 'assignment-status', routes: 'routes', bundle: 'bundle', 'bundle-version': 'bundle-version', validate: 'routing-validate', events: 'routing-events', rebalance: 'routing-rebalance', watch: 'routing-watch', resync: 'routing-resync', drain: 'drain', 'drain-status': 'drain-status', undrain: 'undrain' },
   lifecycle: { status: 'node-status', 'node-status': 'node-status', drain: 'drain', 'drain-status': 'drain-status', undrain: 'undrain', stop: 'stop', 'shutdown-status': 'drain-status' },
