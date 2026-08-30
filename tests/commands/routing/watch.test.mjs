@@ -36,3 +36,12 @@ test('forwards stream updates and stops on a lifecycle signal', async () => {
     expect(close).toHaveBeenCalled();
   } finally { process.once = oldOnce; }
 });
+test('reports malformed stream messages and websocket errors', async () => {
+  const emit = jest.fn(); const onError = jest.fn();
+  class FakeWebSocket { constructor() { this.readyState = 1; queueMicrotask(() => { this.onmessage?.({ data: '{' }); this.onerror?.(new Error('socket')); }); } close() {} }
+  const client = { routingBundle: jest.fn() };
+  const pending = runRoutingWatch({ client, emit, endpoint: 'http://router', token: 'token', identity: 'id', WebSocketImpl: FakeWebSocket });
+  await new Promise((resolve) => queueMicrotask(resolve));
+  process.emit('SIGINT');
+  await expect(pending).resolves.toBe(0);
+});

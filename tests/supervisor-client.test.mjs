@@ -6,7 +6,7 @@ test("sends bearer authentication and validates lease bundles", async () => {
     ok: true,
     json: async () => ({
       data: {
-        database: "app",
+        apiVersion: "v1", application: "app", nodeIdentity: "node-1", bundleVersion: 1, ports: { sql: 3306, http: 8080 }, writer: { host: "sql0", port: 3306 }, readers: [{ host: "sql0", port: 3306 }], failover: [], database: "app",
         identity: "runtime",
         credentials: { username: "u", password: "p" },
         routes: {
@@ -44,10 +44,10 @@ test("exposes the complete REST command surface and handles text errors", async 
     json: async () => ({
       ok: true,
       data: {
-        database: "app",
+        apiVersion: "v1", application: "app", nodeIdentity: "node-1", bundleVersion: 1, ports: { sql: 3306, http: 8080 }, writer: { host: "sql0", port: 3306 }, readers: [{ host: "sql0", port: 3306 }], failover: [], database: "app",
         identity: "runtime",
         credentials: { username: "u", password: "p" },
-        routes: { primary: [{ host: "sql0", port: 3306 }] },
+        routes: { primary: [{ host: "sql0", port: 3306 }], balanced: [{ host: "sql0", port: 3306 }] },
         expiresAt: "2099-01-01",
       },
     }),
@@ -132,10 +132,10 @@ test("exposes the complete REST command surface and handles text errors", async 
 
 test("uses default query values and accepts unwrapped routing and credential bundles", async () => {
   const bundle = {
-    database: "app",
+    apiVersion: "v1", application: "app", nodeIdentity: "node-1", bundleVersion: 1, ports: { sql: 3306, http: 8080 }, writer: { host: "sql0", port: 3306 }, readers: [{ host: "sql0", port: 3306 }], failover: [], database: "app",
     identity: "runtime",
     credentials: { username: "u", password: "p" },
-    routes: { primary: [{ host: "sql0", port: 3306 }] },
+    routes: { primary: [{ host: "sql0", port: 3306 }], balanced: [{ host: "sql0", port: 3306 }] },
     expiresAt: "2099-01-01",
   };
   const fetchImpl = jest.fn(async () => ({

@@ -5,17 +5,13 @@ const bundle = { database: 'app', credentials: { username: 'u', password: 'p' },
 
 test('creates a bundled SQL client and attaches the routing stream', async () => {
   const db = { attachRoutingStream: jest.fn(async () => {}), close: jest.fn(async () => {}) };
-  const stream = { close: jest.fn() };
   const createDb = jest.fn(async () => db);
-  const createStream = jest.fn(() => stream);
-  const live = await createLiveDb({ bundle, endpoint: 'http://supervisor', token: 'token', application: 'app', fetchBundle: jest.fn(), createDb, createStream });
-  expect(createStream).toHaveBeenCalledWith(expect.objectContaining({ endpoint: 'http://supervisor', token: 'token', application: 'app' }));
-  expect(db.attachRoutingStream).toHaveBeenCalledWith(stream);
+  const live = await createLiveDb({ bundle, endpoint: 'http://supervisor', token: 'token', fetchBundle: jest.fn(), createDb });
+  expect(createDb).toHaveBeenCalledWith({ endpoint: 'http://supervisor', token: 'token' });
   await live.close();
-  expect(stream.close).toHaveBeenCalled();
   expect(db.close).toHaveBeenCalled();
 });
 
 test('requires complete live-client inputs', async () => {
-  await expect(createLiveDb()).rejects.toThrow('bundle, endpoint, token, and fetchBundle are required');
+  await expect(createLiveDb()).rejects.toThrow('bundle, endpoint, token, fetchBundle, and createDb are required');
 });

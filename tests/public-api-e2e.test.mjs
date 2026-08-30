@@ -12,7 +12,7 @@ test('executes cold bootstrap through public HTTP endpoints only', async () => {
   const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => responses.shift() }));
   const jsonRequest = async (...args) => (await fetchImpl(...args)).json();
   const output = stream();
-  expect(await runCli({ argv: ['recovery', 'apply', '--confirm', '--operation-id=e2e', '--json'], environment: { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }, output, errorOutput: stream(), dependencies: { createSupervisorClient: (config) => ({ coldBootstrapPlan: () => jsonRequest(`${config.endpoint}/api/v1/cluster/cold-bootstrap/plan`), coldBootstrap: (input) => jsonRequest(`${config.endpoint}/api/v1/cluster/cold-bootstrap`, { body: JSON.stringify(input) }), ready: () => jsonRequest(`${config.endpoint}/readyz`) }) } })).toBe(0);
+  expect(await runCli({ argv: ['recovery', 'apply', '--confirm', '--operation-id=e2e', '--json'], environment: { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_CLI_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }, output, errorOutput: stream(), dependencies: { createSupervisorClient: (config) => ({ coldBootstrapPlan: () => jsonRequest(`${config.endpoint}/api/v1/cluster/cold-bootstrap/plan`), coldBootstrap: (input) => jsonRequest(`${config.endpoint}/api/v1/cluster/cold-bootstrap`, { body: JSON.stringify(input) }), ready: () => jsonRequest(`${config.endpoint}/readyz`) }) } })).toBe(0);
   expect(fetchImpl).toHaveBeenCalledTimes(3);
   expect(JSON.parse(output.value).status).toBe('completed');
 });

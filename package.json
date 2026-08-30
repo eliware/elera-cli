@@ -46,12 +46,11 @@
     "typecheck": "node --check src/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
     "pack": "npm pack --dry-run",
-    "audit": "npm audit --ignore-scripts --omit=dev --audit-level=moderate"
+    "audit": "node scripts/run-audit.mjs"
   },
   "dependencies": {
     "@eliware/common": "^2.0.0",
-    "@eliware/elera-client": "0.3.0",
-    "@eliware/elera-lib": "^0.3.0",
+    "@eliware/elera-lib": "file:../elera-lib",
     "@eliware/snowflake": "^2.0.0",
     "@eliware/ssh-client": "^2.0.0"
   },

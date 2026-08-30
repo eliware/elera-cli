@@ -1,2 +1,3 @@
 import { jest } from '@jest/globals'; import { runInitializationApply } from '../../../src/commands/initialization/apply.mjs';
 test('applies initialization', async () => { const emit = jest.fn(); await runInitializationApply({ client: { initializationApply: async () => ({ ok: true }) }, emit }); expect(emit).toHaveBeenCalledWith({ ok: true }); });
+test('emits a failed initialization response without changing the command exit contract', async () => { const emit = jest.fn(); await expect(runInitializationApply({ client: { initializationApply: async () => ({ ok: false, error: 'already initialized' }) }, emit })).resolves.toBe(0); expect(emit).toHaveBeenCalledWith({ ok: false, error: 'already initialized' }); });

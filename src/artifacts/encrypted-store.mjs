@@ -1,4 +1,4 @@
-import { createMaterializer } from "@eliware/elera-lib";
+import { createMaterializer } from "../internal/artifacts/materializer.mjs";
 
 const AGE_HEADER = "age-encryption.org/";
 

@@ -16,7 +16,7 @@ test('dispatches explicit lifecycle commands to the supervisor', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, options) => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ ok: true, operation: url, request: JSON.parse(options.body) }) });
   try {
-    const code = await runCli({ argv: context.args, environment: { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_API_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }, ...context.streams });
+    const code = await runCli({ argv: context.args, environment: { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_CLI_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }, ...context.streams });
     expect(code).toBe(0);
     expect(JSON.parse(context.output.text).request).toMatchObject({ action: 'join', target: 'node-a', confirm: true });
   } finally { globalThis.fetch = originalFetch; }

@@ -1,6 +1,5 @@
 import { loadCliConfig } from "../config.mjs";
 import { createSupervisorClient } from "../supervisor-client.mjs";
-import { createDbFromBundle } from "@eliware/elera-lib";
 import { dumpDatabase, restoreDatabase } from "../backup/native-stream.mjs";
 import {
   createBackupFromBundle,
@@ -47,6 +46,7 @@ import { runInitializationStatus } from "../commands/initialization/status.mjs";
 import { runInitializationPlan } from "../commands/initialization/plan.mjs";
 import { runInitializationApply } from "../commands/initialization/apply.mjs";
 import { runInitializationVerify } from "../commands/initialization/verify.mjs";
+import { runStandaloneInitialization } from "../commands/initialization/standalone.mjs";
 import { runClusterStatus, runClusterObservations, runClusterQuorum } from "../commands/cluster/status.mjs";
 import { runClusterPlan, runClusterAction } from "../commands/cluster/lifecycle.mjs";
 import { runClusterBootstrap } from "../commands/cluster/bootstrap.mjs";
@@ -125,7 +125,7 @@ export async function runCli({
     dependencies.restoreVerifyFromBundle ?? restoreVerifyFromBundle;
   const restoreArtifactOperation =
     dependencies.restoreArtifact ?? restoreArtifact;
-  const createDb = dependencies.createDbFromBundle ?? createDbFromBundle;
+  const createDb = dependencies.createDb;
   const createLive = dependencies.createLiveDb ?? createLiveDb;
   const parsed = parseArguments(argv);
   const command = parsed.command;
@@ -177,14 +177,14 @@ export async function runCli({
     }
     const readOnlyResult = await dispatchReadOnly({ command, client, emit, application: argv[1], identity: config.identity, handlers: { health: runHealthStatus, ready: runHealthReady, initializationStatus: runInitializationStatus, initializationVerify: runInitializationVerify, initializationPlan: runInitializationPlan, telemetry: runTelemetrySummary, telemetryDetail: runTelemetryDetail, connections: runTelemetryConnections, telemetryWatch: (value) => runTelemetryWatch({ ...value, endpoint: config.endpoint, token: config.token, identity: config.identity, once: argv.includes('--once') }), clusterStatus: runClusterStatus, clusterObservations: runClusterObservations, nodeEvidence: async ({ client: targetClient, emit: targetEmit }) => { targetEmit(await targetClient.coldBootstrapEvidence()); return 0; }, coldRecoveryEvidence: runColdRecoveryEvidence, coldRecoveryStatus: runColdRecoveryStatus, coldRecoveryPlan: runColdRecoveryPlan, clusterQuorum: runClusterQuorum, assignment: runAssignment, bundleVersion: runBundleVersion, routes: runRoutes, bundle: runBundle, resync: runResync, routingValidate: runRoutingValidate, routingEvents: runRoutingEvents, routingWatch: (value) => runRoutingWatch({ ...value, endpoint: config.endpoint, token: config.token, identity: config.identity, once: argv.includes('--once') }), recoveryStatus: runRecoveryStatus, recoveryEvents: runRecoveryEvents, configInspect: runConfigInspect, configVerify: runConfigVerify, metadataStatus: runMetadataStatus, metadataVerify: runMetadataVerify, databaseList: runDatabaseList, identityList: runIdentityList, accountList: runAccountList, tokenList: runTokenList } });
     if (readOnlyResult !== undefined) return readOnlyResult;
-    const managementResult = await dispatchManagement({ command, client, controlClient, emit, args: positional, handlers: { initializationApply: runInitializationApply, standaloneInit: async ({ client: targetClient, emit: targetEmit }) => { const plan = await targetClient.initializationPlan(); if (argv.includes("--dry-run")) { targetEmit({ ok: plan.data?.database === "elera_meta", operation: "standalone-init", status: "planned", data: plan.data ?? plan }); return plan.data?.database === "elera_meta" ? 0 : 1; } targetEmit(await targetClient.initializationApply()); return 0; }, configApply: runConfigApply, metadataInitialize: runMetadataInitialize, reconcile: runReconcile, databaseCreate: runDatabaseCreate, databasePlan: runDatabasePlan, databaseVerify: runDatabaseVerify, identityCreate: runIdentityCreate, identityRotate: runIdentityRotate, accountCreate: runAccountCreate, accountRevoke: runAccountRevoke, accountVerify: runAccountVerify, tokenCreate: runTokenCreate, tokenRevoke: runTokenRevoke, tokenRotate: runTokenRotate, recoveryAcknowledge: runRecoveryAcknowledge, recoveryAbort: runRecoveryAbort, routingRebalance: runRoutingRebalance, coldRecoveryAuthorize: runColdRecoveryAuthorize, coldRecoveryBootstrap: runColdRecoveryBootstrap, coldRecoveryComplete: runColdRecoveryComplete } });
+    const managementResult = await dispatchManagement({ command, client, controlClient, emit, args: positional, handlers: { initializationApply: runInitializationApply, standaloneInit: runStandaloneInitialization, configApply: runConfigApply, metadataInitialize: runMetadataInitialize, reconcile: runReconcile, databaseCreate: runDatabaseCreate, databasePlan: runDatabasePlan, databaseVerify: runDatabaseVerify, identityCreate: runIdentityCreate, identityRotate: runIdentityRotate, accountCreate: runAccountCreate, accountRevoke: runAccountRevoke, accountVerify: runAccountVerify, tokenCreate: runTokenCreate, tokenRevoke: runTokenRevoke, tokenRotate: runTokenRotate, recoveryAcknowledge: runRecoveryAcknowledge, recoveryAbort: runRecoveryAbort, routingRebalance: runRoutingRebalance, coldRecoveryAuthorize: runColdRecoveryAuthorize, coldRecoveryBootstrap: runColdRecoveryBootstrap, coldRecoveryComplete: runColdRecoveryComplete } });
     if (managementResult !== undefined) return managementResult;
     if (command === "cold-bootstrap" || command === "cold-recover") {
       const result = await runColdBootstrap({ client: controlClient, confirm: argv.includes("--confirm"), dryRun: argv.includes("--dry-run"), operationId: argv.find((value) => value.startsWith("--operation-id="))?.split("=")[1] });
       emit(result);
       return result.ok === false ? 1 : 0;
     }
-    const lifecycle = createLifecycleCommands({ client, timeoutMs: Number(environment.ELERA_DRAIN_TIMEOUT_MS ?? 60000) });
+    const lifecycle = (dependencies.createLifecycleCommands ?? createLifecycleCommands)({ client, timeoutMs: Number(environment.ELERA_DRAIN_TIMEOUT_MS ?? 60000) });
     const lifecycleResult = await dispatchLifecycle({ command, client, controlClient, lifecycle, emit, target: targetHost ?? argv[1], lifecycleCommands, handlers: { bootstrap: runClusterBootstrap, join: runClusterJoin, rejoin: async ({ client: targetClient, emit: targetEmit }) => { targetEmit(await targetClient.rejoin()); return 0; }, drain: runDrain, undrain: runUndrain, drainStatus: runDrainStatus, stop: runStop, status: runLifecycleStatus, recover: runLifecycleRecover } });
     if (lifecycleResult !== undefined) return lifecycleResult;
     if (command === "config-plan") return await runConfigPlan({ client, emit });

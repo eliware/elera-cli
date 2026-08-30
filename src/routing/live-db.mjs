@@ -1,15 +1,10 @@
-import { createDbFromBundle, createRoutingStream } from '@eliware/elera-lib';
-
-export async function createLiveDb({ bundle, endpoint, token, application, fetchBundle, createDb = createDbFromBundle, createStream = createRoutingStream } = {}) {
-  if (!bundle || !endpoint || !token || typeof fetchBundle !== 'function') throw new TypeError('bundle, endpoint, token, and fetchBundle are required');
-  const db = await createDb({ bundle });
-  const stream = createStream({ endpoint, token, application, fetchBundle });
-  await db.attachRoutingStream(stream);
+export async function createLiveDb({ bundle, endpoint, token, fetchBundle, createDb: createClient } = {}) {
+  if (!bundle || !endpoint || !token || typeof fetchBundle !== 'function' || typeof createClient !== 'function') throw new TypeError('bundle, endpoint, token, fetchBundle, and createDb are required');
+  const db = await createClient({ endpoint, token });
   return {
     db,
-    stream,
+    stream: undefined,
     async close() {
-      stream.close();
       await db.close();
     },
   };

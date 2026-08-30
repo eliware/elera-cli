@@ -1,18 +1,17 @@
 # @eliware/elera-cli
 
-Agent-friendly Elera database operations CLI. The package consumes the
-published `@eliware/elera-lib` client.
+Agent-friendly Elera database operations CLI. The package consumes
+`@eliware/elera-lib` for shared contracts and validation.
 
 The CLI will authenticate to the supervisor API with a scoped bearer token and
-use `@eliware/elera-lib` for SQL metadata operations. Large backup and restore
+use its supervisor API client for SQL metadata operations. Large backup and restore
 streams will continue to use native `mariadb-dump` and `mariadb` subprocesses;
 they will not pass through the supervisor API as JSON.
 
-The supervisor REST API remains the CLI's primary control interface. The
-optional WebSocket routing stream belongs inside `@eliware/elera-lib`: it
-delivers versioned routing snapshots and topology events while the library
-maintains direct MariaDB connections on port `3306`. If that stream is
-unavailable, the library refreshes its bundle through the supervisor REST API.
+The supervisor REST API remains the CLI's primary control interface. Application
+WebSocket routing and native MariaDB connections belong to
+`@eliware/elera-client`; the CLI uses its own administrative API and native
+subprocess paths. The CLI does not own application connection pools.
 
 ## Command model
 
@@ -68,8 +67,15 @@ npm ci
 npm test
 npm run lint
 npm run check
+npm run contracts
+npm run audit
 npm run pack
 ```
+
+During pre-release development, this checkout may intentionally consume
+`@eliware/elera-lib` through the local workspace reference in `package.json`.
+That link is for coordinated local validation only; replace it with the
+published semver dependency before packaging a release.
 
 Do not commit API tokens, age keys, database passwords, dumps, or decrypted
 artifacts.
