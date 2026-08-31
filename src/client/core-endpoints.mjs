@@ -15,6 +15,7 @@ export function createCoreEndpoints(request, validateBundle) {
     createAppAdminToken: (application, tokenName = 'owner') => jsonRequest(request, '/api/v1/app-admin/tokens', { application, tokenName }),
     deleteDatabase: (databaseId, input = {}) => jsonRequest(request, `/api/v1/databases/${encoded(databaseId)}/delete`, input),
     operationStatus: (operationId) => request(`/api/v1/operations/${encoded(operationId)}`),
+    resetNodeData: (node, input = {}) => jsonRequest(request, '/api/v1/node/data/reset', { node, ...input }),
     intent: () => request('/api/v1/config/intent'),
     plan: (intent) => jsonRequest(request, '/api/v1/config/plan', { intent }),
     apply: (intent) => jsonRequest(request, '/api/v1/config/apply', { intent, confirm: true }),

@@ -15,7 +15,7 @@ export const mutatingCommands = new Set([
   'reconcile-apply', 'restore-metadata-apply', 'restore-accounts-apply',
   'restore-artifact', 'database-create', 'identity-create', 'identity-rotate',
   'account-create', 'account-revoke', 'token-create', 'token-revoke', 'token-rotate',
-  'app-create', 'app-admin-create', 'database-delete',
+  'app-create', 'app-admin-create', 'database-delete', 'node-reset-data',
   'secret-put', 'secret-delete', 'secret-materialize', 'backup', 'restore',
   'recovery-acknowledge', 'recovery-abort', 'routing-rebalance',
   'cold-recovery-authorize', 'cold-recovery-bootstrap', 'cold-recovery-complete',
@@ -50,6 +50,7 @@ export const commandRequirements = Object.freeze({
   'account-revoke': { positional: 1, label: 'user' },
   'account-verify': { positional: 1, label: 'user' },
   'token-create': { positional: 3, label: 'token, application, and identity' },
+  'node-reset-data': { positional: 1, label: 'exact node name' },
   'cold-recovery-authorize': { positional: 1, label: 'authorization JSON' },
   'cold-recovery-bootstrap': { positional: 1, label: 'bootstrap JSON' },
   'cold-recovery-complete': { positional: 1, label: 'completion JSON' },
@@ -71,6 +72,7 @@ const commandSpecificOptions = Object.freeze({
   'reconcile-verify': ['value'],
   'identity-create': ['grants'],
   'token-create': ['scopes'],
+  'node-reset-data': ['confirm', 'force', 'disposition'],
 });
 
 export function schemaFor(command) {

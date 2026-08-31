@@ -16,7 +16,7 @@ const families = {
   'app-admin': { create: 'app-admin-create' },
   migrate: { explain: 'migration-explain', inspect: 'migration-inspect', database: 'migration-database-create', identity: 'migration-identity-create', token: 'migration-token-create', verify: 'migration-verify' },
   credentials: { list: 'account-list', create: 'account-create', revoke: 'account-revoke', rotate: 'token-rotate' },
-  node: { status: 'node-status', drain: 'drain', 'drain-status': 'drain-status', undrain: 'undrain', shutdown: 'stop', recover: 'recover' },
+  node: { status: 'node-status', drain: 'drain', 'drain-status': 'drain-status', undrain: 'undrain', shutdown: 'stop', recover: 'recover', 'reset-data': 'node-reset-data' },
   secrets: { list: 'secret-list', get: 'secret-get', put: 'secret-put', verify: 'secret-verify', delete: 'secret-delete', materialize: 'secret-materialize' },
   backup: { create: 'backup', dump: 'dump', verify: 'verify-backup', list: 'backup-list', plan: 'backup-plan' },
   restore: { plan: 'restore-plan', apply: 'restore', verify: 'restore-verify', artifact: 'restore-artifact', 'metadata-plan': 'restore-metadata-plan', 'metadata-apply': 'restore-metadata-apply', 'accounts-plan': 'restore-accounts-plan', 'accounts-apply': 'restore-accounts-apply', 'accounts-verify': 'restore-accounts-verify' },
