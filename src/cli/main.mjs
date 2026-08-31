@@ -138,7 +138,7 @@ export async function runCli({
   const jsonOutput = argv.includes("--json");
   const operationId = commandArgv.find((value) => value.startsWith("--operation-id="))?.slice("--operation-id=".length);
   const explicitTarget = commandArgv.find((value) => value.startsWith("--target-endpoint="))?.slice("--target-endpoint=".length);
-  const targetHost = directedCommands.has(command) && commandArgv[1] && !commandArgv[1].startsWith("--") ? commandArgv[1] : undefined;
+  const targetHost = directedCommands.has(command) && parsed.positional[0] && !parsed.positional[0].startsWith("--") ? parsed.positional[0] : undefined;
   const emit = (value) =>
     output.write(jsonOutput ? JSON.stringify(value) + "\n" : formatHuman(value) + "\n");
   const earlyExit = handleEarlyExit({ argv, parsed, emit, output, errorOutput });

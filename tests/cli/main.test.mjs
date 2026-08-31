@@ -23,6 +23,15 @@ test('maps supervisor authorization failures to the auth exit code', async () =>
   const client = { health: async () => { throw Object.assign(new Error('forbidden'), { statusCode: 403 }); } };
   expect(await runCli({ argv: ['health', 'status'], environment, output: stream(), errorOutput: stream(), dependencies: { createSupervisorClient: () => client } })).toBe(3);
 });
+test('directed cluster commands select the positional host endpoint', async () => {
+  const endpoints = [];
+  const environment = { ELERA_API_ENDPOINT: 'http://elera-0:8080', ELERA_CLI_TOKEN: 'root-token' };
+  const client = { lifecycle: jest.fn(async () => ({ ok: true })) };
+  const createSupervisorClient = jest.fn((config) => { endpoints.push(config.endpoint); return client; });
+  expect(await runCli({ argv: ['cluster', 'join', 'elera-1', '--confirm', '--json'], environment, output: stream(), errorOutput: stream(), dependencies: { createSupervisorClient } })).toBe(0);
+  expect(endpoints).toContain('http://elera-1:8080');
+  expect(client.lifecycle).toHaveBeenCalledWith('join', { target: 'elera-1' });
+});
 test('requires explicit confirmation for metadata initialization', async () => { const error = stream(); expect(await runCli({ argv: ['metadata', 'initialize'], environment: {}, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('--confirm'); });
 test('requires a backup path for the backup list command', async () => { const error = stream(); const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_CLI_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }; expect(await runCli({ argv: ['backup', 'list'], environment, output: stream(), errorOutput: error })).toBe(2); expect(error.value).toContain('backup-list requires a backup path'); });
 test('rejects commands that are not part of the supported command tree', async () => { const error = stream(); const environment = { ELERA_API_ENDPOINT: 'http://supervisor', ELERA_CLI_TOKEN: 'token', ELERA_DATABASE: 'app', ELERA_IDENTITY: 'runtime' }; expect(await runCli({ argv: ['diagnostics', 'safety'], environment, output: stream(), errorOutput: error, dependencies: { createSupervisorClient: () => ({}) } })).toBe(2); expect(error.value).toContain('unknown command'); });
