@@ -19,3 +19,8 @@ test('preserves structured authorization and idempotency failures', async () => 
   const request = createSupervisorRequest({ endpoint: 'http://node', token: 'secret', fetchImpl: async () => response(body, false, 409) });
   await expect(request('/api/v1/databases/2/delete', { body: JSON.stringify({ confirm: true, idempotencyKey: 'op-1' }) })).rejects.toMatchObject({ message: 'operation already used', statusCode: 409, body });
 });
+test('diagnoses duplicate resources without exposing unrelated fields', async () => {
+  const body = { error: { code: 'duplicate_resource', message: 'database already exists' }, details: { token: 'not-for-output' } };
+  const request = createSupervisorRequest({ endpoint: 'http://node', token: 'secret', fetchImpl: async () => response(body, false, 409) });
+  await expect(request('/api/v1/databases')).rejects.toMatchObject({ message: 'resource already exists: database already exists', statusCode: 409, body });
+});

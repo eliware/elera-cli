@@ -69,6 +69,8 @@ const commandSpecificOptions = Object.freeze({
   'reconcile-plan': ['value'],
   'reconcile-apply': ['value'],
   'reconcile-verify': ['value'],
+  'identity-create': ['grants'],
+  'token-create': ['scopes'],
 });
 
 export function schemaFor(command) {

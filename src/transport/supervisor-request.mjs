@@ -15,7 +15,12 @@ export function createSupervisorRequest({ endpoint, token, fetchImpl = fetch, op
       ? await response.json()
       : { ok: response.ok, status: (await response.text()).trim() };
     if (!response.ok) {
-      throw Object.assign(new Error(body.error?.message ?? body.error ?? `supervisor request failed: ${response.status}`), { statusCode: response.status, body });
+      const errorCode = body.error?.code ?? body.code;
+      const rawMessage = body.error?.message ?? body.error ?? body.message ?? `supervisor request failed: ${response.status}`;
+      const message = errorCode === 'duplicate_resource' || /duplicate|already exists/i.test(String(rawMessage))
+        ? `resource already exists: ${rawMessage}`
+        : String(rawMessage);
+      throw Object.assign(new Error(message), { statusCode: response.status, body });
     }
     return body;
   };

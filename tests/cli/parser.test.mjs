@@ -39,6 +39,10 @@ test('rejects unknown options without guessing', () => {
   const parsed = parseArguments(['health', 'status', '--mystery']);
   expect(parsed.errors).toEqual(['unknown option: --mystery']);
 });
+test('accepts provisioning grant and scope options', () => {
+  expect(parseArguments(['identity', 'create', 'app', 'db', 'runtime', '--grants=SELECT,INSERT']).options.grants).toBe('SELECT,INSERT');
+  expect(parseArguments(['token', 'create', 'runtime', 'app', 'identity', '--scopes', 'database:read,database:write']).options.scopes).toBe('database:read,database:write');
+});
 
 test('accepts command-specific value options in separated and inline forms', () => {
   expect(parseArguments(['cluster', 'plan', '--action', 'rebalance']).options).toEqual({ action: 'rebalance' });
