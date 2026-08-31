@@ -1,24 +1,10 @@
 import { readdir } from "node:fs/promises";
 import { generate as generateSnowflake } from "@eliware/snowflake";
 import { connect, sshExec } from "@eliware/ssh-client";
+import { withRetry } from './retry.mjs';
+import { prepareStaging, finalizeStaging } from './nas-staging.mjs';
 
-const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
-export async function withRetry(
-  operation,
-  { attempts = 3, delayMs = 250 } = {},
-) {
-  let last;
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      return await operation();
-    } catch (error) {
-      last = error;
-      if (attempt < attempts)
-        await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
-    }
-  }
-  throw last;
-}
+export { withRetry } from './retry.mjs';
 export async function syncToNas({
   localPath,
   remotePath,
@@ -66,35 +52,4 @@ export async function syncToNas({
     await notify(error instanceof Error ? error.message : String(error));
     throw error;
   }
-}
-
-async function prepareStaging({ sshOptions, stagePath, sshRun }) {
-  const results = await sshRun({
-    ...sshOptions,
-    commands: [
-      `rm -rf -- ${quote(stagePath)}`,
-      `mkdir -p -- ${quote(stagePath)}`,
-    ],
-  });
-  if (results.some((result) => result.code && result.code !== 0))
-    throw new Error("remote staging preparation failed");
-}
-
-async function finalizeStaging({
-  sshOptions,
-  stagePath,
-  remotePath,
-  rotateCommand,
-  sshRun,
-}) {
-  const results = await sshRun({
-    ...sshOptions,
-    commands: [
-      `cd ${quote(stagePath)} && sha256sum -c SHA256SUMS`,
-      rotateCommand,
-      `mv -- ${quote(stagePath)} ${quote(remotePath)}`,
-    ],
-  });
-  if (results.some((result) => result.code && result.code !== 0))
-    throw new Error("remote backup finalization failed");
 }

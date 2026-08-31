@@ -24,10 +24,10 @@ test('forwards stream updates and stops on a lifecycle signal', async () => {
       client: { routingBundle: jest.fn(async () => ({ application: 'app', routes: { primary: [], balanced: [] } })) },
       emit, endpoint: 'http://router', token: 'token', identity: 'id', WebSocketImpl: FakeWebSocket,
     });
-    await new Promise((resolve) => queueMicrotask(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const socket = FakeWebSocket.instances[0];
-    socket.onmessage?.({ data: JSON.stringify({ type: 'routing.update', version: 1, routes: { primary: [], balanced: [] } }) });
-    socket.onmessage?.({ data: JSON.stringify({ type: 'routing.shutdown', node: 'elera-0', reconnectDeadlineMs: 1000, loadBalancerEndpoint: 'http://lb' }) });
+    socket.onmessage?.({ data: JSON.stringify({ type: 'routing.update', version: 1, generatedAt: '2099-01-01T00:00:00Z', apiVersion: 'v1', application: 'app', database: 'db', physicalDatabase: 'elera_db_app', identity: 'id', nodeIdentity: 'node-1', credentials: { username: 'u', password: 'fixture-only' }, bundleVersion: 1, ports: { sql: 3306, http: 8080 }, writer: { host: 'db', port: 3306 }, readers: [], failover: [], expiresAt: '2099-01-01T00:00:00Z', routes: { primary: [], balanced: [] } }) });
+    socket.onmessage?.({ data: JSON.stringify({ type: 'routing.shutdown', version: 1, generatedAt: '2099-01-01T00:00:00Z', node: 'elera-0', reconnectDeadlineMs: 1000, loadBalancerEndpoint: 'http://lb' }) });
     await new Promise((resolve) => queueMicrotask(resolve));
     signals.get('SIGTERM')();
     await expect(pending).resolves.toBe(0);

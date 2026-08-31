@@ -1,4 +1,3 @@
-import { createWriteStream } from "node:fs";
 import {
   mkdtemp,
   mkdir,
@@ -8,40 +7,15 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { join } from "node:path";
-import { createGzip, gunzip } from "node:zlib";
-import { spawn } from "node:child_process";
-import { pipeline } from "node:stream/promises";
+import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
 import { applicationDatabases, manifestText, sha256 } from "./manifests.mjs";
 import { dumpArgs } from "../database/commands.mjs";
 import { rotateBackups } from "./rotate-backups.mjs";
+import { dumpToGzip } from './dump-to-gzip.mjs';
 
 const testGzip = promisify(gunzip);
-export function dumpToGzip(binary, args, destination) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(binary, args, {
-      shell: false,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    let stderr = "";
-    child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk;
-    });
-    const exited = new Promise((done, fail) =>
-      child.once("close", (code) =>
-        code === 0
-          ? done()
-          : fail(new Error(stderr.trim() || `dump exited with ${code}`)),
-      ),
-    );
-    Promise.all([
-      pipeline(child.stdout, createGzip(), createWriteStream(destination)),
-      exited,
-    ]).then(() => resolve(), reject);
-    child.once("error", reject);
-  });
-}
+export { dumpToGzip } from './dump-to-gzip.mjs';
 export async function createBackup({
   backupRoot,
   databases,

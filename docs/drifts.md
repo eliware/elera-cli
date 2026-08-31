@@ -6,7 +6,7 @@ repository conventions. Findings are recorded before implementation changes.
 ## Current status
 
 - [x] Administrative command-family ownership and shared-library boundary are established.
-- [ ] Recovery authorization, temporary dependency cleanup, and final release gates remain open.
+- [ ] Published shared-library dependency and final release gates remain open.
 
 ## Actionable drifts
 
@@ -88,6 +88,15 @@ repository conventions. Findings are recorded before implementation changes.
   local shared-library link used before lab validation. Release metadata,
   lockfile, and release notes remain unchanged until the lab-validated release
   candidate is selected.
+
+## Current validation status
+
+- [x] Source/test mirroring is complete: every `src/**/*.mjs` has a matching
+  `tests/**/*.test.mjs` path.
+- [x] Knit validation includes the same contract check as CI.
+- [x] Routing-bundle fixtures and stream timing tests are synchronized with the
+  current shared-library contract.
+- [ ] Full validation must be rerun after any shared-library publish transition.
 
 ## Verified or intentional boundaries
 

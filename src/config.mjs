@@ -1,15 +1,6 @@
-import { readFileSync } from 'node:fs';
-
-export function projectEnvironment(environment, { readFile = readFileSync, path = '.env' } = {}) {
-  if (environment !== process.env) return environment;
-  try {
-    const values = Object.fromEntries(readFile(path, 'utf8').split(/\r?\n/).filter((line) => line && !line.trim().startsWith('#')).map((line) => {
-      const separator = line.indexOf('=');
-      return separator < 0 ? [line.trim(), ''] : [line.slice(0, separator).trim(), line.slice(separator + 1).trim().replace(/^(['"])(.*)\1$/, '$2')];
-    }));
-    return { ...values, ...environment };
-  } catch { return environment; }
-}
+export { projectEnvironment } from './config/project-environment.mjs';
+export { redactCliConfig } from './config/redact.mjs';
+import { projectEnvironment } from './config/project-environment.mjs';
 
 export function loadCliConfig(environment = process.env) {
   environment = projectEnvironment(environment);
@@ -29,5 +20,3 @@ export function loadCliConfig(environment = process.env) {
     ...(identity ? { identity } : {}),
   };
 }
-
-export function redactCliConfig(config) { return { ...config, token: config?.token ? '[redacted]' : config?.token }; }

@@ -1,5 +1,12 @@
 # Release notes
 
+## Unreleased
+
+- Synchronized routing-bundle fixtures with the shared `@eliware/elera-lib`
+  contract, including `physicalDatabase` validation.
+- Kept source and test trees in 1:1 mirrored paths and aligned CI and Knit
+  validation commands.
+
 ## 0.1.0
 
 - Initial CLI package scaffold using the published `@eliware/elera-lib@0.1.0` client.

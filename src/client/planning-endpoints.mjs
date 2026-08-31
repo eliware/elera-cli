@@ -1,0 +1,2 @@
+import { jsonRequest } from './endpoint-helpers.mjs';
+export function createPlanningEndpoints(request) { return { planDatabases: (desired) => jsonRequest(request, '/api/v1/databases/plan', { desired }), verifyDatabases: (desired) => jsonRequest(request, '/api/v1/databases/verify', { desired }), planBackup: (desired) => jsonRequest(request, '/api/v1/backups/plan', { desired }), planRestore: (desired) => jsonRequest(request, '/api/v1/restores/plan', { desired }) }; }

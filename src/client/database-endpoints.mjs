@@ -1,0 +1,2 @@
+import { encoded, jsonRequest } from './endpoint-helpers.mjs';
+export function createDatabaseEndpoints(request) { return { deleteDatabase: (databaseId, input = {}) => jsonRequest(request, `/api/v1/databases/${encoded(databaseId)}/delete`, input), routes: (application) => request(`/api/v1/routes?application=${encoded(application ?? 'default')}`), databases: () => request('/api/v1/databases'), provisionDatabase: (application, database) => jsonRequest(request, '/api/v1/databases', { application, database }) }; }

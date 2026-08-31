@@ -1,0 +1,2 @@
+import { jsonRequest } from './endpoint-helpers.mjs';
+export function createRestoreMetadataEndpoints(request) { return { metadataExport: () => request('/api/v1/metadata/export'), restoreMetadataPlan: (desired) => jsonRequest(request, '/api/v1/restores/metadata/plan', { desired }), restoreMetadataApply: (desired) => jsonRequest(request, '/api/v1/restores/metadata/apply', { desired, confirm: true }) }; }

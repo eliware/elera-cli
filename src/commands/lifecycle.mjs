@@ -1,17 +1,13 @@
 import { completeOperation, createOperationRecord } from '../operations/record.mjs';
 import { classifyOperation } from '../operations/exit-codes.mjs';
 import { pollOperation } from '../operations/poll.mjs';
-
-function statusDone(data) {
-  return Boolean(data?.lifecycle === 'stopped' || (data?.drained && Number(data?.active ?? 0) === 0));
-}
+import { lifecycleStatusDone } from './lifecycle/status-done.mjs';
+import { runLifecycleOperation } from './lifecycle/run-operation.mjs';
 
 export function createLifecycleCommands({ client, now, sleep, timeoutMs = 60000 } = {}) {
   if (!client) throw new TypeError('supervisor client is required');
   const run = async (action, input, operation) => {
-    const record = createOperationRecord(action, input, now);
-    const result = await operation();
-    return completeOperation(record, result, now);
+    return runLifecycleOperation({ action, input, operation, now });
   };
   return {
     async drain() {
@@ -26,7 +22,7 @@ export function createLifecycleCommands({ client, now, sleep, timeoutMs = 60000 
       const polled = await pollOperation(async () => {
         const response = await client.trafficStatus();
         const data = response.data ?? response;
-        return { response, done: statusDone(data) };
+        return { response, done: lifecycleStatusDone(data) };
       }, { timeoutMs, sleep });
       return completeOperation(record, polled.done ? { ...polled.response, status: 'completed' } : { ...polled.response, status: 'incomplete', timedOut: true }, now);
     },

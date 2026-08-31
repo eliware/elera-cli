@@ -17,12 +17,8 @@ import { exitCodes } from "../operations/exit-codes.mjs";
 import { formatHuman } from "../output/format.mjs";
 import { runColdBootstrap } from "../commands/cold-bootstrap.mjs";
 import { parseArguments, helpPaths } from "./parser.mjs";
-import {
-  confirmationCommands,
-  directedCommands,
-  mutatingCommands,
-  schemaFor,
-} from "./command-spec.mjs";
+import { shouldPlan, requiresConfirmation } from "./policy.mjs";
+import { deriveRuntimeOptions } from "./runtime-options.mjs";
 import { runHealthStatus } from "../commands/health/status.mjs";
 import { runHealthReady } from "../commands/health/ready.mjs";
 import { runTelemetrySummary } from "../commands/telemetry/summary.mjs";
@@ -134,11 +130,7 @@ export async function runCli({
   const createLive = dependencies.createLiveDb ?? createLiveDb;
   const parsed = parseArguments(argv);
   const command = parsed.command;
-  const commandArgv = parsed.argv;
-  const jsonOutput = argv.includes("--json");
-  const operationId = commandArgv.find((value) => value.startsWith("--operation-id="))?.slice("--operation-id=".length);
-  const explicitTarget = commandArgv.find((value) => value.startsWith("--target-endpoint="))?.slice("--target-endpoint=".length);
-  const targetHost = directedCommands.has(command) && parsed.positional[0] && !parsed.positional[0].startsWith("--") ? parsed.positional[0] : undefined;
+  const { commandArgv, jsonOutput, operationId, explicitTarget, targetHost } = deriveRuntimeOptions({ argv, command, parsed });
   const emit = (value) =>
     output.write(jsonOutput ? JSON.stringify(value) + "\n" : formatHuman(value) + "\n");
   const earlyExit = handleEarlyExit({ argv, parsed, emit, output, errorOutput });
@@ -153,11 +145,11 @@ export async function runCli({
   if ((command === "cold-bootstrap" || command === "cold-recover") && commandArgv.includes("--confirm") === false && commandArgv.includes("--dry-run") === false) {
     errorOutput.write(`${command} requires --confirm or --dry-run\n`);
   }
-  if (mutatingCommands.has(command) && argv.includes("--dry-run") && command !== 'node-reset-data') {
+  if (shouldPlan({ command, argv })) {
     emit({ ok: true, operation: command, status: "planned", operationId: operationId ?? null, data: { arguments: argv.slice(1).filter((value) => !value.startsWith("--")) } });
     return 0;
   }
-  if (confirmationCommands.has(command) && !argv.includes("--confirm") && !argv.includes("--dry-run")) {
+  if (requiresConfirmation({ command, argv })) {
     errorOutput.write(`${command} requires --confirm\n`);
     return exitCodes.invalid;
   }

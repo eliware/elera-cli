@@ -1,0 +1,2 @@
+import { jsonRequest } from './endpoint-helpers.mjs';
+export function createReconcileEndpoints(request) { return { reconcilePlan: (desired) => jsonRequest(request, '/api/v1/reconcile/plan', { desired }), reconcileApply: (desired) => jsonRequest(request, '/api/v1/reconcile/apply', { desired, confirm: true }), reconcileVerify: (desired) => jsonRequest(request, '/api/v1/reconcile/verify', { desired }) }; }

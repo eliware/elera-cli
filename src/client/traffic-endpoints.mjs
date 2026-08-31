@@ -1,0 +1,1 @@
+export function createTrafficEndpoints(request) { return { trafficStatus: () => request('/api/v1/traffic/status'), drain: () => request('/api/v1/traffic/drain', { method: 'POST' }), undrain: () => request('/api/v1/traffic/undrain', { method: 'POST' }) }; }
