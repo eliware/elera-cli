@@ -22,3 +22,8 @@ test('rejects flat command names and resolves hierarchical paths', () => {
   expect(resolveCommand(['backup'])).toBeUndefined();
   expect(resolveCommand(['backup', 'create'])).toBe('backup');
 });
+
+test('resolves the telemetry family shorthand to its summary command', () => {
+  expect(resolveCommand(['telemetry'])).toBe('telemetry');
+  expect(resolveCommand(['telemetry', 'summary', 'extra'])).toBeUndefined();
+});

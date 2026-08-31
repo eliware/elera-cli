@@ -12,6 +12,9 @@ test('supports family and command help', () => {
   expect(parseArguments(['recovery', 'bootstrap', '{"epoch":"e","winner":"elera-0"}']).command).toBe('cold-recovery-bootstrap');
   expect(helpPaths(['cluster'])).toContain('join');
 });
+test('accepts telemetry shorthand as the summary command', () => {
+  expect(parseArguments(['telemetry']).command).toBe('telemetry');
+});
 
 test('rejects unknown or incomplete command paths', () => {
   expect(parseArguments(['not-a-command']).command).toBeUndefined();

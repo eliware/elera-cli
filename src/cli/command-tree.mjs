@@ -27,6 +27,7 @@ export function commandTree() { return families; }
 
 export function resolveCommand(path) {
   if (!Array.isArray(path) || path.length === 0) return undefined;
+  if (path.length === 1) return families[path[0]]?.summary;
   if (path.length !== 2) return undefined;
   const [family, action] = path;
   return families[family]?.[action];
