@@ -1,4 +1,4 @@
-export async function dispatchManagement({ command, client, controlClient, emit, args, handlers }) {
+export async function dispatchManagement({ command, client, controlClient, emit, args, operationId, handlers }) {
   const calls = {
     'initialization-apply': () => handlers.initializationApply({ client, emit }),
     'standalone-init': () => handlers.standaloneInit({ client, emit }),
@@ -8,6 +8,16 @@ export async function dispatchManagement({ command, client, controlClient, emit,
     'reconcile-apply': () => handlers.reconcile({ client, emit, command, value: args[0] }),
     'reconcile-verify': () => handlers.reconcile({ client, emit, command, value: args[0] }),
     'database-create': () => handlers.databaseCreate({ client, emit, application: args[0], database: args[1] }),
+    'database-delete': () => handlers.databaseDelete({ client, emit, databaseId: args[0], confirm: true, dryRun: false, idempotencyKey: operationId }),
+    'app-create': () => handlers.applicationCreate({ client, emit, name: args[0] }),
+    'app-status': () => handlers.applicationStatus({ client, emit, applicationId: args[0] }),
+    'app-admin-create': () => handlers.appAdminCreate({ client, emit, application: args[0], tokenName: args[1] }),
+    'migration-explain': () => handlers.migrationExplain({ emit }),
+    'migration-inspect': () => handlers.migrationPending({ action: 'inspect' }),
+    'migration-database-create': () => handlers.migrationPending({ action: 'database' }),
+    'migration-identity-create': () => handlers.migrationPending({ action: 'identity' }),
+    'migration-token-create': () => handlers.migrationPending({ action: 'token' }),
+    'migration-verify': () => handlers.migrationPending({ action: 'verify' }),
     'database-plan': () => handlers.databasePlan({ client, emit, value: args[0] }),
     'database-verify': () => handlers.databaseVerify({ client, emit, value: args[0] }),
     'identity-create': () => handlers.identityCreate({ client, emit, application: args[0], database: args[1], identity: args[2], purpose: args[3], grants: args[4] }),

@@ -1,3 +1,5 @@
+import { validateRoutingEvent } from '@eliware/elera-lib';
+
 export function createCliRoutingStream({ endpoint, token, WebSocketImpl = globalThis.WebSocket, onUpdate, onError } = {}) {
   if (!endpoint) throw new TypeError('endpoint is required');
   let socket;
@@ -6,7 +8,7 @@ export function createCliRoutingStream({ endpoint, token, WebSocketImpl = global
   async function connect() {
     if (closed || typeof WebSocketImpl !== 'function') return;
     socket = new WebSocketImpl(url);
-    socket.onmessage = ({ data }) => { try { onUpdate?.(JSON.parse(data)); } catch (error) { onError?.(error); } };
+    socket.onmessage = ({ data }) => { try { onUpdate?.(validateRoutingEvent(JSON.parse(data))); } catch (error) { onError?.(error); } };
     socket.onerror = (error) => onError?.(error);
     socket.onclose = () => { socket = undefined; };
   }

@@ -33,6 +33,21 @@ restore remain root-only operations.
 All command requests and responses must preserve the shared resource IDs,
 token binding, scope, routing-bundle, and authorization semantics.
 
+Supervisor responses are passed through without flattening the shared envelope:
+`apiVersion`, `ok`, `requestId`, `operation`, `operationId`, `status`,
+`changed`, and `data` remain available to callers. Failed responses retain the
+supervisor error shape and are never replayed automatically. Long-running
+operations can be polled through the documented operation endpoint with a
+bounded timeout; terminal states include `completed`, `failed`, `error`, and
+`cancelled`.
+
+Migration is a CLI workflow over existing supervisor operations: `database`,
+`identity`, and `token` map to provisioning APIs, while `inspect` and `verify`
+map to reconcile plan and verify. Migration-specific response schemas remain
+pending until the supervisor publishes them. Friendly-name resolution is only
+used where a public supervisor lookup exists; application status and database
+delete require stable IDs at the API boundary.
+
 The CLI consumes `@eliware/elera-lib` only for shared contracts and validation;
 administration, SQL passthrough, backup, restore, and recovery workflows remain
 CLI-owned.

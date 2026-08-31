@@ -53,3 +53,12 @@ test('rejects missing values for command-specific options', () => {
 test('validates declared positional requirements', () => {
   expect(parseArguments(['telemetry', 'detail']).errors).toEqual(['telemetry-detail requires a application']);
 });
+
+test('scaffolds Core Flow command paths with generic parsing and safety flags', () => {
+  expect(parseArguments(['app', 'status', '--json']).command).toBe('app-status');
+  expect(parseArguments(['app-admin', 'create', 'Basement']).positional).toEqual(['Basement']);
+  expect(parseArguments(['migrate', 'explain', '--help']).help).toBe(true);
+  const deletion = parseArguments(['database', 'delete', 'primary', '--dry-run']);
+  expect(deletion.command).toBe('database-delete');
+  expect(deletion.flags.has('--dry-run')).toBe(true);
+});

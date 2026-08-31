@@ -15,6 +15,7 @@ export const mutatingCommands = new Set([
   'reconcile-apply', 'restore-metadata-apply', 'restore-accounts-apply',
   'restore-artifact', 'database-create', 'identity-create', 'identity-rotate',
   'account-create', 'account-revoke', 'token-create', 'token-revoke', 'token-rotate',
+  'app-create', 'app-admin-create', 'database-delete',
   'secret-put', 'secret-delete', 'secret-materialize', 'backup', 'restore',
   'recovery-acknowledge', 'recovery-abort', 'routing-rebalance',
   'cold-recovery-authorize', 'cold-recovery-bootstrap', 'cold-recovery-complete',
@@ -28,6 +29,7 @@ export const confirmationCommands = new Set([
   'cluster-rejoin', 'metadata-init', 'standalone-init', 'cold-bootstrap', 'cold-recover', 'recover', 'token-rotate',
   'recovery-acknowledge', 'recovery-abort', 'routing-rebalance',
   'cold-recovery-authorize', 'cold-recovery-bootstrap', 'cold-recovery-complete',
+  'database-delete',
 ]);
 
 export const commandRequirements = Object.freeze({
@@ -52,6 +54,10 @@ export const commandRequirements = Object.freeze({
   'cold-recovery-bootstrap': { positional: 1, label: 'bootstrap JSON' },
   'cold-recovery-complete': { positional: 1, label: 'completion JSON' },
   'token-revoke': { positional: 1, label: 'token' },
+  'app-status': { positional: 0, label: 'application' },
+  'app-create': { positional: 1, label: 'application' },
+  'app-admin-create': { positional: 1, label: 'application' },
+  'database-delete': { positional: 1, label: 'database' },
   'database-plan': { positional: 1, label: 'desired database JSON' },
   'database-verify': { positional: 1, label: 'desired database JSON' },
   'backup-plan': { positional: 1, label: 'desired backup JSON' },

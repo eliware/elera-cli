@@ -60,8 +60,8 @@ repository conventions. Findings are recorded before implementation changes.
 - [x] Created `docs/source-test-inventory.md` and reconciled the source/test
   paths. The standalone initialization test was moved to its matching focused
   path without rewriting it; no unmapped focused implementation modules remain.
-- [ ] Remove non-barrel Istanbul ignores and reach 100×4 coverage for all
-  in-scope CLI implementation modules.
+- [x] Removed the non-barrel Istanbul ignore from the backup rotation re-export;
+  the complete suite continues to reach 100×4 coverage with zero warnings.
 - [x] Add focused routing-bundle validation tests covering malformed bundles,
   expiry, route lists, hosts, and port boundaries.
 - [x] Add focused routing-stream tests covering URL construction, updates,
@@ -98,6 +98,9 @@ repository conventions. Findings are recorded before implementation changes.
 - [x] Application SQL pools and WebSocket client behavior remain in
   `@eliware/elera-client`, not in the CLI.
 - [x] The CLI uses `@eliware/elera-lib` as the shared contract boundary.
+- [x] Contract verification uses the canonical `validateBundle` export from
+  `@eliware/elera-lib`; the former CLI-local routing-bundle JSON schema was
+  removed. The retained fixture is sample data only.
 - [x] Existing command families cover application, database, identity, token,
   routing, telemetry, cluster, recovery, backup, restore, and secrets work.
 - [x] Lint, typecheck, contract validation, audit, package dry-run, and the

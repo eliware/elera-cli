@@ -26,4 +26,6 @@ test('command policy defines common flags, targeting, mutation, confirmation, an
   expect(requirementFor('account-create')).toEqual({ positional: 2, label: 'user and database' });
   expect(requirementFor('token-create')).toEqual({ positional: 3, label: 'token, application, and identity' });
   expect(requirementFor('health')).toBeUndefined();
+  expect(mutatingCommands.has('database-delete')).toBe(true);
+  expect(confirmationCommands.has('database-delete')).toBe(true);
 });

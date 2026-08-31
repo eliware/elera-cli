@@ -1,0 +1,3 @@
+import { runApplicationCreate, runApplicationStatus, runAppAdminCreate } from '../../src/commands/app.mjs';
+import { jest } from '@jest/globals';
+test('runs application administration commands', async () => { const emit = jest.fn(); const client = { createApplication: async (name) => ({ name }), applicationStatus: async (id) => ({ id }), createAppAdminToken: async (application, tokenName) => ({ application, tokenName }) }; await runApplicationCreate({ client, emit, name: 'Demo' }); await runApplicationStatus({ client, emit, applicationId: '1' }); await runAppAdminCreate({ client, emit, application: 'Demo', tokenName: 'owner' }); expect(emit).toHaveBeenCalledTimes(3); });

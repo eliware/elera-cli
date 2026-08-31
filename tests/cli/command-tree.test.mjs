@@ -12,6 +12,12 @@ test('exposes credentials and node as first-class command families', () => {
   expect(suggestCommand(['node', 'sta'])).toBe('node status');
 });
 
+test('exposes generic Core Flow command paths', () => {
+  expect(suggestCommand(['app'])).toBe('app');
+  expect(resolveCommand(['database', 'delete'])).toBe('database-delete');
+  expect(resolveCommand(['migrate', 'explain'])).toBe('migration-explain');
+});
+
 test('rejects flat command names and resolves hierarchical paths', () => {
   expect(resolveCommand(['backup'])).toBeUndefined();
   expect(resolveCommand(['backup', 'create'])).toBe('backup');

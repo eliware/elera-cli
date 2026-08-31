@@ -38,6 +38,30 @@ test("includes an operation id when configured", async () => {
   await client.status();
   expect(fetchImpl.mock.calls[0][1].headers["x-elera-operation-id"]).toBe("op-1");
 });
+test('polls documented operation status and fails on terminal errors without replay', async () => {
+  const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ operationId: 'op', status: 'completed', result: { ok: true } }) }));
+  const client = createSupervisorClient({ endpoint: 'https://db', token: 'secret', fetchImpl });
+  await expect(client.waitOperation('op', { timeoutMs: 10, intervalMs: 1 })).resolves.toMatchObject({ operationId: 'op', status: 'completed' });
+  expect(fetchImpl).toHaveBeenCalledTimes(1);
+});
+test('returns bounded timeout without replaying mutation', async () => {
+  const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ operationId: 'op', status: 'running' }) }));
+  const client = createSupervisorClient({ endpoint: 'https://db', token: 'secret', fetchImpl });
+  await expect(client.waitOperation('op', { timeoutMs: 0 })).resolves.toMatchObject({ timedOut: true, done: false });
+  expect(fetchImpl).toHaveBeenCalledTimes(1);
+});
+test('maps terminal operation errors without retrying', async () => {
+  const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ operationId: 'op', status: 'failed', error: { message: 'rejected' } }) }));
+  const client = createSupervisorClient({ endpoint: 'https://db', token: 'secret', fetchImpl });
+  await expect(client.waitOperation('op')).rejects.toMatchObject({ message: 'rejected', statusCode: 409 });
+  expect(fetchImpl).toHaveBeenCalledTimes(1);
+});
+test('handles missing optional operation fields safely', async () => {
+  const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'application/json' }, json: async () => ({ status: 'failed' }) }));
+  const client = createSupervisorClient({ endpoint: 'https://db', token: 'secret', fetchImpl });
+  await expect(client.operationStatus(undefined)).resolves.toEqual({ status: 'failed' });
+  await expect(client.waitOperation('op')).rejects.toThrow('supervisor operation failed');
+});
 test("exposes the complete REST command surface and handles text errors", async () => {
   const fetchImpl = jest.fn(async () => ({
     ok: true,

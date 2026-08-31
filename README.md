@@ -60,6 +60,27 @@ mounts using `ELERA_SSH_KEY_PATH`, `ELERA_KNOWN_HOSTS_PATH`,
 `ELERA_TLS_CERTIFICATE_PATH`, and `ELERA_BACKUP_CONFIG_PATH`. The CLI validates
 paths but does not log or copy their contents.
 
+## Configuration and operations
+
+Set `ELERA_API_ENDPOINT` and the administrative `ELERA_CLI_TOKEN` in the
+project-root `.env`; `ELERA_API_TOKEN` is reserved for application runtime
+clients. Explicit environment values take precedence. Do not place passwords,
+raw tokens, private keys, SQL dumps, or decrypted artifacts in the repository.
+
+The CLI is a short-lived command process. It validates configuration before
+opening supervisor or database connections, inherits standard input/output for
+SQL and dump pipelines, and returns the child MariaDB exit code for passthrough
+failures. Health and readiness are exposed through `health status` and
+`health ready`; platform lifecycle, backup, and restore commands require the
+documented confirmation gates and emit operation diagnostics without secret
+values.
+
+Backups use the native MariaDB tools plus Elera metadata artifacts. Verify a
+backup before restore, keep the original artifact unchanged, and use the
+restore verification commands after completion. If restore or deployment
+validation fails, stop and preserve the last known-good backup; application
+image rollback does not reverse database changes.
+
 ## Development
 
 ```bash
