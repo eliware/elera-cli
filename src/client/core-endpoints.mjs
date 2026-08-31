@@ -11,6 +11,7 @@ export function createCoreEndpoints(request, validateBundle) {
     health: () => request('/healthz'),
     ready: () => request('/readyz'),
     createApplication: (name) => jsonRequest(request, '/api/v1/applications', { name }),
+    applications: () => request('/api/v1/applications'),
     applicationStatus: (applicationId) => request(`/api/v1/applications/${encoded(applicationId)}`),
     createAppAdminToken: (application, tokenName = 'owner') => jsonRequest(request, '/api/v1/app-admin/tokens', { application, tokenName }),
     deleteDatabase: (databaseId, input = {}) => jsonRequest(request, `/api/v1/databases/${encoded(databaseId)}/delete`, input),
