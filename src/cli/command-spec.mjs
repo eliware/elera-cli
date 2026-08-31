@@ -51,6 +51,7 @@ export const commandRequirements = Object.freeze({
   'account-verify': { positional: 1, label: 'user' },
   'token-create': { positional: 3, label: 'token, application, and identity' },
   'node-reset-data': { positional: 1, label: 'exact node name' },
+  'node-resync': { positional: 1, label: 'exact node name' },
   'cold-recovery-authorize': { positional: 1, label: 'authorization JSON' },
   'cold-recovery-bootstrap': { positional: 1, label: 'bootstrap JSON' },
   'cold-recovery-complete': { positional: 1, label: 'completion JSON' },
@@ -73,6 +74,7 @@ const commandSpecificOptions = Object.freeze({
   'identity-create': ['grants'],
   'token-create': ['scopes'],
   'node-reset-data': ['confirm', 'force', 'disposition'],
+  'node-resync': ['confirm', 'force'],
 });
 
 export function schemaFor(command) {

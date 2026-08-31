@@ -102,3 +102,6 @@ Do not commit API tokens, age keys, database passwords, dumps, or decrypted
 artifacts.
 Metadata initialization is explicit and requires `elera-cli metadata initialize
 --confirm`; status and verification use `metadata status` and `metadata verify`.
+Disposable node recovery uses `elera-cli node resync <node> --confirm="RESYNC
+<node>"`; the supervisor enforces node identity, liveness, and data-disposition
+safety. The CLI never deletes node data locally.

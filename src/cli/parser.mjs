@@ -20,7 +20,7 @@ function normalizeOptions(values, command) {
   const commandValueOptions = new Set([
     ...valueOptions,
     ...schema.options
-      .filter((option) => (!flags.has(`--${option}`) || command === 'node-reset-data') && !valueOptions.has(`--${option}`))
+      .filter((option) => (!flags.has(`--${option}`) || command === 'node-reset-data' || command === 'node-resync') && !valueOptions.has(`--${option}`))
       .map((option) => `--${option}`),
   ]);
   for (let index = 0; index < values.length; index += 1) {
