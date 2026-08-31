@@ -30,6 +30,11 @@ database, identity, and token command families. Cluster initialization,
 bootstrap, recovery, node lifecycle, drain, secrets, and platform backup or
 restore remain root-only operations.
 
+Metadata initialization is also a supervisor control-plane operation. The CLI
+dispatches it through the authenticated `controlClient` for the selected
+supervisor endpoint; it does not open a host-local SQL socket or provide a
+local-socket fallback for remote or containerized supervisors.
+
 All command requests and responses must preserve the shared resource IDs,
 token binding, scope, routing-bundle, and authorization semantics.
 
