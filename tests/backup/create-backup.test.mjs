@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { createBackup, dumpToGzip } from '../../src/backup/create-backup.mjs';
 import { backupExists, verifyBackup } from '../../src/backup/verify-backup.mjs';
 import { rotateBackups } from '../../src/backup/rotate-backups.mjs';
+import { sha256 } from '../../src/backup/manifests.mjs';
 
 test('creates and verifies a compressed logical backup', async () => {
   const root = await mkdtemp(join(tmpdir(), 'elera-backup-')); const release = jest.fn();
@@ -31,6 +32,7 @@ test('verifies the databases listed by the backup when no filter is supplied', a
   const { writeFile } = await import('node:fs/promises');
   await writeFile(join(root, 'DATABASES'), 'app\n');
   await writeFile(join(root, 'app.sql.gz'), gzipSync('sql'));
+  await writeFile(join(root, 'SHA256SUMS'), `${await sha256(join(root, 'app.sql.gz'))}  app.sql.gz\n`);
   await expect(verifyBackup({ backupPath: root })).resolves.toMatchObject({ databases: ['app'] });
 });
 

@@ -9,6 +9,6 @@ export function createSecretCommands({ client, age, read, runMaterialize, emit }
     if (command === 'secret-delete') { emit(await client.removeSecret(name)); return true; }
     if (command === 'secret-materialize') { const executable = args[1]; if (!executable) throw new TypeError('secret-materialize requires a command'); await runMaterialize(name, executable, args.slice(2)); emit({ name, materialized: true }); return true; }
     if (command === 'secret-put') { const file = args[1]; if (!file) throw new TypeError('secret-put requires a file path'); const plaintext = await read(file, 'utf8'); emit(await client.putSecret(name, { kind: args[2] ?? 'opaque', keyVersion: args[3] ?? 'default', ciphertext: await age.encrypt(plaintext) })); return true; }
-    return false;
+    throw new TypeError(`unsupported secret command: ${command}`);
   };
 }

@@ -13,6 +13,7 @@ import { applicationDatabases, manifestText, sha256 } from "./manifests.mjs";
 import { dumpArgs } from "../database/commands.mjs";
 import { rotateBackups } from "./rotate-backups.mjs";
 import { dumpToGzip } from './dump-to-gzip.mjs';
+import { validateDatabaseName } from '../database/validate-name.mjs';
 
 const testGzip = promisify(gunzip);
 export { dumpToGzip } from './dump-to-gzip.mjs';
@@ -38,6 +39,7 @@ export async function createBackup({
     staging = await mktemp(join(backupRoot, ".staging-"));
     const entries = [];
     for (const database of eligible) {
+      validateDatabaseName(database);
       const path = join(staging, `${database}.sql.gz`);
       await dump(mysqlDump, dumpArgs(credentialsFile, host, database), path);
       await testGzip(await readFile(path));

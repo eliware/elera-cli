@@ -4,6 +4,8 @@ export function createCliRoutingStream({ endpoint, token, WebSocketImpl = global
   if (!endpoint) throw new TypeError('endpoint is required');
   let socket;
   let closed = false;
+  // The native WebSocket API cannot set arbitrary Authorization headers; the
+  // supervisor stream contract intentionally accepts this query token.
   const url = `${endpoint.replace(/^http/i, 'ws').replace(/\/$/, '')}/api/v1/routing/stream?token=${encodeURIComponent(token ?? '')}`;
   async function connect() {
     if (closed || typeof WebSocketImpl !== 'function') return;

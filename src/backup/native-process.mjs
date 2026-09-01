@@ -3,6 +3,8 @@ import { spawn } from 'node:child_process';
 export function runNative(command, args, { env, input, output, spawnImpl = spawn } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawnImpl(command, args, {
+      // MYSQL_PWD is scoped to the child because MariaDB tools require an
+      // environment or option-based password for non-interactive execution.
       env: { ...process.env, ...env },
       stdio: [input ? 'pipe' : 'ignore', output ? 'pipe' : 'inherit', 'inherit']
     });
