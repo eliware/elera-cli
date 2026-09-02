@@ -2,7 +2,7 @@ import { isDirectedCommand } from './policy.mjs';
 
 export function deriveRuntimeOptions({ argv, command, parsed }) {
   const commandArgv = parsed.argv;
-  const operationId = parsed.options['operation-id'];
+  const operationId = parsed.options?.['operation-id'] ?? commandArgv.find((value) => value.startsWith('--operation-id='))?.slice('--operation-id='.length);
   const explicitTarget = commandArgv
     .find((value) => value.startsWith('--target-endpoint='))
     ?.slice('--target-endpoint='.length);

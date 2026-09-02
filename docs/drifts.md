@@ -6,7 +6,8 @@ repository conventions. Findings are recorded before implementation changes.
 ## Current status
 
 - [x] Administrative command-family ownership and shared-library boundary are established.
-- [ ] Published shared-library dependency and final release gates remain open.
+- [x] Local `file:../elera-lib` linking is intentional development state;
+  publication remains deferred until the lab is green.
 
 ## Actionable drifts
 
@@ -82,8 +83,8 @@ repository conventions. Findings are recorded before implementation changes.
   also present. The complete suite now passes at 100×4 with zero warnings.
 - [x] Run complete tests, lint, syntax/type checks, contract validation, audit,
   package dry-run, and CI validation after the boundary changes.
-- [ ] Replace the temporary `file:../elera-lib` dependency with the published
-  semver dependency before release packaging.
+- [x] Local `file:../elera-lib` linking is intentional development state;
+  replace it with the published semver dependency only for release packaging.
 - [x] Reconciled the README development gates and documented the intentional
   local shared-library link used before lab validation. Release metadata,
   lockfile, and release notes remain unchanged until the lab-validated release
@@ -96,7 +97,9 @@ repository conventions. Findings are recorded before implementation changes.
 - [x] Knit validation includes the same contract check as CI.
 - [x] Routing-bundle fixtures and stream timing tests are synchronized with the
   current shared-library contract.
-- [ ] Full validation must be rerun after any shared-library publish transition.
+- [~] Full validation must be rerun after the intentional future transition
+  from the local `elera-lib` link to its published package; this is a release
+  gate, not an active development drift.
 
 ## Verified or intentional boundaries
 
