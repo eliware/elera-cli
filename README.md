@@ -1,5 +1,7 @@
 # @eliware/elera-cli
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 Agent-friendly Elera database operations CLI. The package consumes
 `@eliware/elera-lib` for shared contracts and validation.
 
