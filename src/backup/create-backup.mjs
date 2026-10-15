@@ -1,22 +1,17 @@
-import {
-  mkdtemp,
-  mkdir,
-  readFile,
-  rename,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
-import { applicationDatabases, manifestText, sha256 } from "./manifests.mjs";
-import { dumpArgs } from "../database/commands.mjs";
-import { rotateBackups } from "./rotate-backups.mjs";
-import { dumpToGzip } from './dump-to-gzip.mjs';
-import { validateDatabaseName } from '../database/validate-name.mjs';
+import { applicationDatabases } from "./application-databases.mjs";
+import { manifestText } from "./manifest-text.mjs";
+import { sha256 } from "./hash-file.mjs";
+import { dumpArgs } from "../database/mysql-args.mjs";
+import { rotateBackups } from "./rotation.mjs";
+import { dumpToGzip } from "./dump-to-gzip.mjs";
+import { validateDatabaseName } from "../database/validate-name.mjs";
 
 const testGzip = promisify(gunzip);
-export { dumpToGzip } from './dump-to-gzip.mjs';
+export { dumpToGzip } from "./dump-to-gzip.mjs";
 export async function createBackup({
   backupRoot,
   databases,
@@ -52,9 +47,7 @@ export async function createBackup({
     await rename(staging, latest);
     return { path: latest, databases: eligible };
   } catch (error) {
-    await (staging
-      ? rm(staging, { recursive: true, force: true })
-      : Promise.resolve());
+    await (staging ? rm(staging, { recursive: true, force: true }) : Promise.resolve());
     await notify(error instanceof Error ? error.message : String(error));
     throw error;
   } finally {

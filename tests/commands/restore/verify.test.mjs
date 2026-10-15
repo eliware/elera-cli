@@ -1,1 +1,14 @@
-import { jest } from '@jest/globals'; import { runRestoreVerify } from '../../../src/commands/restore/verify.mjs'; test('verifies a restore', async () => { const restoreVerify = jest.fn(async () => ({ ok: true })); await runRestoreVerify({ client: { lease: async () => ({}) }, restoreVerify, emit: jest.fn(), database: 'db', identity: 'id', root: 'root' }); expect(restoreVerify).toHaveBeenCalledWith(expect.objectContaining({ restoreRoot: 'root' })); });
+import { jest } from "@jest/globals";
+import { runRestoreVerify } from "../../../src/commands/restore/verify.mjs";
+test("verifies a restore", async () => {
+  const restoreVerify = jest.fn(async () => ({ ok: true }));
+  await runRestoreVerify({
+    client: { lease: async () => ({}) },
+    restoreVerify,
+    emit: jest.fn(),
+    database: "db",
+    identity: "id",
+    root: "root",
+  });
+  expect(restoreVerify).toHaveBeenCalledWith(expect.objectContaining({ restoreRoot: "root" }));
+});

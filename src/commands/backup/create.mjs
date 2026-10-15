@@ -1,1 +1,23 @@
-export async function runBackup({ client, createBackup, emit, database, identity, root, databases }) { const bundle = await client.lease(database, identity); const metadata = { ...(await client.metadataExport()).data, accounts: (await client.exportAccounts()).accounts ?? [] }; const result = await createBackup({ bundle, backupRoot: root, databases: databases ?? [database], metadata }); emit({ ok: true, operation: 'backup', data: result }); return 0; }
+export async function runBackup({
+  client,
+  createBackup,
+  emit,
+  database,
+  identity,
+  root,
+  databases,
+}) {
+  const bundle = await client.lease(database, identity);
+  const metadata = {
+    ...(await client.metadataExport()).data,
+    accounts: (await client.exportAccounts()).accounts ?? [],
+  };
+  const result = await createBackup({
+    bundle,
+    backupRoot: root,
+    databases: databases ?? [database],
+    metadata,
+  });
+  emit({ ok: true, operation: "backup", data: result });
+  return 0;
+}

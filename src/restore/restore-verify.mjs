@@ -1,8 +1,15 @@
 import { readFile } from "node:fs/promises";
-import { mysqlArgs, validateDatabaseName } from "../database/commands.mjs";
-import { appendFile, createGunzip, createReadStream, runRestore, runSql } from './mysql-process.mjs';
+import { mysqlArgs } from "../database/mysql-args.mjs";
+import { validateDatabaseName } from "../database/validate-name.mjs";
+import {
+  appendFile,
+  createGunzip,
+  createReadStream,
+  runRestore,
+  runSql,
+} from "./mysql-process.mjs";
 
-export { runRestore, runSql } from './mysql-process.mjs';
+export { runRestore, runSql } from "./mysql-process.mjs";
 export async function restoreVerify({
   restoreRoot,
   credentialsFile,
@@ -18,13 +25,10 @@ export async function restoreVerify({
   notify = async () => {},
   now = () => new Date().toISOString(),
 }) {
-  if (logPath)
-    await writeLog(logPath, `restore verification started ${now()}\n`);
+  if (logPath) await writeLog(logPath, `restore verification started ${now()}\n`);
   let currentDatabase;
   try {
-    const names = (await read(`${restoreRoot}/DATABASES`, "utf8"))
-      .split(/\r?\n/)
-      .filter(Boolean);
+    const names = (await read(`${restoreRoot}/DATABASES`, "utf8")).split(/\r?\n/).filter(Boolean);
     let count = 0;
     for (const database of names) {
       currentDatabase = database;

@@ -1,1 +1,4 @@
-export async function runMetadataInitialize({ client, emit }) { emit(await client.metadataInitialize()); return 0; }
+export async function runMetadataInitialize({ client, emit }) {
+  emit(await client.metadataInitialize());
+  return 0;
+}

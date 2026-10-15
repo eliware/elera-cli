@@ -1,109 +1,94 @@
-# @eliware/elera-cli
+# [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+## @eliware/elera-cli [![npm](https://img.shields.io/npm/v/@eliware/elera-cli)](https://www.npmjs.com/package/@eliware/elera-cli) [![License](https://img.shields.io/github/license/eliware/elera-cli)](https://github.com/eliware/elera-cli/blob/main/LICENSE) [![CI](https://github.com/eliware/elera-cli/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/elera-cli/actions/workflows/ci.yaml)
 
-Agent-friendly Elera database operations CLI. The package consumes
-`@eliware/elera-lib` for shared contracts and validation.
+Agent-friendly CLI for Elera database operations, backup, restore, and metadata management
 
-The CLI will authenticate to the supervisor API with a scoped bearer token and
-use its supervisor API client for SQL metadata operations. Large backup and restore
-streams will continue to use native `mariadb-dump` and `mariadb` subprocesses;
-they will not pass through the supervisor API as JSON.
+## Table of Contents
 
-The supervisor REST API remains the CLI's primary control interface. Application
-WebSocket routing and native MariaDB connections belong to
-`@eliware/elera-client`; the CLI uses its own administrative API and native
-subprocess paths. The CLI does not own application connection pools.
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+- [Configuration](#configuration)
+- [Operations](#operations)
+- [Commands](#commands)
+- [Exit codes](#exit-codes)
+- [Support](#support)
+- [Links](#links)
+- [License](#license)
 
-## Command model
+## Features
 
-Commands use a family/action hierarchy. Use `elera-cli --help` for families,
-`elera-cli cluster --help` for family actions, and
-`elera-cli cluster join --help` for command-specific usage and options.
+Agent-friendly CLI for Elera database operations, backup, restore, and metadata management.
 
-Examples:
+## Requirements
 
-```text
-elera-cli health status
-elera-cli cluster status --json
-elera-cli routing bundle --target node-1
-elera-cli telemetry detail app-name
-elera-cli cluster bootstrap --confirm --operation-id bootstrap-1
-```
+- Use Node.js 26 or later.
 
-The load-balancer endpoint is the default for ordinary API operations. Commands
-that affect a specific node require an explicit direct target. Bootstrap,
-recovery, drain, restore, and credential-destructive operations require
-`--confirm`; `--dry-run` plans without changing state.
+## Setup
 
-## Current status
+Run npm ci to install the locked packages.
 
-The CLI currently supports health and readiness checks, supervisor status and
-routing inspection, metadata and cluster lifecycle operations, managed
-database/identity/account/token commands, reconciliation, and native-stream
-backup/restore verification. Metadata-first artifact restore reads the local
-`SUPERVISOR-METADATA.json` sidecar, restores metadata and logical accounts
-through the supervisor API, and streams application SQL with native MariaDB
-commands.
+## Usage
 
-Encrypted artifact commands are available for listing, retrieval of ciphertext,
-verification, replacement, and deletion. `AGE_RECIPIENT` configures native age
-encryption for `secret-put`; `AGE_IDENTITY_FILE` is used only for local
-decryption by library workflows. Neither key is sent to the supervisor or
-persisted by the CLI.
-
-`secrets materialize <name> <command> [args...]` decrypts an artifact into a
-mode-restricted temporary file, appends that path to the child command, and
-removes the temporary directory when the command exits. It never writes
-plaintext to CLI output.
-
-SSH, `known_hosts`, TLS, and backup inputs are resolved from GitOps/operator
-mounts using `ELERA_SSH_KEY_PATH`, `ELERA_KNOWN_HOSTS_PATH`,
-`ELERA_TLS_CERTIFICATE_PATH`, and `ELERA_BACKUP_CONFIG_PATH`. The CLI validates
-paths but does not log or copy their contents.
-
-## Configuration and operations
-
-Set `ELERA_API_ENDPOINT` and the administrative `ELERA_CLI_TOKEN` in the
-project-root `.env`; `ELERA_API_TOKEN` is reserved for application runtime
-clients. Explicit environment values take precedence. Do not place passwords,
-raw tokens, private keys, SQL dumps, or decrypted artifacts in the repository.
-
-The CLI is a short-lived command process. It validates configuration before
-opening supervisor or database connections, inherits standard input/output for
-SQL and dump pipelines, and returns the child MariaDB exit code for passthrough
-failures. Health and readiness are exposed through `health status` and
-`health ready`; platform lifecycle, backup, and restore commands require the
-documented confirmation gates and emit operation diagnostics without secret
-values.
-
-Backups use the native MariaDB tools plus Elera metadata artifacts. Verify a
-backup before restore, keep the original artifact unchanged, and use the
-restore verification commands after completion. If restore or deployment
-validation fails, stop and preserve the last known-good backup; application
-image rollback does not reverse database changes.
+Run elera-cli --help to list command groups.
+Read the [documentation index](docs/README.md) and [specification index](specs/README.md).
+Read [release notes](RELEASE_NOTES.md) for released changes.
 
 ## Development
 
-```bash
-npm ci
-npm test
-npm run lint
-npm run check
-npm run contracts
-npm run audit
-npm run pack
-```
+Keep code and tests in their assigned folders.
 
-During pre-release development, this checkout may intentionally consume
-`@eliware/elera-lib` through the local workspace reference in `package.json`.
-That link is for coordinated local validation only; replace it with the
-published semver dependency before packaging a release.
+## Testing
 
-Do not commit API tokens, age keys, database passwords, dumps, or decrypted
-artifacts.
-Metadata initialization is explicit and requires `elera-cli metadata initialize
---confirm`; status and verification use `metadata status` and `metadata verify`.
-Disposable node recovery uses `elera-cli node resync <node> --confirm="RESYNC
-<node>"`; the supervisor enforces node identity, liveness, and data-disposition
-safety. The CLI never deletes node data locally.
+Run npm test for repository validation.
+
+## Troubleshooting
+
+Read [troubleshooting](docs/troubleshooting.md) when a command fails.
+
+## Security
+
+Keep tokens, passwords, keys, and runtime data out of Git.
+
+## Configuration
+
+Set the values in .env.example when the application needs them.
+
+## Operations
+
+Use the repository docs for supported operations.
+
+## Commands
+
+Use elera-cli --help to read command help.
+
+## Exit codes
+
+The command returns zero when it succeeds. It returns a nonzero code when it fails.
+
+## Support
+
+For help, questions, or to chat with the author and community, visit:
+
+[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)[![eliware.org](https://eliware.org/logos/eliware_96.png)](https://discord.gg/M6aTR9eTwN)
+
+**[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
+
+## Links
+
+- [Home Page](https://eliware.org)
+- [GitHub Org](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/elera-cli)
+- [Bug Reports](https://github.com/eliware/elera-cli/issues)
+- [npm](https://www.npmjs.com/package/@eliware/elera-cli)
+- [Discord](https://discord.gg/M6aTR9eTwN)
+
+## License
+
+[MIT © Eliware](LICENSE)

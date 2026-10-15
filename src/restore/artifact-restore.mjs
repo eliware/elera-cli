@@ -1,30 +1,69 @@
-import { createReadStream } from 'node:fs';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { createGunzip } from 'node:zlib';
-import { runRestore } from './restore-verify.mjs';
-import { validateDatabaseName } from '../database/validate-name.mjs';
-import { verifyBackup } from '../backup/verify-backup.mjs';
+import { createReadStream } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { createGunzip } from "node:zlib";
+import { runRestore } from "./restore-verify.mjs";
+import { validateDatabaseName } from "../database/validate-name.mjs";
+import { verifyBackup } from "../backup/verify-backup.mjs";
 
-const readNames = async (root, read) => (await read(join(root, 'DATABASES'), 'utf8')).split(/\r?\n/).map((value) => value.trim()).filter(Boolean);
+const readNames = async (root, read) =>
+  (await read(join(root, "DATABASES"), "utf8"))
+    .split(/\r?\n/)
+    .map((value) => value.trim())
+    .filter(Boolean);
 
-export async function restoreArtifact({ root, client, bundle, confirm = false, restore = runRestore, read = readFile }) {
-  if (!confirm) throw Object.assign(new Error('artifact restore requires confirm: true'), { statusCode: 409 });
+export async function restoreArtifact({
+  root,
+  client,
+  bundle,
+  confirm = false,
+  restore = runRestore,
+  read = readFile,
+}) {
+  if (!confirm)
+    throw Object.assign(new Error("artifact restore requires confirm: true"), { statusCode: 409 });
   await verifyBackup({ backupPath: root, read });
-  const metadata = JSON.parse(await read(join(root, 'SUPERVISOR-METADATA.json'), 'utf8'));
+  const metadata = JSON.parse(await read(join(root, "SUPERVISOR-METADATA.json"), "utf8"));
   const accounts = metadata.accounts ?? [];
-  await client.restoreMetadataApply({ databases: metadata.databases ?? [], identities: metadata.identities ?? [] });
+  await client.restoreMetadataApply({
+    databases: metadata.databases ?? [],
+    identities: metadata.identities ?? [],
+  });
   if (accounts.length) await client.restoreAccountsApply(accounts);
-  for (const artifact of metadata.artifacts ?? [])
-    await client.putSecret(artifact.name, artifact);
-  const profile = { ...bundle, ...(bundle.credentials ?? {}), host: bundle.host ?? bundle.routes?.primary?.[0]?.host, port: bundle.port ?? bundle.routes?.primary?.[0]?.port };
+  for (const artifact of metadata.artifacts ?? []) await client.putSecret(artifact.name, artifact);
+  const profile = {
+    ...bundle,
+    ...bundle.credentials,
+    host: bundle.host ?? bundle.routes?.primary?.[0]?.host,
+    port: bundle.port ?? bundle.routes?.primary?.[0]?.port,
+  };
   const databases = await readNames(root, read);
   const restored = [];
   for (const database of databases) {
     validateDatabaseName(database);
-    if (['mysql', 'sys', 'information_schema', 'performance_schema'].includes(database)) continue;
-    await restore('mariadb', ['--host', profile.host, '--port', String(profile.port ?? 3306), '--user', profile.username, database], createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()), { env: { MYSQL_PWD: profile.password } });
+    if (["mysql", "sys", "information_schema", "performance_schema"].includes(database)) continue;
+    await restore(
+      "mariadb",
+      [
+        "--host",
+        profile.host,
+        "--port",
+        String(profile.port ?? 3306),
+        "--user",
+        profile.username,
+        database,
+      ],
+      createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()),
+      { env: { MYSQL_PWD: profile.password } },
+    );
     restored.push(database);
   }
-  return { metadata: { databases: metadata.databases?.length ?? 0, identities: metadata.identities?.length ?? 0, accounts: accounts.length }, restored };
+  return {
+    metadata: {
+      databases: metadata.databases?.length ?? 0,
+      identities: metadata.identities?.length ?? 0,
+      accounts: accounts.length,
+    },
+    restored,
+  };
 }

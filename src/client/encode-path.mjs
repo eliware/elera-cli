@@ -1,1 +1,3 @@
-export function encoded(value) { return encodeURIComponent(value ?? ''); }
+export function encoded(value) {
+  return encodeURIComponent(value ?? "");
+}

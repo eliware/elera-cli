@@ -1,10 +1,10 @@
 import { readdir } from "node:fs/promises";
 import { generate as generateSnowflake } from "@eliware/snowflake";
 import { connect, sshExec } from "@eliware/ssh-client";
-import { withRetry } from './retry.mjs';
-import { prepareStaging, finalizeStaging } from './nas-staging.mjs';
+import { withRetry } from "./retry.mjs";
+import { prepareStaging, finalizeStaging } from "./nas-staging.mjs";
 
-export { withRetry } from './retry.mjs';
+export { withRetry } from "./retry.mjs";
 export async function syncToNas({
   localPath,
   remotePath,
@@ -23,9 +23,7 @@ export async function syncToNas({
   if (dryRun) return remotePath;
   try {
     await retry(async () => {
-      await (prepareRemote
-        ? prepareStaging({ sshOptions, stagePath, sshRun })
-        : Promise.resolve());
+      await (prepareRemote ? prepareStaging({ sshOptions, stagePath, sshRun }) : Promise.resolve());
       const connection = await sshConnect(sshOptions);
       try {
         for (const entry of await list(localPath))

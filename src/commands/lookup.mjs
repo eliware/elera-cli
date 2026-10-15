@@ -5,5 +5,9 @@ export function resolveByName(records, name, label) {
   return matches[0].id;
 }
 
-export function applicationStatusOutput(application) { return { ok: true, operation: 'app-status', data: application }; }
-export function databaseDeleteOutput(result) { return { ok: true, operation: 'database-delete', data: result }; }
+export function applicationStatusOutput(application) {
+  return { ok: true, operation: "app-status", data: application };
+}
+export function databaseDeleteOutput(result) {
+  return { ok: true, operation: "database-delete", data: result };
+}

@@ -1,1 +1,7 @@
-import { jest } from '@jest/globals'; import { runDrainStatus } from '../../../src/commands/lifecycle/drain-status.mjs'; test('reads drain status', async () => { const emit = jest.fn(); const lifecycle = { drainStatus: async () => ({ ok: true }), classify: () => 0 }; await expect(runDrainStatus({ lifecycle, emit })).resolves.toBe(0); });
+import { jest } from "@jest/globals";
+import { runDrainStatus } from "../../../src/commands/lifecycle/drain-status.mjs";
+test("reads drain status", async () => {
+  const emit = jest.fn();
+  const lifecycle = { drainStatus: async () => ({ ok: true }), classify: () => 0 };
+  await expect(runDrainStatus({ lifecycle, emit })).resolves.toBe(0);
+});

@@ -1,2 +1,10 @@
-import { jsonRequest } from './endpoint-helpers.mjs';
-export function createAccountEndpoints(request) { return { accounts: () => request('/api/v1/accounts'), provisionAccount: (input) => jsonRequest(request, '/api/v1/accounts/provision', input), revokeAccount: (input) => jsonRequest(request, '/api/v1/accounts/revoke', input), verifyAccount: (input) => jsonRequest(request, '/api/v1/accounts/verify', input), exportAccounts: () => request('/api/v1/accounts/export', { method: 'POST' }) }; }
+import { jsonRequest } from "./request-json.mjs";
+export function createAccountEndpoints(request) {
+  return {
+    accounts: () => request("/api/v1/accounts"),
+    provisionAccount: (input) => jsonRequest(request, "/api/v1/accounts/provision", input),
+    revokeAccount: (input) => jsonRequest(request, "/api/v1/accounts/revoke", input),
+    verifyAccount: (input) => jsonRequest(request, "/api/v1/accounts/verify", input),
+    exportAccounts: () => request("/api/v1/accounts/export", { method: "POST" }),
+  };
+}

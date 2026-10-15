@@ -1,1 +1,0 @@
-export async function runTokenCreate({ client, emit, tokenName, application, identity, scopes = 'credential:issue' }) { emit(await client.createToken({ tokenName, application, identity, scopes: scopes.split(',') })); return 0; }

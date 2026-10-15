@@ -1,18 +1,7 @@
-# Release notes
+# Release Notes
 
-## Unreleased
+## 12.0.0 — 2026-10-14
 
-- Synchronized routing-bundle fixtures with the shared `@eliware/elera-lib`
-  contract, including `physicalDatabase` validation.
-- Kept source and test trees in 1:1 mirrored paths and aligned CI and Knit
-  validation commands.
+### Changed
 
-## 0.1.0
-
-- Initial CLI package scaffold using the published `@eliware/elera-lib@0.1.0` client.
-- Added age-encrypted artifact CRUD and verification commands using the
-  supervisor’s scoped REST API.
-- Added safe `secret-materialize` execution and GitOps-mounted input
-  resolution; plaintext is confined to a cleaned temporary operation.
-- Added Docker-only HTTP migration diagnostics for probe and legacy-config
-  validation.
+- Align package metadata, documentation, dependencies, and workflows with convention v12.0.

@@ -1,4 +1,12 @@
-export async function pollOperation(check, { timeoutMs = 60000, intervalMs = 1000, now = Date.now, sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)) } = {}) {
+export async function pollOperation(
+  check,
+  {
+    timeoutMs = 60000,
+    intervalMs = 1000,
+    now = Date.now,
+    sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  } = {},
+) {
   const deadline = now() + timeoutMs;
   let latest;
   do {

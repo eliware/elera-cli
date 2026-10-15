@@ -1,0 +1,7 @@
+import { jest } from "@jest/globals";
+import { runSecretList } from "../../../src/commands/protected-settings/list.mjs";
+test("lists secrets", async () => {
+  const emit = jest.fn();
+  await runSecretList({ client: { listSecrets: async () => ({ ok: true }) }, emit });
+  expect(emit).toHaveBeenCalledWith({ ok: true });
+});

@@ -1,7 +1,7 @@
 export function createClientContext({ config, createClient, targetEndpoint, operationId }) {
   const client = createClient({ ...config, operationId });
   const controlClient = targetEndpoint
-    ? createClient({ ...config, endpoint: targetEndpoint.replace(/\/$/, ''), operationId })
+    ? createClient({ ...config, endpoint: targetEndpoint.replace(/\/$/, ""), operationId })
     : client;
   return Object.freeze({ client, controlClient });
 }

@@ -1,1 +1,17 @@
-export function runMigrationExplain({ emit }) { emit({ ok: true, operation: 'migration-explain', data: { mapping: { database: 'provisionDatabase', identity: 'provisionIdentity', token: 'createToken', inspect: 'reconcilePlan', verify: 'reconcileVerify' }, pending: ['supervisor name lookup contract', 'migration-specific response schemas'] } }); return 0; }
+export function runMigrationExplain({ emit }) {
+  emit({
+    ok: true,
+    operation: "migration-explain",
+    data: {
+      mapping: {
+        database: "provisionDatabase",
+        identity: "provisionIdentity",
+        token: "createToken",
+        inspect: "reconcilePlan",
+        verify: "reconcileVerify",
+      },
+      pending: ["supervisor name lookup contract", "migration-specific response schemas"],
+    },
+  });
+  return 0;
+}

@@ -1,19 +1,13 @@
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { createBackup } from "./create-backup.mjs";
 import { verifyBackup } from "./verify-backup.mjs";
 import { restoreVerify } from "../restore/restore-verify.mjs";
 import { syncToNas } from "../transport/nas.mjs";
-export { withBundleCredentials } from './bundle-credentials.mjs';
-import { withBundleCredentials } from './bundle-credentials.mjs';
+export { withBundleCredentials } from "./bundle-credentials.mjs";
+import { withBundleCredentials } from "./bundle-credentials.mjs";
 
-export function createBackupFromBundle({
-  bundle,
-  backupRoot,
-  databases,
-  metadata,
-  ...options
-}) {
+export function createBackupFromBundle({ bundle, backupRoot, databases, metadata, ...options }) {
   return withBundleCredentials(bundle, async (credentialsFile, profile) => {
     const result = await createBackup({
       backupRoot,
@@ -34,12 +28,7 @@ export function createBackupFromBundle({
   });
 }
 
-export function verifyBackupFromBundle({
-  bundle,
-  backupPath,
-  databases,
-  ...options
-}) {
+export function verifyBackupFromBundle({ bundle, backupPath, databases, ...options }) {
   return withBundleCredentials(bundle, (credentialsFile, profile) =>
     verifyBackup({
       backupPath,

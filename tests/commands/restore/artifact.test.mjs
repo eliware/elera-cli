@@ -1,1 +1,16 @@
-import { jest } from '@jest/globals'; import { runRestoreArtifact } from '../../../src/commands/restore/artifact.mjs'; test('restores a complete artifact with confirmation', async () => { const restoreArtifact = jest.fn(async () => ({ restored: [] })); await runRestoreArtifact({ client: { lease: async () => ({}) }, restoreArtifact, emit: jest.fn(), database: 'db', identity: 'id', root: 'root' }); expect(restoreArtifact).toHaveBeenCalledWith(expect.objectContaining({ root: 'root', confirm: true })); });
+import { jest } from "@jest/globals";
+import { runRestoreArtifact } from "../../../src/commands/restore/artifact.mjs";
+test("restores a complete artifact with confirmation", async () => {
+  const restoreArtifact = jest.fn(async () => ({ restored: [] }));
+  await runRestoreArtifact({
+    client: { lease: async () => ({}) },
+    restoreArtifact,
+    emit: jest.fn(),
+    database: "db",
+    identity: "id",
+    root: "root",
+  });
+  expect(restoreArtifact).toHaveBeenCalledWith(
+    expect.objectContaining({ root: "root", confirm: true }),
+  );
+});

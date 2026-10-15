@@ -1,6 +1,7 @@
 {
   "name": "@eliware/elera-cli",
-  "version": "0.1.0",
+  "version": "12.0.0",
+  "type": "module",
   "description": "Agent-friendly CLI for Elera database operations, backup, restore, and metadata management",
   "keywords": [
     "eliware",
@@ -12,60 +13,72 @@
     "restore",
     "cli"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/eliware/elera-cli.git"
-  },
-  "homepage": "https://github.com/eliware/elera-cli#readme",
-  "bugs": {
-    "url": "https://github.com/eliware/elera-cli/issues"
-  },
-  "license": "Apache-2.0",
-  "type": "module",
-  "engines": {
-    "node": ">=26"
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "bin": {
-    "elera-cli": "./src/elera-cli.mjs"
-  },
-  "exports": {
-    ".": "./src/index.mjs"
+    "elera-cli": "./bin/elera-cli.mjs"
   },
   "files": [
-    "src",
+    "src/",
+    "docs/",
     "README.md",
-    "RELEASE_NOTES.md",
+    "AGENTS.md",
     "LICENSE",
-    "THIRD-PARTY-NOTICES.md"
+    "RELEASE_NOTES.md",
+    "bin/",
+    "specs/",
+    ".env.example"
   ],
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
-    "build": "node --check src/elera-cli.mjs",
-    "check": "node --check src/elera-cli.mjs",
-    "typecheck": "node --check src/elera-cli.mjs",
-    "contracts": "node scripts/verify-contracts.mjs",
-    "pack": "npm pack --dry-run",
-    "audit": "node scripts/run-audit.mjs"
+    "build": "node --check bin/elera-cli.mjs",
+    "check": "node --check bin/elera-cli.mjs",
+    "typecheck": "node --check bin/elera-cli.mjs",
+    "contracts": "node test-fixtures/verify-contracts.mjs",
+    "pack": "eliware-test --pack",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check"
+  },
+  "engines": {
+    "node": ">=26"
   },
   "dependencies": {
-    "@eliware/common": "^2.0.0",
-    "@eliware/elera-lib": "file:../elera-lib",
-    "@eliware/snowflake": "^2.0.0",
-    "@eliware/ssh-client": "^2.0.0"
+    "@eliware/common": "^12.0.1",
+    "@eliware/elera-lib": "^12.0.0",
+    "@eliware/snowflake": "^12.0.0",
+    "@eliware/ssh-client": "^12.0.0"
   },
   "devDependencies": {
-    "@eliware/test": "^5.0.0",
+    "@eliware/test": "^12.0.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"
   },
-  "private": true,
-  "allowScripts": {
-    "ssh2": true,
-    "cpu-features": true,
-    "unrs-resolver": true
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.mjs"
+    ],
+    "coverageReporters": [
+      "text",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    }
   },
-  "jest": {},
   "prettier": {
     "printWidth": 100,
     "tabWidth": 2,
@@ -81,8 +94,31 @@
     "proseWrap": "preserve",
     "endOfLine": "lf"
   },
+  "author": "Eliware <eliware@eliware.org>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/elera-cli.git"
+  },
+  "homepage": "https://github.com/eliware/elera-cli#readme",
+  "bugs": {
+    "url": "https://github.com/eliware/elera-cli/issues"
+  },
   "eliware": {
-    "id": "E-1321",
-    "apply": ["general", "application", "cli", "npm-published"]
+    "id": "E-1322",
+    "apply": [
+      "general",
+      "application",
+      "cli",
+      "npm-published"
+    ]
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "allowScripts": {
+    "ssh2": true,
+    "cpu-features": true,
+    "unrs-resolver": true
   }
 }

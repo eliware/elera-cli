@@ -1,0 +1,7 @@
+import { jest } from "@jest/globals";
+import { runSecretVerify } from "../../../src/commands/protected-settings/verify.mjs";
+test("verifies a secret", async () => {
+  const verifySecret = jest.fn(async () => ({ ok: true }));
+  await runSecretVerify({ client: { verifySecret }, emit: jest.fn(), name: "x" });
+  expect(verifySecret).toHaveBeenCalledWith("x");
+});

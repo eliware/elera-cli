@@ -1,1 +1,4 @@
-export async function runMetadataStatus({ client, emit }) { emit(await client.metadataStatus()); return 0; }
+export async function runMetadataStatus({ client, emit }) {
+  emit(await client.metadataStatus());
+  return 0;
+}

@@ -7,7 +7,10 @@
   "credentials": { "username": "billing_runtime", "password": "fixture-only" },
   "nodeIdentity": "sql0",
   "ports": { "sql": 3306, "http": 8080 },
-  "routes": { "primary": [{ "host": "sql0.internal", "port": 3306, "weight": 100 }], "balanced": [{ "host": "sql1.internal", "port": 3306, "weight": 80 }] },
+  "routes": {
+    "primary": [{ "host": "sql0.internal", "port": 3306, "weight": 100 }],
+    "balanced": [{ "host": "sql1.internal", "port": 3306, "weight": 80 }]
+  },
   "writer": { "host": "sql0.internal", "port": 3306, "weight": 100 },
   "failover": [{ "host": "sql1.internal", "port": 3306, "weight": 80 }],
   "readers": [{ "host": "sql2.internal", "port": 3306, "weight": 60 }],

@@ -1,0 +1,7 @@
+import { jest } from "@jest/globals";
+import { runSecretDelete } from "../../../src/commands/protected-settings/delete.mjs";
+test("deletes a secret", async () => {
+  const removeSecret = jest.fn(async () => ({ ok: true }));
+  await runSecretDelete({ client: { removeSecret }, emit: jest.fn(), name: "x" });
+  expect(removeSecret).toHaveBeenCalledWith("x");
+});

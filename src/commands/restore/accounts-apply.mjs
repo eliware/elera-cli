@@ -1,1 +1,5 @@
-export async function runRestoreAccountsApply({ client, emit, value }) { const result = await client.restoreAccountsApply(JSON.parse(value ?? '[]')); emit(result); return result.ok === false ? 1 : 0; }
+export async function runRestoreAccountsApply({ client, emit, value }) {
+  const result = await client.restoreAccountsApply(JSON.parse(value ?? "[]"));
+  emit(result);
+  return result.ok === false ? 1 : 0;
+}
