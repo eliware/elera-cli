@@ -24,53 +24,69 @@ Agent-friendly CLI for Elera database operations, backup, restore, and metadata 
 
 ## Features
 
-Agent-friendly CLI for Elera database operations, backup, restore, and metadata management.
+Use the Elera supervisor CLI to manage applications, databases, identities, tokens, routing, backups, and restores.
 
 ## Requirements
 
-- Use Node.js 26 or later.
+- Install Node.js 26 or later.
+- Get a CLI token from an Elera administrator.
 
 ## Setup
 
-Run npm ci to install the locked packages.
+Install the public package:
+
+```sh
+npm install --global @eliware/elera-cli
+```
+
+Set the supervisor URL and CLI token. Read [Configuration](docs/configuration.md).
 
 ## Usage
 
-Run elera-cli --help to list command groups.
-Read the [documentation index](docs/README.md) and [specification index](specs/README.md).
-Read [release notes](RELEASE_NOTES.md) for released changes.
+Run `elera-cli --help` to list command groups. Read the [usage guide](docs/usage.md) to start.
+Read [RELEASE_NOTES.md](RELEASE_NOTES.md) for package changes.
+Read [docs/README.md](docs/README.md) for all user guides.
 
 ## Development
 
-Keep code and tests in their assigned folders.
+Read [AGENTS.md](AGENTS.md) before you change this repository.
 
 ## Testing
 
-Run npm test for repository validation.
+Run `npm test` to check the repository.
 
 ## Troubleshooting
 
-Read [troubleshooting](docs/troubleshooting.md) when a command fails.
+Read the [troubleshooting guide](docs/troubleshooting.md) when a command fails.
 
 ## Security
 
-Keep tokens, passwords, keys, and runtime data out of Git.
+Protect CLI tokens, age keys, database dumps, and backup files. Read the [security guide](docs/security.md).
 
 ## Configuration
 
-Set the values in .env.example when the application needs them.
+Set the supervisor URL and CLI token in the process environment or `.env`. Read the [configuration guide](docs/configuration.md).
 
 ## Operations
 
-Use the repository docs for supported operations.
+Read the [access model](docs/access-model.md) before you use root or app-admin commands. Read the [backup and restore guide](docs/backup-restore.md) before you move data.
 
 ## Commands
 
-Use elera-cli --help to read command help.
+Run `elera-cli GROUP ACTION --help` for action details. Read the [command reference](docs/commands.md) for all groups and options. Read the [specification index](specs/README.md) for repository rules.
 
 ## Exit codes
 
-The command returns zero when it succeeds. It returns a nonzero code when it fails.
+| Code | Meaning                                                       |
+| ---- | ------------------------------------------------------------- |
+| `0`  | The command completed.                                        |
+| `1`  | The operation did not complete or returned a negative result. |
+| `2`  | The command, option, or input is invalid.                     |
+| `3`  | The token lacks access or has expired.                        |
+| `4`  | The CLI could not complete a network request.                 |
+| `5`  | The supervisor reports an unsafe operation.                   |
+| `6`  | The cluster is not in a primary state.                        |
+| `7`  | The operation was forced or escalated.                        |
 
 ## Support
 

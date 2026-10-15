@@ -16,3 +16,17 @@ test("derives output, operation, endpoint, and target options", () => {
     targetHost: "node-1",
   });
 });
+
+test("uses the target option for directed commands", () => {
+  expect(
+    deriveRuntimeOptions({
+      argv: ["cluster", "join", "--target=node-2"],
+      command: "cluster-join",
+      parsed: {
+        argv: ["cluster-join", "--target=node-2"],
+        positional: [],
+        options: { target: "node-2" },
+      },
+    }).targetHost,
+  ).toBe("node-2");
+});

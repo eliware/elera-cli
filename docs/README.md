@@ -1,10 +1,11 @@
 # Documentation
 
-- [core-flow-contract](core-flow-contract.md)
-- [drifts](drifts.md)
-- [release-history](release-history.md)
-- [source-test-inventory](source-test-inventory.md)
-- [specifications-out-of-scope](specifications-out-of-scope.md)
-- [specifications-requirements](specifications-requirements.md)
-- [troubleshooting](troubleshooting.md)
-- [usage](usage.md)
+## Navigation
+
+- Read [Usage](usage.md) to install and run the CLI.
+- Read [Configuration](configuration.md) to set the supervisor endpoint and token.
+- Read [Commands](commands.md) for every command group, argument, and option.
+- Read [Backup and restore](backup-restore.md) before you move database data.
+- Read [Security](security.md) to protect tokens, keys, and database files.
+- Read [Troubleshooting](troubleshooting.md) when a command fails.
+- Read [Access model](access-model.md) to learn how Elera roles work.

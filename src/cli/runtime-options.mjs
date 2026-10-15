@@ -10,10 +10,12 @@ export function deriveRuntimeOptions({ argv, command, parsed }) {
   const explicitTarget = commandArgv
     .find((value) => value.startsWith("--target-endpoint="))
     ?.slice("--target-endpoint=".length);
-  const targetHost =
-    isDirectedCommand(command) && parsed.positional[0] && !parsed.positional[0].startsWith("--")
-      ? parsed.positional[0]
-      : undefined;
+  const targetHost = isDirectedCommand(command)
+    ? (parsed.options?.target ??
+      (parsed.positional[0] && !parsed.positional[0].startsWith("--")
+        ? parsed.positional[0]
+        : undefined))
+    : undefined;
   return {
     commandArgv,
     jsonOutput: argv.includes("--json"),
