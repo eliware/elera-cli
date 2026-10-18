@@ -100,16 +100,16 @@
     "node-resync": { "positional": 1, "label": "exact node name" },
     "cold-recovery-authorize": { "positional": 1, "label": "authorization JSON" },
     "cold-recovery-bootstrap": { "positional": 1, "label": "bootstrap JSON" },
-    "cold-recovery-complete": { "positional": 1, "label": "completion JSON" },
+    "cold-recovery-complete": { "positional": 1, "label": "final JSON" },
     "token-revoke": { "positional": 1, "label": "token" },
     "app-status": { "positional": 0, "label": "application" },
     "app-create": { "positional": 1, "label": "application" },
     "app-admin-create": { "positional": 1, "label": "application" },
     "database-delete": { "positional": 1, "label": "database" },
-    "database-plan": { "positional": 1, "label": "desired database JSON" },
-    "database-verify": { "positional": 1, "label": "desired database JSON" },
-    "backup-plan": { "positional": 1, "label": "desired backup JSON" },
-    "restore-plan": { "positional": 1, "label": "desired restore JSON" }
+    "database-plan": { "positional": 1, "label": "required database JSON" },
+    "database-verify": { "positional": 1, "label": "required database JSON" },
+    "backup-plan": { "positional": 1, "label": "required backup JSON" },
+    "restore-plan": { "positional": 1, "label": "required restore JSON" }
   },
   "commandSpecificOptions": {
     "cluster-plan": ["action"],

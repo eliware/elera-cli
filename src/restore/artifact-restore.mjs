@@ -2,7 +2,7 @@ import { createReadStream } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createGunzip } from "node:zlib";
-import { runRestore } from "./restore-verify.mjs";
+import { runRestore } from "./verify.mjs";
 import { validateDatabaseName } from "../database/validate-name.mjs";
 import { verifyBackup } from "../backup/verify-backup.mjs";
 

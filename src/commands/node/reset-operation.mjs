@@ -19,7 +19,7 @@ export async function runNodeResetData({
       { exitCode: 2 },
     );
   if (disposition !== "single-member-resync")
-    throw Object.assign(new Error(`unsupported reset disposition: ${disposition}`), {
+    throw Object.assign(new Error(`unsupported data removal disposition: ${disposition}`), {
       exitCode: 2,
     });
   if (dryRun) {

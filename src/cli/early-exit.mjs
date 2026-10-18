@@ -1,7 +1,7 @@
 import { exitCodes } from "../operations/exit-code-table.mjs";
 import { helpPaths, parseArguments } from "./parser.mjs";
-import { schemaFor } from "./command-spec.mjs";
-import { suggestCommand } from "./command-tree.mjs";
+import { schemaFor } from "./command/spec.mjs";
+import { suggestCommand } from "./command/tree.mjs";
 
 export function handleEarlyExit({
   argv,
@@ -40,7 +40,7 @@ export function handleEarlyExit({
     }
     const suggestion = suggestCommand(parsed.path);
     errorOutput.write(
-      `unknown command: ${parsed.path.join(" ")}${suggestion ? `; did you mean ${suggestion}?` : ""}\n`,
+      `unknown command: ${parsed.path.join(" ")}${suggestion ? `. Did you mean ${suggestion}?` : ""}\n`,
     );
     return exitCodes.invalid;
   }

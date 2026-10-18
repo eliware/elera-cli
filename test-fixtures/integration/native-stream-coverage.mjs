@@ -1,5 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
-import { dumpDatabase, restoreDatabase } from "../../src/backup/native-stream.mjs";
+import { dumpDatabase, restoreDatabase } from "../../src/backup/native/stream.mjs";
 import { PassThrough } from "node:stream";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { join } from "node:path";

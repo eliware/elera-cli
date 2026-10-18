@@ -4,9 +4,9 @@
 
 Run `elera-cli --help` to list command groups. Add `--help` after a group or action to show its arguments and options.
 
-Use `--json` for JSON output. Use `--once` for a watch command that must stop after one update.
+Use `--json` for JSON output. Use `--once` for a live update command that must stop after one update.
 
-Use `--confirm` only after you review a command that changes data or service state. Use `--dry-run` when the command supports a plan.
+Use `--confirm` only after you check a command that changes data or supervisor state. Use `--dry-run` when the command supports a plan.
 
 Use `--operation-id ID` to set the operation ID for supported calls. Use `--target HOST` or `--target-endpoint URL` for directed cluster work.
 
@@ -18,7 +18,7 @@ The parser accepts `--quiet` and `--verbose`, but these flags do not change outp
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `health`         | `status`, `ready`                                                                                                                                                           | Check supervisor health and readiness.            |
 | `initialization` | `status`, `plan`, `apply`, `verify`, `standalone`                                                                                                                           | Check or initialize supervisor metadata.          |
-| `telemetry`      | `summary`, `detail APP`, `connections APP`, `watch`                                                                                                                         | Read telemetry or watch updates.                  |
+| `telemetry`      | `summary`, `detail APP`, `connections APP`, `watch`                                                                                                                         | Read telemetry or monitor updates.                |
 | `recovery`       | `status`, `events`, `acknowledge`, `abort`, `evidence`, `plan`, `authorize JSON`, `bootstrap JSON`, `complete JSON`, `apply`                                                | Inspect or run the supervisor recovery flow.      |
 | `cluster`        | `status`, `observations`, `evidence`, `quorum`, `plan ACTION`, `bootstrap`, `join`, `leave`, `rejoin`, `recover`, `startup-status`                                          | Read cluster state or request a lifecycle action. |
 | `routing`        | `status`, `routes`, `bundle`, `bundle-version`, `validate`, `events`, `rebalance`, `watch`, `resync NODE`, `drain`, `drain-status`, `undrain`                               | Read or change routing and traffic state.         |
@@ -52,13 +52,13 @@ Use `--grants VALUE` with `identity create`. Separate grant names with commas. U
 
 ## Confirmation
 
-Use `--confirm` for cluster bootstrap, join, leave, rejoin, metadata setup, standalone setup, token rotation, acknowledge, abort, and routing rebalance.
+Use `--confirm` for cluster setup, join, exit, rejoin, metadata setup, standalone setup, token changes, acknowledge, abort, and routing rebalance.
 
 Use `--confirm` for database deletion and cold recovery actions.
 
 Use `--dry-run` for a plan when the command supports it. The CLI sends the final request to the supervisor. The supervisor makes the final access decision.
 
-For node data reset, set `--confirm="RESET NODE"`. Replace `NODE` with the exact node name. For node resync, set `--confirm="RESYNC NODE"`.
+For node data removal, set `--confirm="RESET NODE"`. Replace `NODE` with the exact node name. For node resync, set `--confirm="RESYNC NODE"`.
 
 Read [Backup and restore](backup-restore.md) before you run a restore. Restore commands can replace database or supervisor data.
 

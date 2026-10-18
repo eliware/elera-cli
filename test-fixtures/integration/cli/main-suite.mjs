@@ -1130,7 +1130,7 @@ test("returns a usage error for an unknown option", async () => {
 test("suggests a command-tree match for an unknown action", async () => {
   const error = stream();
   expect(await runCli({ argv: ["routing", "bun"], output: stream(), errorOutput: error })).toBe(2);
-  expect(error.value).toContain("did you mean routing bundle?");
+  expect(error.value).toContain("Did you mean routing bundle?");
 });
 
 test("renders command-level help from the declarative schema", async () => {

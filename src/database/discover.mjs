@@ -10,7 +10,7 @@ export async function discoverDatabases({
     ...mysqlArgs(credentialsFile, host),
     "-N",
     "-e",
-    "SHOW DATABASES;",
+    "SHOW DATABASES",
   ]);
   return result.stdout
     .split(/\r?\n/)

@@ -67,7 +67,7 @@ test("diagnoses duplicate resources without exposing unrelated fields", async ()
     fetchImpl: async () => response(body, false, 409),
   });
   await expect(request("/api/v1/databases")).rejects.toMatchObject({
-    message: "resource already exists: database already exists",
+    message: "resource exists: database already exists",
     statusCode: 409,
     body,
   });

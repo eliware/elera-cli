@@ -1,5 +1,5 @@
-import { resolveCommand, helpFor } from "./command-tree.mjs";
-import { schemaFor, validateArguments } from "./command-spec.mjs";
+import { resolveCommand, helpFor } from "./command/tree.mjs";
+import { schemaFor, validateArguments } from "./command/spec.mjs";
 
 const flags = new Set(["--confirm", "--dry-run", "--json", "--quiet", "--verbose", "--once"]);
 const valueOptions = new Set(["--operation-id", "--target", "--target-endpoint"]);
@@ -7,7 +7,7 @@ const commonOptions = new Set([...flags, "--help", "-h", ...valueOptions]);
 
 function closestOption(value, knownOptions) {
   const candidate = [...knownOptions].find((option) => option.startsWith(value.slice(0, 5)));
-  return candidate ? `; did you mean ${candidate}?` : "";
+  return candidate ? `. Did you mean ${candidate}?` : "";
 }
 
 function normalizeOptions(values, command) {

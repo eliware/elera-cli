@@ -1,4 +1,4 @@
-import { confirmationCommands, directedCommands, mutatingCommands } from "./command-policy.mjs";
+import { confirmationCommands, directedCommands, mutatingCommands } from "./command/policy.mjs";
 
 export function isDirectedCommand(command) {
   return directedCommands.has(command);

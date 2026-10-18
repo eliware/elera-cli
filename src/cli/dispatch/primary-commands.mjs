@@ -4,7 +4,7 @@ import { dispatchReadOnly } from "./read-only.mjs";
 import { dispatchManagement } from "./management.mjs";
 import { createReadOnlyHandlers } from "../handlers/read-only.mjs";
 import { createManagementHandlers } from "../handlers/management.mjs";
-import { runBackupRestoreCommand } from "../handlers/backup-restore.mjs";
+import { runBackupRestoreCommand } from "../handlers/backup/restore.mjs";
 import { runSqlSmoke } from "../../commands/smoke/sql.mjs";
 
 export async function dispatchPrimaryCommands(input) {

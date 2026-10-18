@@ -3,7 +3,7 @@ import { Readable } from "node:stream";
 import { EventEmitter } from "node:events";
 import { Writable } from "node:stream";
 import { gzipSync } from "node:zlib";
-import { restoreVerify, runRestore, runSql } from "../../../src/restore/restore-verify.mjs";
+import { restoreVerify, runRestore, runSql } from "../../../src/restore/verify.mjs";
 
 test("restores each application schema, skips system schemas, and logs verification", async () => {
   const calls = [];
@@ -82,7 +82,7 @@ test("restore verification cleans up when restore itself fails", async () => {
       notify,
     }),
   ).rejects.toThrow("restore failed");
-  expect(execSql).toHaveBeenCalledTimes(2);
+  expect(execSql).toHaveBeenCalledTimes(3);
   expect(notify).toHaveBeenCalled();
 });
 

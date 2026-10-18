@@ -1,6 +1,6 @@
 import { loadCliConfig } from "../config.mjs";
 import { createSupervisorClient } from "../supervisor-client.mjs";
-import { dumpDatabase, restoreDatabase } from "../backup/native-stream.mjs";
+import { dumpDatabase, restoreDatabase } from "../backup/native/stream.mjs";
 import {
   createBackupFromBundle,
   verifyBackupFromBundle,

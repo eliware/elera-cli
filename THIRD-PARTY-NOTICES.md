@@ -1,6 +1,5 @@
 # Third-party notices
 
-Eliware-authored code is Apache-2.0 licensed. `@eliware/common`,
-`@eliware/elera-lib`, and transitive npm dependencies retain their respective
-licenses as recorded in package metadata. Review the complete dependency tree
-before redistribution.
+Eliware code uses the Apache-2.0 license. Package metadata lists licenses for
+`@eliware/common`, `@eliware/elera-lib`, and all npm dependencies. Examine all
+dependency licenses before redistribution.

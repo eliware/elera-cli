@@ -1,0 +1,64 @@
+import { commandTree } from "./tree.mjs";
+import { commonFlags } from "./policy.mjs";
+export const commandRequirements = Object.freeze({
+  "telemetry-detail": { positional: 1, label: "application" },
+  connections: { positional: 1, label: "application" },
+  dump: { positional: 1, label: "file path" },
+  restore: { positional: 1, label: "file path" },
+  backup: { positional: 1, label: "backup path" },
+  "verify-backup": { positional: 1, label: "backup path" },
+  "restore-verify": { positional: 1, label: "backup path" },
+  "restore-artifact": { positional: 1, label: "backup path" },
+  "backup-list": { positional: 1, label: "backup path" },
+  "token-rotate": { positional: 1, label: "token name" },
+  "database-create": { positional: 2, label: "application and database" },
+  "identity-create": { positional: 3, label: "application, database, and identity" },
+  "identity-rotate": { positional: 1, label: "identity" },
+  "account-create": { positional: 2, label: "user and database" },
+  "account-revoke": { positional: 1, label: "user" },
+  "account-verify": { positional: 1, label: "user" },
+  "token-create": { positional: 3, label: "token, application, and identity" },
+  "node-reset-data": { positional: 1, label: "exact node name" },
+  "node-resync": { positional: 1, label: "exact node name" },
+  "cold-recovery-authorize": { positional: 1, label: "authorization JSON" },
+  "cold-recovery-bootstrap": { positional: 1, label: "bootstrap JSON" },
+  "cold-recovery-complete": { positional: 1, label: "final JSON" },
+  "token-revoke": { positional: 1, label: "token" },
+  "app-status": { positional: 0, label: "application" },
+  "app-create": { positional: 1, label: "application" },
+  "app-admin-create": { positional: 1, label: "application" },
+  "database-delete": { positional: 1, label: "database" },
+  "database-plan": { positional: 1, label: "required database JSON" },
+  "database-verify": { positional: 1, label: "required database JSON" },
+  "backup-plan": { positional: 1, label: "required backup JSON" },
+  "restore-plan": { positional: 1, label: "required restore JSON" },
+});
+const commandSpecificOptions = Object.freeze({
+  "cluster-plan": ["action"],
+  "reconcile-plan": ["value"],
+  "reconcile-apply": ["value"],
+  "reconcile-verify": ["value"],
+  "identity-create": ["grants"],
+  "token-create": ["scopes"],
+  "node-reset-data": ["confirm", "force", "disposition"],
+  "node-resync": ["confirm", "force"],
+});
+export function schemaFor(command) {
+  const requirement = commandRequirements[command];
+  return Object.freeze({
+    positional: requirement?.positional ?? 0,
+    label: requirement?.label ?? "argument",
+    options: Object.freeze([...commonFlags, ...(commandSpecificOptions[command] ?? [])]),
+  });
+}
+export function validateArguments(command, positional = []) {
+  if (!command) return [];
+  const schema = schemaFor(command);
+  return positional.length < schema.positional ? [`${command} requires a ${schema.label}`] : [];
+}
+export function commandNames() {
+  return Object.values(commandTree()).flatMap((family) => Object.values(family));
+}
+export function requirementFor(command) {
+  return commandRequirements[command];
+}

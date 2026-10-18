@@ -35,7 +35,7 @@ Check the supervisor connection:
 elera-cli health status --json
 ```
 
-Check service readiness:
+Check supervisor readiness:
 
 ```sh
 elera-cli health ready --json
@@ -65,7 +65,7 @@ elera-cli database delete --help
 
 Add `--json` to return JSON output. Use `--operation-id ID` to set an operation ID where the supervisor supports it.
 
-Set `ELERA_DATABASE` and `ELERA_IDENTITY` to choose default application context. A command argument can select a more specific resource.
+Set `ELERA_DATABASE` and `ELERA_IDENTITY` to select the default application context. A command argument can select a named resource.
 
 Use `--target HOST` to send a directed cluster command to a host. Use `--target-endpoint URL` to set its full endpoint.
 

@@ -8,7 +8,7 @@ Use an administrative CLI token for platform work. The supervisor checks the tok
 
 ## Application access
 
-An administrator creates an application and an app-admin token. The app-admin token can manage its assigned application within its scope.
+An administrator creates an application and an app-admin token. The token can manage its assigned application in its scope.
 
 Use friendly application, database, and identity names in CLI commands. The supervisor maps these names to internal IDs and physical database names.
 

@@ -23,7 +23,7 @@ test("database helpers filter, discover, validate, and build dump arguments", as
     "db",
     "-N",
     "-e",
-    "SHOW DATABASES;",
+    "SHOW DATABASES",
   ]);
   expect(dumpArgs("/root/.my.cnf", "db", "app")).toContain("app");
   expect(() => validateDatabaseName("app; DROP DATABASE mysql")).toThrow("Invalid database name");

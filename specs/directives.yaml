@@ -3,7 +3,7 @@ description: Defines requirements for @eliware/elera-cli.
 directives:
   - id: E-1322.0
     dos:
-      - Keep public behavior consistent with the package README.
+      - Keep public behavior aligned with the package README.
       - Validate the package with npm test before commit.
     donts:
       - Do not expose secrets, tokens, or private data.

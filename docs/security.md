@@ -26,10 +26,10 @@ Keep age identities and recipients out of Git. Use GitOps input paths for mounte
 
 ## Backups
 
-Treat SQL dumps and backup sets as sensitive data. Store them outside the repository. Limit access to the users who need them.
+Use SQL dumps and backup sets as sensitive data. Store them outside the repository. Limit access to approved users.
 
 Check target names and paths before restore. Read [Backup and restore](backup-restore.md) before you change data.
 
 ## Logs and reports
 
-Use `--json` when a script needs structured output. Review output before you share it. Remove tokens, passwords, private data, and secret values.
+Use `--json` when a script requires structured output. Check output before you share it. Remove tokens, passwords, private data, and secret values.

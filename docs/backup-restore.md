@@ -74,7 +74,7 @@ Pass a JSON value to the plan command first:
 elera-cli restore metadata-plan '{"databases":[],"identities":[]}' --json
 ```
 
-Apply metadata only after you review the plan:
+Apply metadata only after you check the plan:
 
 ```sh
 elera-cli restore metadata-apply '{"databases":[],"identities":[]}' --json
@@ -86,4 +86,4 @@ Use `restore accounts-plan`, `restore accounts-apply`, and `restore accounts-ver
 
 Keep `DATABASES`, `SHA256SUMS`, `SUPERVISOR-METADATA.json`, and every listed `.sql.gz` file in one directory. Do not edit the checksum file.
 
-Store backups outside Git. Protect backups as sensitive data. Read [Security](security.md) before you move backup files.
+Store backups outside Git. Keep backup files safe. Read the [token guide](security.md) before you move backup files.

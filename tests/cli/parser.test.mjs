@@ -56,7 +56,7 @@ test("parses verbose output as a common flag", () => {
 
 test("rejects unknown options with a useful suggestion", () => {
   const parsed = parseArguments(["health", "status", "--jso"]);
-  expect(parsed.errors).toEqual(["unknown option: --jso; did you mean --json?"]);
+  expect(parsed.errors).toEqual(["unknown option: --jso. Did you mean --json?"]);
 });
 
 test("rejects unknown options without guessing", () => {

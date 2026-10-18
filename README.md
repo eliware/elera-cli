@@ -61,7 +61,7 @@ Read the [troubleshooting guide](docs/troubleshooting.md) when a command fails.
 
 ## Security
 
-Protect CLI tokens, age keys, database dumps, and backup files. Read the [security guide](docs/security.md).
+Keep CLI tokens, age keys, database dumps, and backup files safe. Read the [token guide](docs/security.md).
 
 ## Configuration
 

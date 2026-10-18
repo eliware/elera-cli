@@ -1,6 +1,6 @@
 {
   "name": "@eliware/elera-cli",
-  "version": "12.0.0",
+  "version": "13.0.0",
   "type": "module",
   "description": "Agent-friendly CLI for Elera database operations, backup, restore, and metadata management",
   "keywords": [
@@ -38,7 +38,7 @@
     "build": "node --check bin/elera-cli.mjs",
     "check": "node --check bin/elera-cli.mjs",
     "typecheck": "node --check bin/elera-cli.mjs",
-    "contracts": "node test-fixtures/verify-contracts.mjs",
+    "contracts": "node scripts/verify-contracts.mjs",
     "pack": "eliware-test --pack",
     "audit": "eliware-test --audit",
     "format": "eliware-test --format",

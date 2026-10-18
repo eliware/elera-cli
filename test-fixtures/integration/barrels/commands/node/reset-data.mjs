@@ -19,7 +19,7 @@ test("refuses missing node and unsupported disposition", async () => {
       confirm: "RESET elera-1",
       disposition: "wipe-all",
     }),
-  ).rejects.toThrow("unsupported reset disposition");
+  ).rejects.toThrow("unsupported data removal disposition");
 });
 test("plans and executes the supervisor reset with idempotency", async () => {
   const emit = jest.fn();

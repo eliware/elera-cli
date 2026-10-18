@@ -52,8 +52,8 @@ test("supports dry runs, retries, and notifies on permanent failures", async () 
       retry: async (operation) => operation(),
       notify,
     }),
-  ).rejects.toThrow("preparation");
-  expect(notify).toHaveBeenCalledWith("remote staging preparation failed");
+  ).rejects.toThrow("setup");
+  expect(notify).toHaveBeenCalledWith("remote staging setup failed");
 });
 test("handles optional staging and upload/finalization failures", async () => {
   const upload = jest.fn(async () => {

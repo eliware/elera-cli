@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { runMigrationWorkflow } from "../../../../src/commands/migration/run-workflow.mjs";
-import { runMigrationAction } from "../../../../src/commands/migration/run-action.mjs";
+import { runMigrationWorkflow } from "../../../../src/commands/migration/run/workflow.mjs";
+import { runMigrationAction } from "../../../../src/commands/migration/run/action.mjs";
 import { runMigrationExplain } from "../../../../src/commands/migration/explain.mjs";
 import { runMigrationPending } from "../../../../src/commands/migration/pending.mjs";
 test("composes migration workflow over an existing client operation", async () => {

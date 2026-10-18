@@ -4,7 +4,7 @@
 
 Set `ELERA_API_ENDPOINT` to the HTTP or HTTPS URL of the supervisor. The default example is `http://localhost:8080`.
 
-Set `ELERA_CLI_TOKEN` to the administrative token for this CLI. Do not use `ELERA_API_TOKEN`; that name belongs to application runtime clients.
+Set `ELERA_CLI_TOKEN` to the administrative token for this CLI. Do not use `ELERA_API_TOKEN`. Application runtime clients use that name.
 
 ## Optional values
 
@@ -17,7 +17,7 @@ Set `ELERA_CLI_TOKEN` to the administrative token for this CLI. Do not use `ELER
 | `AGE_RECIPIENT`      | Recipient for encrypted secrets.     | None.                                           |
 | `AGE_IDENTITY_FILE`  | Identity file for secret reads.      | None.                                           |
 
-Commands can need database and identity context. Set both values when a command needs them.
+Some commands require database and identity context. Set both values for those commands.
 
 ## Set values
 
@@ -25,7 +25,7 @@ The CLI reads `.env` from its current working directory. Copy `.env.example` to 
 
 Set one value on each line. Use `NAME=value` format. Use quotes around a value when it contains spaces.
 
-The process environment takes priority over `.env`. Keep real token values out of Git.
+The CLI uses process environment values before `.env` values. Keep real token values out of Git.
 
 ```dotenv
 ELERA_API_ENDPOINT=https://supervisor.example

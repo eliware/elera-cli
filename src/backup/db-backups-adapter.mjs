@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createBackup } from "./create-backup.mjs";
 import { verifyBackup } from "./verify-backup.mjs";
-import { restoreVerify } from "../restore/restore-verify.mjs";
+import { restoreVerify } from "../restore/verify.mjs";
 import { syncToNas } from "../transport/nas.mjs";
 export { withBundleCredentials } from "./bundle-credentials.mjs";
 import { withBundleCredentials } from "./bundle-credentials.mjs";

@@ -1,10 +1,10 @@
 import { validateBundle } from "@eliware/elera-lib";
 import { createSupervisorRequest } from "./transport/supervisor-request.mjs";
 import { createCoreEndpoints } from "./client/core-endpoints.mjs";
-import { createClusterEndpoints } from "./client/cluster-endpoints.mjs";
-import { createRoutingEndpoints } from "./client/routing-endpoints.mjs";
-import { createRestoreEndpoints } from "./client/restore-endpoints.mjs";
-import { createRecoveryEndpoints } from "./client/recovery-endpoints.mjs";
+import { createClusterEndpoints } from "./client/cluster/endpoints.mjs";
+import { createRoutingEndpoints } from "./client/routing/endpoints.mjs";
+import { createRestoreEndpoints } from "./client/restore/endpoints.mjs";
+import { createRecoveryEndpoints } from "./client/recovery/endpoints.mjs";
 import { pollOperation } from "./operations/poll.mjs";
 
 /** Creates the public supervisor API by composing focused endpoint families. */

@@ -6,7 +6,7 @@ export async function prepareStaging({ sshOptions, stagePath, sshRun }) {
     commands: [`rm -rf -- ${quote(stagePath)}`, `mkdir -p -- ${quote(stagePath)}`],
   });
   if (results.some((result) => result.code && result.code !== 0))
-    throw new Error("remote staging preparation failed");
+    throw new Error("remote staging setup failed");
 }
 
 export async function finalizeStaging({

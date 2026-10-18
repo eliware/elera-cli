@@ -42,7 +42,7 @@ export function createLifecycleCommands({ client, now, sleep, timeoutMs = 60000 
       if (data.lifecycle === "stopping" || data.lifecycle === "stopped") {
         return completeOperation(
           createOperationRecord("traffic.undrain", {}, now),
-          { ok: false, status: "unsafe", error: "cannot resume a stopping supervisor" },
+          { ok: false, status: "unsafe", error: "cannot continue a stopping supervisor" },
           now,
         );
       }

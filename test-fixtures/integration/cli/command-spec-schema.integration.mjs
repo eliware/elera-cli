@@ -1,4 +1,4 @@
-import { commandNames, schemaFor, validateArguments } from "../../../src/cli/command-spec.mjs";
+import { commandNames, schemaFor, validateArguments } from "../../../src/cli/command/spec.mjs";
 
 test("provides a schema for every registered command", () => {
   expect(commandNames().every((command) => schemaFor(command).options.includes("json"))).toBe(true);

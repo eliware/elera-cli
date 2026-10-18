@@ -24,7 +24,7 @@ export function createSupervisorRequest({ endpoint, token, fetchImpl = fetch, op
         `supervisor request failed: ${response.status}`;
       const message =
         errorCode === "duplicate_resource" || /duplicate|already exists/i.test(String(rawMessage))
-          ? `resource already exists: ${rawMessage}`
+          ? `resource exists: ${rawMessage}`
           : String(rawMessage);
       throw Object.assign(new Error(message), { statusCode: response.status, body });
     }
