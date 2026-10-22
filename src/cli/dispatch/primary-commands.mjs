@@ -51,7 +51,10 @@ export async function dispatchPrimaryCommands(input) {
     options: {
       ...parsed.options,
       confirm: parsed.options.confirm ?? argv.includes("--confirm"),
-      "dry-run": argv.includes("--dry-run"),
+      "dry-run":
+        parsed.options["dry-run"] === true ||
+        parsed.options["dry-run"] === "true" ||
+        argv.includes("--dry-run"),
     },
     operationId,
     handlers: createManagementHandlers(),

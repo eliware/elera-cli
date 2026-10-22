@@ -38,3 +38,37 @@ test("preserves exact node confirmation phrases during dispatch", async () => {
     expect.objectContaining({ confirm: "RESET elera-1" }),
   );
 });
+
+test("preserves the node reset dry-run value during dispatch", async () => {
+  const emit = jest.fn();
+  const resetNodeData = jest.fn();
+  const result = await dispatchPrimaryCommands({
+    command: "node-reset-data",
+    client: { resetNodeData },
+    controlClient: {},
+    emit,
+    args: ["elera-single.lab.local"],
+    config: {},
+    dependencies: {},
+    environment: {},
+    argv: [
+      "node-reset-data",
+      "elera-single.lab.local",
+      "--dry-run=true",
+      "--force=true",
+      "--disposition=single-member-resync",
+      "--confirm=RESET elera-single.lab.local",
+    ],
+    parsed: {
+      options: {
+        "dry-run": "true",
+        force: "true",
+        disposition: "single-member-resync",
+        confirm: "RESET elera-single.lab.local",
+      },
+    },
+  });
+  expect(result).toBe(0);
+  expect(resetNodeData).not.toHaveBeenCalled();
+  expect(emit).toHaveBeenCalledWith(expect.objectContaining({ status: "planned", changed: false }));
+});
