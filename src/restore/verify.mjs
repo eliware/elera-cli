@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { mysqlArgs } from "../database/mysql-args.mjs";
 import { validateDatabaseName } from "../database/validate-name.mjs";
+import { verificationDatabase } from "./verification-database.mjs";
 import {
   appendFile,
   createGunzip,
@@ -34,29 +35,17 @@ export async function restoreVerify({
       currentDatabase = database;
       if (["sys", "mysql"].includes(database)) continue;
       validateDatabaseName(database);
-      const target = `${prefix}${database}`;
+      const target = verificationDatabase(database, prefix);
       try {
-        await execSql(mysql, [
-          ...mysqlArgs(credentialsFile, host),
-          "-e",
-          `DROP DATABASE IF EXISTS \`${target}\``,
-        ]);
-        await execSql(mysql, [
-          ...mysqlArgs(credentialsFile, host),
-          "-e",
-          `CREATE DATABASE \`${target}\``,
-        ]);
+        await execSql(mysql, [...mysqlArgs(credentialsFile, host), "-e", target.drop]);
+        await execSql(mysql, [...mysqlArgs(credentialsFile, host), "-e", target.create]);
         await restore(
           mysql,
-          [...mysqlArgs(credentialsFile, host), target],
+          [...mysqlArgs(credentialsFile, host), target.name],
           stream(`${restoreRoot}/${database}.sql.gz`).pipe(createGunzip()),
         );
       } finally {
-        await execSql(mysql, [
-          ...mysqlArgs(credentialsFile, host),
-          "-e",
-          `DROP DATABASE IF EXISTS \`${target}\``,
-        ]);
+        await execSql(mysql, [...mysqlArgs(credentialsFile, host), "-e", target.drop]);
       }
       count += 1;
     }

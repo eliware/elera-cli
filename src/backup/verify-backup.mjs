@@ -5,20 +5,14 @@ import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
 import { applicationDatabases } from "./application-databases.mjs";
 import { sha256 } from "./hash-file.mjs";
+import { parseBackupManifest } from "./manifest.mjs";
 
 const testGzip = promisify(gunzip);
 export async function verifyBackup({ backupPath, databases, read = readFile, hash = sha256 }) {
-  const listed = (await read(join(backupPath, "DATABASES"), "utf8")).split(/\r?\n/).filter(Boolean);
+  const databaseContent = await read(join(backupPath, "DATABASES"), "utf8");
+  const checksumContent = await read(join(backupPath, "SHA256SUMS"), "utf8");
+  const { databases: listed, hashes } = parseBackupManifest(databaseContent, checksumContent);
   const expected = applicationDatabases(databases ?? listed);
-  const manifest = (await read(join(backupPath, "SHA256SUMS"), "utf8"))
-    .split(/\r?\n/)
-    .filter(Boolean);
-  const hashes = new Map(
-    manifest.map((line) => {
-      const [value, name] = line.trim().split(/\s+/, 2);
-      return [name, value];
-    }),
-  );
   for (const database of expected) {
     const file = join(backupPath, `${database}.sql.gz`);
     const content = await read(file);
