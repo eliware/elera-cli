@@ -2,10 +2,7 @@ import { createArtifactCommands } from "../../../state-materialization/commands.
 import { createAgeProcess } from "../../../state-materialization/age-process.mjs";
 import { dispatchBackupRestore } from "../../dispatch/backup-restore.mjs";
 import { createBackupRestoreOperations } from "./operations.mjs";
-import { runSecretList } from "../../../commands/protected-settings/list.mjs";
-import { runSecretGet } from "../../../commands/protected-settings/get.mjs";
-import { runSecretVerify } from "../../../commands/protected-settings/verify.mjs";
-import { runSecretDelete } from "../../../commands/protected-settings/delete.mjs";
+import { createSecretCommandHandler } from "./secrets.mjs";
 
 export function runBackupRestoreCommand({
   command,
@@ -22,23 +19,13 @@ export function runBackupRestoreCommand({
     materialize: dependencies.materialize,
     emit,
   });
-  const secretHandlers = {
-    "secret-list": runSecretList,
-    "secret-get": runSecretGet,
-    "secret-verify": runSecretVerify,
-    "secret-delete": runSecretDelete,
-  };
   return dispatchBackupRestore({
     command,
     client,
     emit,
     args,
     config,
-    artifactCommands: async (name, values) => {
-      if (secretHandlers[name]) return secretHandlers[name]({ client, emit, name: values[0] });
-      await artifactCommands(name, values);
-      return 0;
-    },
+    artifactCommands: createSecretCommandHandler({ client, emit, artifactCommands }),
     operations: createBackupRestoreOperations({ command, dependencies }),
   });
 }

@@ -32,3 +32,19 @@ test("keeps credentials out of native arguments while supporting streamed dump a
   expect(calls[0].args).toContain("user");
   expect(calls[1].args).toContain("app");
 });
+
+test("native database streams accept direct connection fields", async () => {
+  const calls = [];
+  const runImpl = async (binary, args, options) => {
+    calls.push({ binary, args, options });
+    return { code: 0 };
+  };
+  const bundle = { database: "app", username: "u", password: "p", host: "direct", port: 3307 };
+  await dumpDatabase(bundle, new PassThrough(), { runImpl });
+  await restoreDatabase(bundle, new PassThrough(), { runImpl });
+  expect(calls.map(({ args }) => args)).toEqual([
+    expect.arrayContaining(["direct", "3307", "u", "app"]),
+    expect.arrayContaining(["direct", "3307", "u", "app"]),
+  ]);
+  expect(calls.map(({ options }) => options.env.MYSQL_PWD)).toEqual(["p", "p"]);
+});

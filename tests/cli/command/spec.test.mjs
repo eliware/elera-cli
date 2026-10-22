@@ -8,6 +8,7 @@ import {
   directedCommands,
   mutatingCommands,
   confirmationCommands,
+  schemaFor,
   validateArguments,
 } from "../../../src/cli/command/spec.mjs";
 
@@ -49,4 +50,14 @@ test("command policy defines common flags, targeting, mutation, confirmation, an
 
 test("uses the default positional list", () => {
   expect(validateArguments("health")).toEqual([]);
+});
+
+test("defines command schemas and validates required arguments", () => {
+  expect(schemaFor("database-create").positional).toBe(2);
+  expect(schemaFor("identity-create").options).toContain("grants");
+  expect(schemaFor("unknown").positional).toBe(0);
+  expect(validateArguments("database-create", ["app"])).toHaveLength(1);
+  expect(validateArguments("database-create", ["app", "db"])).toEqual([]);
+  expect(validateArguments()).toEqual([]);
+  expect(requirementFor("database-create")).toBeDefined();
 });

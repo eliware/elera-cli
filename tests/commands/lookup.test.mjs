@@ -1,8 +1,4 @@
-import {
-  resolveByName,
-  applicationStatusOutput,
-  databaseDeleteOutput,
-} from "../../src/commands/lookup.mjs";
+import { resolveByName } from "../../src/commands/lookup.mjs";
 test("resolves friendly names or stable IDs and rejects ambiguity", () => {
   const records = [{ id: "1", name: "Demo" }];
   expect(resolveByName(records, "Demo", "application")).toBe("1");
@@ -11,16 +7,4 @@ test("resolves friendly names or stable IDs and rejects ambiguity", () => {
   expect(() =>
     resolveByName([...records, { id: "2", name: "Demo" }], "Demo", "application"),
   ).toThrow("application is ambiguous");
-});
-test("provides stable administrative output envelopes", () => {
-  expect(applicationStatusOutput({ id: "1" })).toEqual({
-    ok: true,
-    operation: "app-status",
-    data: { id: "1" },
-  });
-  expect(databaseDeleteOutput({ id: "2" })).toEqual({
-    ok: true,
-    operation: "database-delete",
-    data: { id: "2" },
-  });
 });

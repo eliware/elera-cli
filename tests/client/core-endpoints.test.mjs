@@ -43,3 +43,11 @@ test("lists applications for friendly-name resolution", async () => {
   const endpoints = subject.createCoreEndpoints(request, (value) => value);
   await expect(endpoints.applications()).resolves.toEqual({ path: "/api/v1/applications" });
 });
+
+test("composes token operations with core endpoint families", () => {
+  const endpoints = subject.createCoreEndpoints(jest.fn(), (value) => value);
+  expect(endpoints.tokens).toEqual(expect.any(Function));
+  expect(endpoints.createToken).toEqual(expect.any(Function));
+  expect(endpoints.rotateToken).toEqual(expect.any(Function));
+  expect(endpoints.revokeToken).toEqual(expect.any(Function));
+});

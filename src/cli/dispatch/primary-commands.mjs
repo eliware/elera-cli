@@ -1,11 +1,10 @@
-import { createMigrationDiagnostics } from "../../migration/diagnostics.mjs";
-import { runMigrationDiagnostics } from "../../commands/diagnostics/migration.mjs";
 import { dispatchReadOnly } from "./read-only.mjs";
 import { dispatchManagement } from "./management.mjs";
-import { createReadOnlyHandlers } from "../handlers/read-only.mjs";
+import { createReadOnlyHandlers } from "../handlers/read/only.mjs";
 import { createManagementHandlers } from "../handlers/management.mjs";
 import { runBackupRestoreCommand } from "../handlers/backup/restore.mjs";
-import { runSqlSmoke } from "../../commands/smoke/sql.mjs";
+import { runPrimarySqlSmoke } from "../handlers/primary/smoke.mjs";
+import { runPrimaryMigrationDiagnostics } from "../handlers/primary/diagnostics.mjs";
 
 export async function dispatchPrimaryCommands(input) {
   const {
@@ -21,14 +20,7 @@ export async function dispatchPrimaryCommands(input) {
     parsed,
     operationId,
   } = input;
-  if (command === "sql-smoke")
-    return runSqlSmoke({
-      client,
-      createLive: dependencies.createLiveDb,
-      createDb: dependencies.createDb,
-      emit,
-      config,
-    });
+  if (command === "sql-smoke") return runPrimarySqlSmoke({ client, emit, config, dependencies });
   const backupResult = await runBackupRestoreCommand({
     command,
     client,
@@ -39,11 +31,8 @@ export async function dispatchPrimaryCommands(input) {
     environment,
   });
   if (backupResult !== undefined) return backupResult;
-  if (command === "migration-check" || command === "preflight") {
-    const diagnose = dependencies.migrationDiagnostics ?? createMigrationDiagnostics();
-    const configPath = argv.slice(1).find((argument) => !argument.startsWith("--"));
-    return runMigrationDiagnostics({ diagnose, emit, endpoint: config.endpoint, configPath });
-  }
+  if (command === "migration-check" || command === "preflight")
+    return runPrimaryMigrationDiagnostics({ dependencies, argv, config, emit });
   const readOnlyResult = await dispatchReadOnly({
     command,
     client,
