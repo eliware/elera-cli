@@ -74,6 +74,17 @@ test("preserves absent token redaction value", () => {
   expect(redactCliConfig({ endpoint: "https://db.example" }).token).toBeUndefined();
 });
 
-test("rejects the default process environment when it lacks CLI settings", () => {
-  expect(() => loadCliConfig()).toThrow("ELERA_CLI_TOKEN is required");
+test("rejects the default process environment when the token is missing", () => {
+  const endpoint = process.env.ELERA_API_ENDPOINT;
+  const token = process.env.ELERA_CLI_TOKEN;
+  process.env.ELERA_API_ENDPOINT = "https://db.example";
+  process.env.ELERA_CLI_TOKEN = "";
+  try {
+    expect(() => loadCliConfig()).toThrow("ELERA_CLI_TOKEN is required");
+  } finally {
+    if (endpoint === undefined) delete process.env.ELERA_API_ENDPOINT;
+    else process.env.ELERA_API_ENDPOINT = endpoint;
+    if (token === undefined) delete process.env.ELERA_CLI_TOKEN;
+    else process.env.ELERA_CLI_TOKEN = token;
+  }
 });
