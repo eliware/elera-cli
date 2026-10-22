@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises";
-import { generate as generateSnowflake } from "@eliware/snowflake";
+import { generate as generateSnowflake } from "@eliware/common";
 import { connect, sshExec } from "@eliware/ssh-client";
 import { withRetry } from "./retry.mjs";
 import { prepareStaging, finalizeStaging } from "./nas-staging.mjs";

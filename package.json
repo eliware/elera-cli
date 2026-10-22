@@ -1,6 +1,6 @@
 {
   "name": "@eliware/elera-cli",
-  "version": "13.0.0",
+  "version": "15.0.0",
   "type": "module",
   "description": "Agent-friendly CLI for Elera database operations, backup, restore, and metadata management",
   "keywords": [
@@ -35,7 +35,6 @@
   "scripts": {
     "test": "eliware-test",
     "lint": "eliware-test --lint",
-    "build": "node --check bin/elera-cli.mjs",
     "check": "node --check bin/elera-cli.mjs",
     "typecheck": "node --check bin/elera-cli.mjs",
     "contracts": "node scripts/verify-contracts.mjs",
@@ -48,13 +47,12 @@
     "node": ">=26"
   },
   "dependencies": {
-    "@eliware/common": "^12.0.1",
-    "@eliware/elera-lib": "^12.0.0",
-    "@eliware/snowflake": "^12.0.0",
-    "@eliware/ssh-client": "^12.0.0"
+    "@eliware/common": "^15.0.0",
+    "@eliware/elera-lib": "^15.0.0",
+    "@eliware/ssh-client": "^15.0.0"
   },
   "devDependencies": {
-    "@eliware/test": "^13.0.0",
+    "@eliware/test": "^15.0.0",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"
   },

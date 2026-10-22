@@ -6,6 +6,6 @@ test("creates an operation record", () => {
     action: "test",
     input: { value: 1 },
     requestedAt: "now",
-    operationId: expect.any(String),
+    operationId: expect.stringMatching(/^\d+$/),
   });
 });

@@ -1,4 +1,4 @@
-import { generate as generateSnowflake } from "@eliware/snowflake";
+import { generate as generateSnowflake } from "@eliware/common";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
