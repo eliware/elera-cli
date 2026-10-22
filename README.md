@@ -39,8 +39,6 @@ Install the public package:
 npm install --global @eliware/elera-cli
 ```
 
-Set the supervisor URL and CLI token. Read [Configuration](docs/configuration.md).
-
 ## Usage
 
 Run `elera-cli --help` to list command groups. Read the [usage guide](docs/usage.md) to start.
@@ -53,7 +51,7 @@ Read [AGENTS.md](AGENTS.md) before you change this repository.
 
 ## Testing
 
-Use npm 12 or later to run the repository checks. Run `npm test` to check the repository.
+Run `npm test` to check the repository.
 
 ## Troubleshooting
 
