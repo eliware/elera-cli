@@ -50,7 +50,7 @@ export async function dispatchPrimaryCommands(input) {
     args,
     options: {
       ...parsed.options,
-      confirm: argv.includes("--confirm"),
+      confirm: parsed.options.confirm ?? argv.includes("--confirm"),
       "dry-run": argv.includes("--dry-run"),
     },
     operationId,

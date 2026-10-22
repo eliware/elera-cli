@@ -7,6 +7,7 @@ const client = () => ({
   trafficStatus: jest.fn(async () => ({
     data: { drained: true, active: 0, lifecycle: "draining" },
   })),
+  lifecycle: jest.fn(async () => ({ ok: true })),
   status: jest.fn(async () => ({
     data: { ready: true, values: { wsrep_cluster_status: "Primary" } },
   })),
@@ -14,8 +15,15 @@ const client = () => ({
 });
 
 test("drain status and stop record outcomes", async () => {
+  const supervisor = client();
+  supervisor.lifecycle.mockImplementation(async () => {
+    supervisor.trafficStatus.mockResolvedValue({
+      data: { lifecycle: "stopped", drained: true, active: 0 },
+    });
+    return { ok: true };
+  });
   const value = createLifecycleCommands({
-    client: client(),
+    client: supervisor,
     now: () => "now",
     sleep: async () => {},
   });
@@ -27,6 +35,7 @@ test("drain status and stop record outcomes", async () => {
     action: "supervisor.shutdown",
     outcome: { status: "completed" },
   });
+  expect(supervisor.lifecycle).toHaveBeenCalledWith("shutdown");
 });
 
 test("refuses unsafe resume and recovery", async () => {
@@ -73,7 +82,10 @@ test("covers direct supervisor response shapes and validation", async () => {
 
 test("handles completed and incomplete stop polls", async () => {
   const completed = client();
-  completed.trafficStatus.mockResolvedValue({ lifecycle: "stopped", active: 0 });
+  completed.lifecycle.mockImplementation(async () => {
+    completed.trafficStatus.mockResolvedValue({ lifecycle: "stopped", active: 0 });
+    return { ok: true };
+  });
   await expect(
     createLifecycleCommands({ client: completed, now: () => "now" }).stop(),
   ).resolves.toMatchObject({ outcome: { status: "completed" } });
@@ -85,6 +97,6 @@ test("handles completed and incomplete stop polls", async () => {
   const noActive = client();
   noActive.trafficStatus.mockResolvedValue({ drained: true });
   await expect(
-    createLifecycleCommands({ client: noActive, now: () => "now" }).stop(),
-  ).resolves.toMatchObject({ outcome: { status: "completed" } });
+    createLifecycleCommands({ client: noActive, now: () => "now", timeoutMs: 0 }).stop(),
+  ).resolves.toMatchObject({ outcome: { status: "incomplete", timedOut: true } });
 });

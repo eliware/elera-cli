@@ -8,7 +8,7 @@ test("diagnoses HTTP probes", async () => {
   });
   await expect(diagnose({ endpoint: "http://vip", configPath: "haproxy.cfg" })).resolves.toEqual({
     ok: false,
-    checks: { healthz: true, readyz: false, httpOnly: true },
+    checks: { healthz: true, readyz: false, configReadable: true, httpOnly: true },
   });
 });
 
@@ -26,7 +26,7 @@ test("uses the default config reader when preflight receives a config path", asy
   const diagnose = createMigrationDiagnostics({ fetchImpl: async () => ({ status: 200 }) });
   await expect(
     diagnose({ endpoint: "http://vip", configPath: "missing-config" }),
-  ).resolves.toMatchObject({ ok: true, checks: { httpOnly: true } });
+  ).resolves.toMatchObject({ ok: false, checks: { configReadable: false, httpOnly: true } });
 });
 
 test("reports unreachable endpoints", async () => {

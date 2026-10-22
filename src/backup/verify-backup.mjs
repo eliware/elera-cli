@@ -5,14 +5,21 @@ import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
 import { applicationDatabases } from "./application-databases.mjs";
 import { sha256 } from "./hash-file.mjs";
-import { parseBackupManifest } from "./manifest.mjs";
+import { hasBackupManifest, parseBackupManifest } from "./manifest.mjs";
 
 const testGzip = promisify(gunzip);
 export async function verifyBackup({ backupPath, databases, read = readFile, hash = sha256 }) {
   const databaseContent = await read(join(backupPath, "DATABASES"), "utf8");
   const checksumContent = await read(join(backupPath, "SHA256SUMS"), "utf8");
   const { databases: listed, hashes } = parseBackupManifest(databaseContent, checksumContent);
+  const manifest = { databases: listed, hashes };
+  const listedApplications = applicationDatabases(listed);
+  if (!hasBackupManifest(manifest, listedApplications))
+    throw new Error("backup manifest is incomplete");
   const expected = applicationDatabases(databases ?? listed);
+  if (expected.length === 0) throw new Error("backup database list is empty");
+  if (expected.some((database) => !listed.includes(database)))
+    throw new Error("backup database is not listed in the manifest");
   for (const database of expected) {
     const file = join(backupPath, `${database}.sql.gz`);
     const content = await read(file);

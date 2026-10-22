@@ -20,6 +20,7 @@ export function createLifecycleCommands({ client, now, sleep, timeoutMs = 60000 
     async stop() {
       const record = createOperationRecord("supervisor.shutdown", {}, now);
       await client.drain();
+      const shutdown = await client.lifecycle("shutdown");
       const polled = await pollOperation(
         async () => {
           const response = await client.trafficStatus();
@@ -31,8 +32,8 @@ export function createLifecycleCommands({ client, now, sleep, timeoutMs = 60000 
       return completeOperation(
         record,
         polled.done
-          ? { ...polled.response, status: "completed" }
-          : { ...polled.response, status: "incomplete", timedOut: true },
+          ? { ...shutdown, ...polled.response, status: "completed" }
+          : { ...shutdown, ...polled.response, status: "incomplete", timedOut: true },
         now,
       );
     },

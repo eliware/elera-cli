@@ -313,14 +313,21 @@ test("supports lifecycle inspection, stop, and explicit recovery confirmation", 
     ELERA_DATABASE: "app",
     ELERA_IDENTITY: "runtime",
   };
+  let shutdownRequested = false;
   const originalFetch = globalThis.fetch;
   globalThis.fetch = jest.fn(async (url, _options = {}) => {
     const path = new URL(url).pathname;
-    const data = path.endsWith("/traffic/status")
-      ? { drained: true, active: 0, lifecycle: "draining" }
-      : path.endsWith("/cluster/lifecycle/plan")
-        ? { eligible: false, reason: "quorum required" }
-        : { ready: true, values: { wsrep_cluster_status: "Primary" } };
+    const data = path.endsWith("/cluster/lifecycle/apply")
+      ? ((shutdownRequested = true), { lifecycle: "stopping" })
+      : path.endsWith("/traffic/status")
+        ? {
+            drained: true,
+            active: 0,
+            lifecycle: shutdownRequested ? "stopped" : "draining",
+          }
+        : path.endsWith("/cluster/lifecycle/plan")
+          ? { eligible: false, reason: "quorum required" }
+          : { ready: true, values: { wsrep_cluster_status: "Primary" } };
     return {
       ok: true,
       headers: { get: () => "application/json" },

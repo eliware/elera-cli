@@ -53,3 +53,42 @@ test("verifies every application database listed in a backup set", async () => {
     "backup hash mismatch: archive.sql.gz",
   );
 });
+
+test("rejects empty or incomplete backup manifests", async () => {
+  const files = new Map([
+    ["DATABASES", ""],
+    ["SHA256SUMS", ""],
+  ]);
+  const read = async (path) => files.get(path.split(/[\\/]/).at(-1));
+  await expect(verifyBackup({ backupPath: "backup", read })).rejects.toThrow(
+    "backup manifest is incomplete",
+  );
+  files.set("DATABASES", "app\n");
+  await expect(verifyBackup({ backupPath: "backup", read })).rejects.toThrow(
+    "backup manifest is incomplete",
+  );
+});
+
+test("rejects a requested database outside the manifest", async () => {
+  const content = gzipSync("sql");
+  const files = new Map([
+    ["DATABASES", "app\n"],
+    ["SHA256SUMS", `${createHash("sha256").update(content).digest("hex")}  app.sql.gz\n`],
+  ]);
+  const read = async (path) => files.get(path.split(/[\\/]/).at(-1));
+  await expect(verifyBackup({ backupPath: "backup", databases: ["other"], read })).rejects.toThrow(
+    "backup database is not listed in the manifest",
+  );
+});
+
+test("rejects an empty requested database list", async () => {
+  const content = gzipSync("sql");
+  const files = new Map([
+    ["DATABASES", "app\n"],
+    ["SHA256SUMS", `${createHash("sha256").update(content).digest("hex")}  app.sql.gz\n`],
+  ]);
+  const read = async (path) => files.get(path.split(/[\\/]/).at(-1));
+  await expect(verifyBackup({ backupPath: "backup", databases: [], read })).rejects.toThrow(
+    "backup database list is empty",
+  );
+});
