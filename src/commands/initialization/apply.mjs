@@ -1,4 +1,5 @@
 export async function runInitializationApply({ client, emit }) {
-  emit(await client.initializationApply());
-  return 0;
+  const result = await client.initializationApply();
+  emit(result);
+  return result?.ok === true ? 0 : 1;
 }

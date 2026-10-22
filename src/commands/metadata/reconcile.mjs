@@ -7,5 +7,5 @@ export async function runReconcile({ client, emit, command, value }) {
         ? await client.reconcileApply(desired)
         : await client.reconcileVerify(desired);
   emit(result);
-  return result.ok === false ? 1 : 0;
+  return result?.ok === true ? 0 : 1;
 }
