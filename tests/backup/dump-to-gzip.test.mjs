@@ -1,5 +1,6 @@
 import { expect, jest, test } from "@jest/globals";
-import { Readable, Writable } from "node:stream";
+import { EventEmitter } from "node:events";
+import { PassThrough, Readable, Writable } from "node:stream";
 import { dumpToGzip } from "../../src/backup/dump-to-gzip.mjs";
 
 test("starts dump subprocesses without a shell", async () => {
@@ -29,4 +30,29 @@ test("starts dump subprocesses without a shell", async () => {
     [],
     expect.objectContaining({ shell: false }),
   );
+});
+
+test("rejects a synchronous spawn failure", async () => {
+  const failure = new Error("spawn failed");
+  await expect(
+    dumpToGzip("mariadb-dump", [], "backup.sql.gz", {
+      spawnImpl: () => {
+        throw failure;
+      },
+    }),
+  ).rejects.toBe(failure);
+});
+
+test("stops the gzip pipeline when the subprocess emits an error", async () => {
+  const child = new EventEmitter();
+  child.stdout = new PassThrough();
+  child.stderr = new PassThrough();
+  const output = new PassThrough();
+  const operation = dumpToGzip("mariadb-dump", [], "backup.sql.gz", {
+    spawnImpl: () => child,
+    createOutput: () => output,
+  });
+  process.nextTick(() => child.emit("error", new Error("spawn failed")));
+  await expect(operation).rejects.toThrow("spawn failed");
+  expect(output.destroyed).toBe(true);
 });

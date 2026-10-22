@@ -31,7 +31,14 @@ test("command tree exposes every supported family and canonical path", () => {
 
 test("command policy defines common flags, targeting, mutation, confirmation, and requirements", () => {
   expect(commonFlags).toEqual(
-    expect.arrayContaining(["confirm", "dry-run", "json", "target", "operation-id"]),
+    expect.arrayContaining([
+      "confirm",
+      "dry-run",
+      "json",
+      "target",
+      "target-endpoint",
+      "operation-id",
+    ]),
   );
   expect(directedCommands.has("cluster-join")).toBe(true);
   expect(mutatingCommands.has("database-create")).toBe(true);
@@ -43,6 +50,14 @@ test("command policy defines common flags, targeting, mutation, confirmation, an
     positional: 3,
     label: "token, application, and identity",
   });
+  expect(requirementFor("migration-inspect")).toEqual({
+    positional: 1,
+    label: "desired state JSON",
+  });
+  expect(schemaFor("migration-database-create").positional).toBe(2);
+  expect(schemaFor("migration-identity-create").positional).toBe(3);
+  expect(schemaFor("migration-token-create").positional).toBe(3);
+  expect(schemaFor("migration-verify").positional).toBe(1);
   expect(requirementFor("health")).toBeUndefined();
   expect(mutatingCommands.has("database-delete")).toBe(true);
   expect(confirmationCommands.has("database-delete")).toBe(true);

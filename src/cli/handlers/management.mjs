@@ -11,7 +11,7 @@ import { runApplicationCreate } from "../../commands/application/create.mjs";
 import { runApplicationStatus } from "../../commands/application/status.mjs";
 import { runAppAdminCreate } from "../../commands/application/admin-create.mjs";
 import { runMigrationExplain } from "../../commands/migration/explain.mjs";
-import { runMigrationPending } from "../../commands/migration/pending.mjs";
+import { runMigrationAction } from "../../commands/migration/run/action.mjs";
 import { runNodeResetData } from "../../commands/node/reset-operation.mjs";
 import { runNodeResync } from "../../commands/node/resync.mjs";
 import { runIdentityCreate } from "../../commands/identity/create.mjs";
@@ -44,7 +44,7 @@ export function createManagementHandlers() {
     applicationStatus: runApplicationStatus,
     appAdminCreate: runAppAdminCreate,
     migrationExplain: runMigrationExplain,
-    migrationPending: runMigrationPending,
+    migrationAction: runMigrationAction,
     nodeResetData: runNodeResetData,
     nodeResync: runNodeResync,
     identityCreate: runIdentityCreate,

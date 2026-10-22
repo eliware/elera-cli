@@ -24,11 +24,42 @@ export function createManagementResourceCalls(input) {
     "app-admin-create": () =>
       handlers.appAdminCreate({ client, emit, application: args[0], tokenName: args[1] }),
     "migration-explain": () => handlers.migrationExplain({ emit }),
-    "migration-inspect": () => handlers.migrationPending({ action: "inspect" }),
-    "migration-database-create": () => handlers.migrationPending({ action: "database" }),
-    "migration-identity-create": () => handlers.migrationPending({ action: "identity" }),
-    "migration-token-create": () => handlers.migrationPending({ action: "token" }),
-    "migration-verify": () => handlers.migrationPending({ action: "verify" }),
+    "migration-inspect": () =>
+      handlers.migrationAction({ client, emit, action: "inspect", input: JSON.parse(args[0]) }),
+    "migration-database-create": () =>
+      handlers.migrationAction({
+        client,
+        emit,
+        action: "database",
+        input: { application: args[0], database: args[1] },
+      }),
+    "migration-identity-create": () =>
+      handlers.migrationAction({
+        client,
+        emit,
+        action: "identity",
+        input: {
+          application: args[0],
+          database: args[1],
+          identity: args[2],
+          purpose: options.purpose ?? "runtime",
+          grants: (options.grants ?? "SELECT").split(",").map((grant) => grant.trim()),
+        },
+      }),
+    "migration-token-create": () =>
+      handlers.migrationAction({
+        client,
+        emit,
+        action: "token",
+        input: {
+          tokenName: args[0],
+          application: args[1],
+          identity: args[2],
+          scopes: (options.scopes ?? "credential:issue").split(","),
+        },
+      }),
+    "migration-verify": () =>
+      handlers.migrationAction({ client, emit, action: "verify", input: JSON.parse(args[0]) }),
     "database-plan": () => handlers.databasePlan({ client, emit, value: args[0] }),
     "database-verify": () => handlers.databaseVerify({ client, emit, value: args[0] }),
     "node-reset-data": () =>

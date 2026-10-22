@@ -10,21 +10,38 @@ export function dumpToGzip(
   { spawnImpl = spawn, createOutput = createWriteStream, gzip = createGzip } = {},
 ) {
   return new Promise((resolve, reject) => {
-    const child = spawnImpl(binary, args, { shell: false, stdio: ["ignore", "pipe", "pipe"] });
+    const controller = new AbortController();
+    let settled = false;
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      controller.abort();
+      reject(error);
+    };
+    let child;
+    try {
+      child = spawnImpl(binary, args, { shell: false, stdio: ["ignore", "pipe", "pipe"] });
+    } catch (error) {
+      fail(error);
+      return;
+    }
     let stderr = "";
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk) => {
       stderr += chunk;
     });
-    const exited = new Promise((done, fail) =>
+    const exited = new Promise((done, rejectExit) =>
       child.once("close", (code) =>
-        code === 0 ? done() : fail(new Error(stderr.trim() || `dump exited with ${code}`)),
+        code === 0 ? done() : rejectExit(new Error(stderr.trim() || `dump exited with ${code}`)),
       ),
     );
-    Promise.all([pipeline(child.stdout, gzip(), createOutput(destination)), exited]).then(
-      () => resolve(),
-      reject,
-    );
-    child.once("error", reject);
+    Promise.all([
+      pipeline(child.stdout, gzip(), createOutput(destination), { signal: controller.signal }),
+      exited,
+    ]).then(() => {
+      settled = true;
+      resolve();
+    }, fail);
+    child.once("error", fail);
   });
 }

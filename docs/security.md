@@ -6,6 +6,8 @@ Use a CLI token that matches the task. Ask an administrator for the correct toke
 
 Store the token in the process environment or a local `.env` file. Keep `.env` out of Git. The repository ignores `.env` files.
 
+The CLI sends the token in the WebSocket authorization header for routing events. It does not add the token to the URL.
+
 Do not paste tokens into command arguments, issue text, logs, or support messages. Use `ELERA_CLI_TOKEN` for this CLI. Do not use the application runtime variable `ELERA_API_TOKEN`.
 
 ## Database access

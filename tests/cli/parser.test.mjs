@@ -50,6 +50,12 @@ test("normalizes separated and inline value options", () => {
   expect(parsed.argv).toContain("--target-endpoint=http://node");
 });
 
+test("accepts a full target endpoint option", () => {
+  const parsed = parseArguments(["health", "status", "--target-endpoint", "https://node.example"]);
+  expect(parsed.errors).toEqual([]);
+  expect(parsed.options["target-endpoint"]).toBe("https://node.example");
+});
+
 test("parses verbose output as a common flag", () => {
   expect(parseArguments(["health", "status", "--verbose"]).flags.has("--verbose")).toBe(true);
 });

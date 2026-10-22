@@ -2,7 +2,6 @@ import { jest } from "@jest/globals";
 import { runMigrationWorkflow } from "../../../../src/commands/migration/run/workflow.mjs";
 import { runMigrationAction } from "../../../../src/commands/migration/run/action.mjs";
 import { runMigrationExplain } from "../../../../src/commands/migration/explain.mjs";
-import { runMigrationPending } from "../../../../src/commands/migration/pending.mjs";
 test("composes migration workflow over an existing client operation", async () => {
   const emit = jest.fn();
   const client = {};
@@ -53,10 +52,9 @@ test("maps migration actions to existing client APIs with stable output", async 
     "unsupported migration action",
   );
 });
-test("explains migration mapping and rejects pending actions explicitly", () => {
+test("explains migration mapping", () => {
   const emit = jest.fn();
   expect(runMigrationExplain({ emit })).toBe(0);
   expect(emit.mock.calls[0][0].data.mapping.database).toBe("provisionDatabase");
   expect(emit.mock.calls[0][0].data.mapping.inspect).toBe("reconcilePlan");
-  expect(() => runMigrationPending({ action: "inspect" })).toThrow("contract pending");
 });

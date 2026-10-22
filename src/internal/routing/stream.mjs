@@ -1,21 +1,21 @@
 import { validateRoutingEvent } from "@eliware/elera-lib";
+import WebSocket from "ws";
 
 export function createCliRoutingStream({
   endpoint,
   token,
-  WebSocketImpl = globalThis.WebSocket,
+  WebSocketImpl = WebSocket,
   onUpdate,
   onError,
 } = {}) {
   if (!endpoint) throw new TypeError("endpoint is required");
+  if (!token) throw new TypeError("token is required");
   let socket;
   let closed = false;
-  // The native WebSocket API cannot set arbitrary Authorization headers.
-  // The supervisor stream contract accepts this query token.
-  const url = `${endpoint.replace(/^http/i, "ws").replace(/\/$/, "")}/api/v1/routing/stream?token=${encodeURIComponent(token ?? "")}`;
+  const url = `${endpoint.replace(/^http/i, "ws").replace(/\/$/, "")}/api/v1/routing/stream`;
   async function connect() {
     if (closed || typeof WebSocketImpl !== "function") return;
-    socket = new WebSocketImpl(url);
+    socket = new WebSocketImpl(url, { headers: { authorization: `Bearer ${token}` } });
     socket.onmessage = ({ data }) => {
       try {
         onUpdate?.(validateRoutingEvent(JSON.parse(data)));

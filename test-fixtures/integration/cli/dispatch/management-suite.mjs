@@ -104,28 +104,71 @@ test("dispatches approved application and deletion scaffolds", async () => {
   expect(calls.admin.application).toBe("1");
   expect(calls.delete.idempotencyKey).toBe("op-2");
 });
-test("dispatches migration explanation and pending actions", async () => {
+test("dispatches migration explanation", async () => {
   const explain = jest.fn(() => 0);
-  const pending = jest.fn(() => 0);
-  const handlers = { migrationExplain: explain, migrationPending: pending };
-  for (const command of [
-    "migration-explain",
-    "migration-inspect",
-    "migration-database-create",
-    "migration-identity-create",
-    "migration-token-create",
-    "migration-verify",
-  ])
-    await dispatchManagement({
-      command,
-      client: {},
-      controlClient: {},
-      emit: jest.fn(),
-      args: [],
-      handlers,
-    });
+  const handlers = { migrationExplain: explain };
+  await dispatchManagement({
+    command: "migration-explain",
+    client: {},
+    controlClient: {},
+    emit: jest.fn(),
+    args: [],
+    handlers,
+  });
   expect(explain).toHaveBeenCalledTimes(1);
-  expect(pending).toHaveBeenCalledTimes(5);
+});
+test("dispatches migration actions with validated positional data", async () => {
+  const migrationAction = jest.fn(async () => 0);
+  const handlers = { migrationAction };
+  const base = { client: {}, controlClient: {}, emit: jest.fn(), handlers };
+  const calls = [
+    ["migration-inspect", ['{"databases":["app"]}']],
+    ["migration-database-create", ["Demo", "app"]],
+    ["migration-identity-create", ["Demo", "app", "runtime"]],
+    ["migration-token-create", ["runtime", "Demo", "runtime"]],
+    ["migration-verify", ['{"databases":["app"]}']],
+  ];
+  for (const [command, args] of calls)
+    await dispatchManagement({ ...base, command, args, options: { grants: "SELECT,INSERT" } });
+  await dispatchManagement({
+    ...base,
+    command: "migration-identity-create",
+    args: ["Demo", "app", "runtime"],
+  });
+  expect(migrationAction.mock.calls.map(([call]) => [call.action, call.input])).toEqual([
+    ["inspect", { databases: ["app"] }],
+    ["database", { application: "Demo", database: "app" }],
+    [
+      "identity",
+      {
+        application: "Demo",
+        database: "app",
+        identity: "runtime",
+        purpose: "runtime",
+        grants: ["SELECT", "INSERT"],
+      },
+    ],
+    [
+      "token",
+      {
+        tokenName: "runtime",
+        application: "Demo",
+        identity: "runtime",
+        scopes: ["credential:issue"],
+      },
+    ],
+    ["verify", { databases: ["app"] }],
+    [
+      "identity",
+      {
+        application: "Demo",
+        database: "app",
+        identity: "runtime",
+        purpose: "runtime",
+        grants: ["SELECT"],
+      },
+    ],
+  ]);
 });
 test("passes provisioning option values to handlers", async () => {
   const identityCreate = jest.fn(() => 0);

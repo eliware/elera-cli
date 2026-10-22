@@ -7,6 +7,7 @@
     "verbose",
     "once",
     "target",
+    "target-endpoint",
     "operation-id"
   ],
   "directedCommands": [
@@ -35,6 +36,9 @@
     "restore-accounts-apply",
     "restore-artifact",
     "database-create",
+    "migration-database-create",
+    "migration-identity-create",
+    "migration-token-create",
     "identity-create",
     "identity-rotate",
     "account-create",
@@ -90,6 +94,14 @@
     "backup-list": { "positional": 1, "label": "backup path" },
     "token-rotate": { "positional": 1, "label": "token name" },
     "database-create": { "positional": 2, "label": "application and database" },
+    "migration-inspect": { "positional": 1, "label": "desired state JSON" },
+    "migration-database-create": { "positional": 2, "label": "application and database" },
+    "migration-identity-create": {
+      "positional": 3,
+      "label": "application, database, and identity"
+    },
+    "migration-token-create": { "positional": 3, "label": "token, application, and identity" },
+    "migration-verify": { "positional": 1, "label": "desired state JSON" },
     "identity-create": { "positional": 3, "label": "application, database, and identity" },
     "identity-rotate": { "positional": 1, "label": "identity" },
     "account-create": { "positional": 2, "label": "user and database" },
@@ -118,6 +130,8 @@
     "reconcile-verify": ["value"],
     "identity-create": ["grants"],
     "token-create": ["scopes"],
+    "migration-identity-create": ["grants"],
+    "migration-token-create": ["scopes"],
     "node-reset-data": ["confirm", "force", "disposition"],
     "node-resync": ["confirm", "force"]
   }

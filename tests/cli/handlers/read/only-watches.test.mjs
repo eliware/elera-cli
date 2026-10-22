@@ -3,7 +3,7 @@ import { createReadOnlyWatchHandlers } from "../../../../src/cli/handlers/read/o
 
 test("read-only watch handlers apply config and one-shot mode", async () => {
   const watch = jest.fn();
-  const config = { endpoint: "db" };
+  const config = { endpoint: "db", token: "secret-token" };
   const handlers = createReadOnlyWatchHandlers({
     config,
     argv: ["node", "watch", "--once"],

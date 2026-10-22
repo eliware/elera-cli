@@ -52,7 +52,8 @@
   "dependencies": {
     "@eliware/common": "^15.0.0",
     "@eliware/elera-lib": "^15.0.0",
-    "@eliware/ssh-client": "^15.0.0"
+    "@eliware/ssh-client": "^15.0.0",
+    "ws": "^8.22.0"
   },
   "devDependencies": {
     "@eliware/test": "^15.0.0",
