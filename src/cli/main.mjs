@@ -6,7 +6,7 @@ import {
   verifyBackupFromBundle,
   restoreVerifyFromBundle,
 } from "../backup/db-backups-adapter.mjs";
-import { restoreArtifact } from "../restore/artifact-restore.mjs";
+import { restoreArtifact } from "../restore/artifact/restore.mjs";
 import { exitCodes } from "../operations/exit-code-table.mjs";
 import { formatHuman } from "../output/format.mjs";
 import { parseArguments } from "./parser.mjs";

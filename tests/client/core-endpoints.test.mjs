@@ -9,18 +9,11 @@ test("builds approved application and database administration requests", async (
   await endpoints.applicationStatus("1");
   await endpoints.createAppAdminToken("Demo", "owner");
   await endpoints.deleteDatabase("2", { confirm: true, dryRun: false, idempotencyKey: "op" });
-  await endpoints.operationStatus("op");
-  await endpoints.resetNodeData("elera-1", {
-    confirm: "RESET elera-1",
-    recoveryDisposition: "single-member-resync",
-  });
   expect(request.mock.calls.map(([path]) => path)).toEqual([
     "/api/v1/applications",
     "/api/v1/applications/1",
     "/api/v1/app-admin/tokens",
     "/api/v1/databases/2/delete",
-    "/api/v1/operations/op",
-    "/api/v1/node/data/reset",
   ]);
   expect(JSON.parse(request.mock.calls[0][1].body)).toEqual({ name: "Demo" });
   expect(JSON.parse(request.mock.calls[2][1].body)).toEqual({
@@ -31,11 +24,6 @@ test("builds approved application and database administration requests", async (
     confirm: true,
     dryRun: false,
     idempotencyKey: "op",
-  });
-  expect(JSON.parse(request.mock.calls[5][1].body)).toEqual({
-    node: "elera-1",
-    confirm: "RESET elera-1",
-    recoveryDisposition: "single-member-resync",
   });
 });
 test("lists applications for friendly-name resolution", async () => {

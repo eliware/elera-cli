@@ -11,7 +11,7 @@ export { createBackup, dumpToGzip } from "./backup/create-backup.mjs";
 export { verifyBackup } from "./backup/verify-backup.mjs";
 export { backupExists } from "./backup/existence.mjs";
 export { restoreVerify, runRestore, runSql } from "./restore/verify.mjs";
-export { restoreArtifact } from "./restore/artifact-restore.mjs";
+export { restoreArtifact } from "./restore/artifact/restore.mjs";
 export { createEncryptedArtifactStore } from "./state-materialization/encrypted-store.mjs";
 export { createAgeProcess } from "./state-materialization/age/process.mjs";
 export { createArtifactCommands } from "./state-materialization/commands.mjs";

@@ -4,7 +4,7 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { restoreArtifact } from "../../../../src/restore/artifact-restore.mjs";
+import { restoreArtifact } from "../../../../src/restore/artifact/restore.mjs";
 
 test("artifact restore requires confirmation before reading or mutating state", async () => {
   await expect(restoreArtifact({ root: "unused", client: {} })).rejects.toThrow(/confirm/);
