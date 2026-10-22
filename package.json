@@ -34,6 +34,9 @@
   ],
   "scripts": {
     "test": "eliware-test",
+    "test:log": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; process.stdout.write(readFileSync('coverage/eliware-test.log', 'utf8'))\"",
+    "test:jest-output": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; process.stdout.write(readFileSync('coverage/jest-console-output.json', 'utf8'))\"",
+    "coverage:summary": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; process.stdout.write(readFileSync('coverage/coverage-summary.json', 'utf8'))\"",
     "lint": "eliware-test --lint",
     "check": "node --check bin/elera-cli.mjs",
     "typecheck": "node --check bin/elera-cli.mjs",
