@@ -1,4 +1,5 @@
 import { expect, jest, test } from "@jest/globals";
+import { join } from "node:path";
 import { createMaterializer } from "../../../src/internal/state-materialization/materializer.mjs";
 
 test("writes a private temporary file and removes its directory", async () => {
@@ -11,7 +12,7 @@ test("writes a private temporary file and removes its directory", async () => {
   });
   await expect(
     materializer.withFile("secret", async (path) => {
-      expect(path).toBe("tmp\\id");
+      expect(path).toBe(join("tmp", "id"));
       return "ok";
     }),
   ).resolves.toBe("ok");
