@@ -1,5 +1,5 @@
 import { createArtifactCommands } from "../../../state-materialization/commands.mjs";
-import { createAgeProcess } from "../../../state-materialization/age-process.mjs";
+import { createAgeProcess } from "../../../state-materialization/age/process.mjs";
 import { dispatchBackupRestore } from "../../dispatch/backup-restore.mjs";
 import { createBackupRestoreOperations } from "./operations.mjs";
 import { createSecretCommandHandler } from "./secrets.mjs";

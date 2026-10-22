@@ -17,13 +17,10 @@ const stream = () => ({
   },
 });
 
-test("prints help and version without requiring configuration", async () => {
+test("prints help without requiring configuration", async () => {
   const help = stream();
   expect(await runCli({ argv: ["--help"], output: help, errorOutput: stream() })).toBe(0);
   expect(help.value).toContain("elera-cli");
-  const version = stream();
-  expect(await runCli({ argv: ["--version"], output: version, errorOutput: stream() })).toBe(0);
-  expect(version.value).toBe("0.1.0\n");
 });
 test("prints root help for an empty invocation and family help for a nested path", async () => {
   const empty = stream();

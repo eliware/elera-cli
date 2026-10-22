@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { expect, jest, test } from "@jest/globals";
-import { createAgeProcess } from "../../src/state-materialization/age-process.mjs";
+import { createAgeProcess } from "../../../src/state-materialization/age/process.mjs";
 
 function child(code = 0, output = "age-output", error = "") {
   const value = new EventEmitter();

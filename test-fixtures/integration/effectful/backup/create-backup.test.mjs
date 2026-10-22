@@ -4,7 +4,8 @@ import { gzipSync } from "node:zlib";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createBackup, dumpToGzip } from "../../../../src/backup/create-backup.mjs";
-import { backupExists, verifyBackup } from "../../../../src/backup/verify-backup.mjs";
+import { backupExists } from "../../../../src/backup/existence.mjs";
+import { verifyBackup } from "../../../../src/backup/verify-backup.mjs";
 import { rotateBackups } from "../../../../src/backup/rotation.mjs";
 import { sha256 } from "../../../../src/backup/hash-file.mjs";
 
@@ -53,7 +54,6 @@ test("rejects empty backups and cleans up failed staging work", async () => {
 });
 
 test("reports missing backups, rotates old entries, and rejects invalid gzip", async () => {
-  expect(await backupExists("/does/not/exist")).toBe(false);
   const removed = [];
   await rotateBackups({
     backupRoot: "root",

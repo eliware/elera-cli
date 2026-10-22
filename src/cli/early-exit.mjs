@@ -2,6 +2,7 @@ import { exitCodes } from "../operations/exit-code-table.mjs";
 import { helpPaths, parseArguments } from "./parser.mjs";
 import { schemaFor } from "./command/spec.mjs";
 import { suggestCommand } from "./command/tree.mjs";
+import packageJson from "../../package.json" with { type: "json" };
 
 export function handleEarlyExit({
   argv,
@@ -11,7 +12,7 @@ export function handleEarlyExit({
   errorOutput,
 }) {
   if (argv[0] === "--version") {
-    output.write("0.1.0\n");
+    output.write(`${packageJson.version}\n`);
     return 0;
   }
   if (parsed.help) {

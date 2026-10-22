@@ -7,22 +7,6 @@ import { applicationDatabases } from "./application-databases.mjs";
 import { sha256 } from "./hash-file.mjs";
 
 const testGzip = promisify(gunzip);
-export async function backupExists(backupPath, read = readFile) {
-  try {
-    const listed = (await read(join(backupPath, "DATABASES"), "utf8"))
-      .split(/\r?\n/)
-      .filter(Boolean);
-    const manifest = (await read(join(backupPath, "SHA256SUMS"), "utf8"))
-      .split(/\r?\n/)
-      .filter(Boolean);
-    return (
-      listed.length > 0 &&
-      listed.every((name) => manifest.some((line) => line.trim().endsWith(`  ${name}.sql.gz`)))
-    );
-  } catch {
-    return false;
-  }
-}
 export async function verifyBackup({ backupPath, databases, read = readFile, hash = sha256 }) {
   const listed = (await read(join(backupPath, "DATABASES"), "utf8")).split(/\r?\n/).filter(Boolean);
   const expected = applicationDatabases(databases ?? listed);
