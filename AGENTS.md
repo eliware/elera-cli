@@ -20,6 +20,8 @@ Keep each source module under 100 lines. Keep each test module under 200 lines.
 
 ## Validation
 
+Use npm 12 or later to run repository validation.
+
 Run `npm test` for all checks.
 Run `npm run lint` for lint checks.
 Run `npm run audit` for package checks.

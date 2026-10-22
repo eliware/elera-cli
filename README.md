@@ -53,7 +53,7 @@ Read [AGENTS.md](AGENTS.md) before you change this repository.
 
 ## Testing
 
-Run `npm test` to check the repository.
+Use npm 12 or later to run the repository checks. Run `npm test` to check the repository.
 
 ## Troubleshooting
 
