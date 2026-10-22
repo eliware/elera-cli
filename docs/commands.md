@@ -4,13 +4,30 @@
 
 Run `elera-cli --help` to list command groups. Add `--help` after a group or action to show its arguments and options.
 
-Use `--json` for JSON output. Use `--once` for a live update command that must stop after one update.
+Use these options when the action supports them:
 
-Use `--confirm` only after you check a command that changes data or supervisor state. Use `--dry-run` when the command supports a plan.
+| Option              | Value                                          | Purpose                                                                         |
+| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `--help`            | None                                           | Show the available groups, actions, arguments, and options.                     |
+| `--json`            | None                                           | Return the result as JSON.                                                      |
+| `--confirm`         | None, or an exact phrase for node data actions | Confirm an action that requires confirmation.                                   |
+| `--dry-run`         | None                                           | Return a local plan for supported actions. This option does not run the action. |
+| `--once`            | None                                           | Stop a supported live update command after one update.                          |
+| `--operation-id`    | Operation ID                                   | Set an operation ID for a supported supervisor call.                            |
+| `--target`          | Host name                                      | Direct a supported cluster action to a host.                                    |
+| `--target-endpoint` | URL                                            | Set the full target URL for a supported directed action.                        |
+| `--quiet`           | None                                           | Accepted by the parser. This option does not change output.                     |
+| `--verbose`         | None                                           | Accepted by the parser. This option does not change output.                     |
 
-Use `--operation-id ID` to set the operation ID for supported calls. Use `--target HOST` or `--target-endpoint URL` for directed cluster work.
+Use `--confirm` only after you check the action and its target. Use `--confirm="RESET NODE"` for `node reset-data`. Replace `NODE` with the exact node name.
 
-The parser accepts `--quiet` and `--verbose`, but these flags do not change output at this time.
+Use `--confirm="RESYNC NODE"` for `node resync`. Replace `NODE` with the exact node name.
+
+Use `--target` or `--target-endpoint` only with an action that supports directed work. The supervisor checks the request and access rules.
+
+The CLI accepts `--grants` with `identity create` and `--scopes` with `token create`. Separate values with commas.
+
+The CLI accepts `--action` with `cluster plan`. It accepts `--value` with metadata reconcile actions. Pass a JSON value to `--value`.
 
 ## Command groups
 
@@ -56,9 +73,9 @@ Use `--confirm` for cluster setup, join, exit, rejoin, metadata setup, standalon
 
 Use `--confirm` for database deletion and cold recovery actions.
 
-Use `--dry-run` for a plan when the command supports it. The CLI sends the final request to the supervisor. The supervisor makes the final access decision.
+Use `--dry-run` to get a local plan for a supported action. Check the action with `--help` before you run it.
 
-For node data removal, set `--confirm="RESET NODE"`. Replace `NODE` with the exact node name. For node resync, set `--confirm="RESYNC NODE"`.
+When you run an action, the supervisor checks the request and makes the final access decision.
 
 Read [Backup and restore](backup-restore.md) before you run a restore. Restore commands can replace database or supervisor data.
 
