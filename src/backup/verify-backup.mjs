@@ -31,19 +31,5 @@ export async function verifyBackup({ backupPath, databases, read = readFile, has
     if (hashes.get(`${database}.sql.gz`) !== actual)
       throw new Error(`backup hash mismatch: ${database}.sql.gz`);
   }
-  try {
-    const metadataPath = join(backupPath, "SUPERVISOR-METADATA.json");
-    const metadata = await read(metadataPath);
-    if (metadata !== undefined) {
-      const actual =
-        hash === sha256
-          ? createHash("sha256").update(metadata).digest("hex")
-          : await hash(metadataPath, metadata);
-      if (hashes.get("SUPERVISOR-METADATA.json") !== actual)
-        throw new Error("backup hash mismatch: SUPERVISOR-METADATA.json");
-    }
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
   return { databases: listed, host: undefined };
 }

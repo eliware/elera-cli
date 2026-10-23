@@ -12,19 +12,21 @@ test("artifact restore requires confirmation before reading or mutating state", 
 
 test("artifact restore applies metadata, secrets, and application SQL while skipping system schemas", async () => {
   const root = await mkdtemp(join(tmpdir(), "elera-artifact-"));
-  const metadataText = JSON.stringify({
-    databases: ["app"],
-    identities: ["runtime"],
-    accounts: [{ user: "app", host: "%" }],
-    artifacts: [{ name: "ssh", ciphertext: "age-encryption.org/v1/x" }],
-  });
-  await writeFile(join(root, "SUPERVISOR-METADATA.json"), metadataText);
+  await writeFile(
+    join(root, "SUPERVISOR-METADATA.json"),
+    JSON.stringify({
+      databases: ["app"],
+      identities: ["runtime"],
+      accounts: [{ user: "app", host: "%" }],
+      artifacts: [{ name: "ssh", ciphertext: "age-encryption.org/v1/x" }],
+    }),
+  );
   await writeFile(join(root, "DATABASES"), "mysql\napp\nsys\n");
   const dump = gzipSync("unused");
   await writeFile(join(root, "app.sql.gz"), dump);
   await writeFile(
     join(root, "SHA256SUMS"),
-    `${createHash("sha256").update(dump).digest("hex")}  app.sql.gz\n${createHash("sha256").update(metadataText).digest("hex")}  SUPERVISOR-METADATA.json\n`,
+    `${createHash("sha256").update(dump).digest("hex")}  app.sql.gz\n`,
   );
   const client = {
     restoreMetadataApply: jest.fn(),
@@ -62,14 +64,13 @@ test("artifact restore applies metadata, secrets, and application SQL while skip
 
 test("artifact restore supports metadata without accounts", async () => {
   const root = await mkdtemp(join(tmpdir(), "elera-artifact-"));
-  const metadataText = "{}";
-  await writeFile(join(root, "SUPERVISOR-METADATA.json"), metadataText);
+  await writeFile(join(root, "SUPERVISOR-METADATA.json"), "{}");
   await writeFile(join(root, "DATABASES"), "app\n");
   const dump = gzipSync("unused");
   await writeFile(join(root, "app.sql.gz"), dump);
   await writeFile(
     join(root, "SHA256SUMS"),
-    `${createHash("sha256").update(dump).digest("hex")}  app.sql.gz\n${createHash("sha256").update(metadataText).digest("hex")}  SUPERVISOR-METADATA.json\n`,
+    `${createHash("sha256").update(dump).digest("hex")}  app.sql.gz\n`,
   );
   await expect(
     restoreArtifact({

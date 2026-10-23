@@ -148,6 +148,5 @@
     "accounts-verify": "restore-accounts-verify"
   },
   "diagnostics": { "migration": "migration-check", "inspect": "config-inspect" },
-  "smoke": { "sql": "sql-smoke" },
-  "sql": { "query": "sql-query", "dump": "sql-dump", "restore": "sql-restore" }
+  "smoke": { "sql": "sql-smoke" }
 }

@@ -16,16 +16,12 @@ import { handleEarlyExit } from "./early-exit.mjs";
 import { createClientContext, resolveTargetEndpoint } from "./client-context.mjs";
 import { dispatchPrimaryCommands } from "./dispatch/primary-commands.mjs";
 import { dispatchFinalCommands } from "./dispatch/final-commands.mjs";
-import { runSqlQuery } from "../commands/sql/query.mjs";
-import { runSqlDump, runSqlRestore } from "../commands/sql/native.mjs";
-import { normalizeSqlArguments } from "./sql-arguments.mjs";
 
 export async function runCli({
   argv = process.argv.slice(2),
   environment = process.env,
   output = process.stdout,
   errorOutput = process.stderr,
-  input = process.stdin,
   dependencies = {},
 } = {}) {
   const supervisorClient = dependencies.createSupervisorClient ?? createSupervisorClient;
@@ -35,10 +31,6 @@ export async function runCli({
   const verifyBackup = dependencies.verifyBackupFromBundle ?? verifyBackupFromBundle;
   const restoreVerify = dependencies.restoreVerifyFromBundle ?? restoreVerifyFromBundle;
   const restoreArtifactOperation = dependencies.restoreArtifact ?? restoreArtifact;
-  argv = normalizeSqlArguments(argv, {
-    knownCommand: parseArguments(argv).command,
-    stdinIsTty: input.isTTY,
-  });
   const parsed = parseArguments(argv);
   const command = parsed.command;
   const { commandArgv, jsonOutput, operationId, explicitTarget, targetHost } = deriveRuntimeOptions(
@@ -73,12 +65,6 @@ export async function runCli({
       migrationDiagnostics: dependencies.migrationDiagnostics,
       createLiveDb: dependencies.createLiveDb,
       createDb: dependencies.createDb,
-      runSqlQuery: dependencies.runSqlQuery ?? runSqlQuery,
-      runSqlDump: dependencies.runSqlDump ?? runSqlDump,
-      runSqlRestore: dependencies.runSqlRestore ?? runSqlRestore,
-      input,
-      output,
-      errorOutput,
     };
     const primaryResult = await dispatchPrimaryCommands({
       command,

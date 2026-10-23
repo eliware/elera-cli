@@ -47,28 +47,6 @@ List database names that the token can access:
 elera-cli database list --json
 ```
 
-## Run SQL and move database data
-
-Run a SQL statement with the current token:
-
-```sh
-elera-cli -e "SHOW DATABASES;"
-```
-
-Write a database dump to a file:
-
-```sh
-elera-cli dump app_db > app_db.sql
-```
-
-Restore a SQL file to a database:
-
-```sh
-elera-cli app_db < app_db.sql
-```
-
-The supervisor selects the MariaDB account and host for the token. The token controls which databases and statements the command can access.
-
 ## Run a command
 
 Use `elera-cli GROUP ACTION`. Use the action names in [Commands](commands.md).

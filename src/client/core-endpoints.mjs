@@ -9,7 +9,6 @@ import { createSecretEndpoints } from "./secret-endpoints.mjs";
 import { createCredentialEndpoints } from "./credential-endpoints.mjs";
 import { createSystemEndpoints } from "./system-endpoints.mjs";
 import { createTokenEndpoints } from "./token-endpoints.mjs";
-import { createSqlEndpoints } from "./sql-endpoints.mjs";
 
 export function createCoreEndpoints(request, validateBundle) {
   return {
@@ -24,6 +23,5 @@ export function createCoreEndpoints(request, validateBundle) {
     ...createCredentialEndpoints(request, validateBundle),
     ...createSystemEndpoints(request),
     ...createTokenEndpoints(request),
-    ...createSqlEndpoints(request),
   };
 }

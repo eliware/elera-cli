@@ -22,15 +22,7 @@ export function createBackupRestoreOperations({ command, dependencies }) {
         identity,
         file,
       }),
-    backup: ({
-      client: targetClient,
-      emit: targetEmit,
-      database,
-      identity,
-      root,
-      databases,
-      token,
-    }) =>
+    backup: ({ client: targetClient, emit: targetEmit, database, identity, root, databases }) =>
       runBackup({
         client: targetClient,
         createBackup: dependencies.createBackup,
@@ -39,7 +31,6 @@ export function createBackupRestoreOperations({ command, dependencies }) {
         identity,
         root,
         databases,
-        token,
       }),
     verify: ({ client: targetClient, emit: targetEmit, database, identity, root }) =>
       runBackupVerify({
@@ -59,7 +50,7 @@ export function createBackupRestoreOperations({ command, dependencies }) {
         identity,
         root,
       }),
-    artifact: ({ client: targetClient, emit: targetEmit, database, identity, root, token }) =>
+    artifact: ({ client: targetClient, emit: targetEmit, database, identity, root }) =>
       runRestoreArtifact({
         client: targetClient,
         restoreArtifact: dependencies.restoreArtifact,
@@ -67,7 +58,6 @@ export function createBackupRestoreOperations({ command, dependencies }) {
         database,
         identity,
         root,
-        token,
       }),
     metadata: ({ client: targetClient, emit: targetEmit, command: operation, value }) =>
       (operation === "restore-metadata-plan" ? runRestoreMetadataPlan : runRestoreMetadataApply)({

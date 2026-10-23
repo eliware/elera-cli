@@ -17,9 +17,6 @@ export async function createBackup({
   databases,
   credentialsFile,
   host,
-  port = 3306,
-  username,
-  password,
   mysqlDump = "mysqldump",
   mktemp = mkdtemp,
   dump = dumpToGzip,
@@ -39,22 +36,7 @@ export async function createBackup({
     for (const database of eligible) {
       validateDatabaseName(database);
       const path = join(staging, `${database}.sql.gz`);
-      const args = credentialsFile
-        ? dumpArgs(credentialsFile, host, database)
-        : [
-            "--host",
-            host,
-            "--port",
-            String(port),
-            "--user",
-            username,
-            "--single-transaction",
-            "--routines",
-            "--triggers",
-            "--events",
-            validateDatabaseName(database),
-          ];
-      await dump(mysqlDump, args, path, { env: password ? { MYSQL_PWD: password } : {} });
+      await dump(mysqlDump, dumpArgs(credentialsFile, host, database), path);
       await testGzip(await readFile(path));
       entries.push({ hash: await sha256(path), name: `${database}.sql.gz` });
     }
