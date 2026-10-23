@@ -29,6 +29,22 @@ The CLI accepts `--grants` with `identity create` and `--scopes` with `token cre
 
 The CLI accepts `--action` with `cluster plan`. It accepts `--value` with metadata reconcile actions. Pass a JSON value to `--value`.
 
+## Native SQL tools
+
+Use `elera-cli sql` to run the native `mysql` command. Use `elera-cli dump` to run the native `mysqldump` command.
+
+The CLI requests a routing bundle with the API token. The bundle supplies the selected writer, port, username, and MariaDB password. The CLI passes command arguments and standard streams to the native client.
+
+```sh
+elera-cli sql -e "SHOW DATABASES;"
+elera-cli dump app_db > app_db.sql
+elera-cli sql app_db < app_db.sql
+elera-cli dump --all-databases > full.sql
+elera-cli sql < full.sql
+```
+
+Use the root token to access every database. Use an app-admin token to access databases in its application. Use a scoped token to access databases allowed by its MariaDB grants.
+
 ## Command groups
 
 | Group            | Actions                                                                                                                                                                     | Purpose                                           |

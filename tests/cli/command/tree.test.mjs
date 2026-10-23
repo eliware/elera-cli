@@ -1,5 +1,10 @@
 import { expect, test } from "@jest/globals";
-import { suggestCommand, resolveCommand, helpFor } from "../../../src/cli/command/tree.mjs";
+import {
+  commandTree,
+  suggestCommand,
+  resolveCommand,
+  helpFor,
+} from "../../../src/cli/command/tree.mjs";
 
 test("suggests family and action names from the registry", () => {
   expect(suggestCommand(["rout"])).toBe("routing");
@@ -31,5 +36,9 @@ test("resolves the telemetry family shorthand to its summary command", () => {
 
 test("uses empty path defaults", () => {
   expect(helpFor()).toContain("health");
+  expect(helpFor()).toEqual(expect.arrayContaining(["sql", "dump"]));
+  expect(helpFor(["cluster"])).toContain("join");
+  expect(helpFor(["missing"])).toEqual([]);
+  expect(commandTree()).toHaveProperty("cluster");
   expect(suggestCommand()).toBe("health");
 });

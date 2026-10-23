@@ -14,7 +14,11 @@ Do not paste tokens into command arguments, issue text, logs, or support message
 
 The CLI sends API requests to the configured supervisor. The supervisor checks each request and applies its access rules.
 
-The CLI leases database credentials for SQL dump and restore commands. It gives the password to the child process through `MYSQL_PWD`. The password does not appear in the command arguments.
+Each API token maps to a MariaDB account. The supervisor stores that account password in encrypted metadata.
+
+The CLI requests the token's routing bundle before it starts `mysql` or `mysqldump`. The bundle supplies the MariaDB host, port, username, and password.
+
+The CLI passes the password to the native process through `MYSQL_PWD`. The password does not appear in the command arguments. The CLI preserves native input and output streams.
 
 Read [Access model](access-model.md) before you use root or app-admin commands.
 

@@ -16,6 +16,7 @@ import { handleEarlyExit } from "./early-exit.mjs";
 import { createClientContext, resolveTargetEndpoint } from "./client-context.mjs";
 import { dispatchPrimaryCommands } from "./dispatch/primary-commands.mjs";
 import { dispatchFinalCommands } from "./dispatch/final-commands.mjs";
+import { runNativeCommand } from "../native/command.mjs";
 
 export async function runCli({
   argv = process.argv.slice(2),
@@ -25,12 +26,25 @@ export async function runCli({
   dependencies = {},
 } = {}) {
   const supervisorClient = dependencies.createSupervisorClient ?? createSupervisorClient;
+  const runNative = dependencies.runNativeCommand ?? runNativeCommand;
   const dump = dependencies.dumpDatabase ?? dumpDatabase;
   const restore = dependencies.restoreDatabase ?? restoreDatabase;
   const createBackup = dependencies.createBackupFromBundle ?? createBackupFromBundle;
   const verifyBackup = dependencies.verifyBackupFromBundle ?? verifyBackupFromBundle;
   const restoreVerify = dependencies.restoreVerifyFromBundle ?? restoreVerifyFromBundle;
   const restoreArtifactOperation = dependencies.restoreArtifact ?? restoreArtifact;
+  if (argv[0] === "sql" || argv[0] === "dump") {
+    try {
+      const config = loadCliConfig(environment);
+      const client = supervisorClient(config);
+      return await runNative({ client, kind: argv[0], args: argv.slice(1) });
+    } catch (error) {
+      errorOutput.write(`${error.message}\n`);
+      return error.statusCode === 401 || error.statusCode === 403
+        ? exitCodes.auth
+        : (error.exitCode ?? exitCodes.network);
+    }
+  }
   const parsed = parseArguments(argv);
   const command = parsed.command;
   const { commandArgv, jsonOutput, operationId, explicitTarget, targetHost } = deriveRuntimeOptions(

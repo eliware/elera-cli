@@ -1,5 +1,7 @@
 import families from "../command-families.json" with { type: "json" };
 
+const nativeCommands = ["dump", "sql"];
+
 export function commandTree() {
   return families;
 }
@@ -13,7 +15,7 @@ export function resolveCommand(path) {
 }
 
 export function helpFor(path = []) {
-  if (path.length === 0) return Object.keys(families).sort();
+  if (path.length === 0) return [...Object.keys(families), ...nativeCommands].sort();
   return Object.keys(families[path[0]] ?? {}).sort();
 }
 

@@ -1343,3 +1343,50 @@ test("routes lifecycle aliases through an injected lifecycle adapter", async () 
   }
   expect(dependencies.createLifecycleCommands).toHaveBeenCalled();
 });
+
+test("routes SQL and dump arguments to native clients through the token routing bundle", async () => {
+  const environment = { ELERA_API_ENDPOINT: "http://supervisor", ELERA_CLI_TOKEN: "token" };
+  const client = { routingBundle: jest.fn(async () => ({ credentials: {}, writer: {} })) };
+  const createSupervisorClient = jest.fn(() => client);
+  const runNativeCommand = jest.fn(async ({ kind, args }) =>
+    kind === "sql" && args[0] === "-e" ? 0 : 7,
+  );
+  const dependencies = { createSupervisorClient, runNativeCommand };
+  const sqlStatus = await runCli({
+    argv: ["sql", "-e", "SHOW DATABASES;"],
+    environment,
+    output: stream(),
+    errorOutput: stream(),
+    dependencies,
+  });
+  const dumpStatus = await runCli({
+    argv: ["dump", "--all-databases"],
+    environment,
+    output: stream(),
+    errorOutput: stream(),
+    dependencies,
+  });
+  expect(sqlStatus).toBe(0);
+  expect(dumpStatus).toBe(7);
+  expect(runNativeCommand.mock.calls.map(([input]) => input)).toEqual([
+    { client, kind: "sql", args: ["-e", "SHOW DATABASES;"] },
+    { client, kind: "dump", args: ["--all-databases"] },
+  ]);
+});
+
+test("maps native routing failures to the CLI auth and network exit codes", async () => {
+  const environment = { ELERA_API_ENDPOINT: "http://supervisor", ELERA_CLI_TOKEN: "token" };
+  const errorOutput = stream();
+  const runNativeCommand = jest
+    .fn()
+    .mockRejectedValueOnce(Object.assign(new Error("forbidden"), { statusCode: 403 }));
+  const dependencies = { createSupervisorClient: () => ({}), runNativeCommand };
+  await expect(
+    runCli({ argv: ["sql"], environment, output: stream(), errorOutput, dependencies }),
+  ).resolves.toBe(3);
+  expect(errorOutput.value).toContain("forbidden");
+  runNativeCommand.mockRejectedValueOnce(new Error("routing unavailable"));
+  await expect(
+    runCli({ argv: ["dump"], environment, output: stream(), errorOutput: stream(), dependencies }),
+  ).resolves.toBe(4);
+});
