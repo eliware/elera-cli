@@ -85,6 +85,9 @@
     "database-delete"
   ],
   "commandRequirements": {
+    "sql-query": { "positional": 1, "label": "SQL query" },
+    "sql-dump": { "positional": 1, "label": "database" },
+    "sql-restore": { "positional": 1, "label": "database" },
     "telemetry-detail": { "positional": 1, "label": "application" },
     "connections": { "positional": 1, "label": "application" },
     "dump": { "positional": 1, "label": "file path" },

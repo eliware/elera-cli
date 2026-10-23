@@ -29,6 +29,7 @@ export async function dispatchBackupRestore({
         identity: config.identity,
         root,
         databases: (args[1] ?? config.database).split(","),
+        token: config.token,
       });
     if (command === "verify-backup")
       return operations.verify({
@@ -53,6 +54,7 @@ export async function dispatchBackupRestore({
       database: config.database,
       identity: config.identity,
       root: args[0],
+      token: config.token,
     });
   if (command.startsWith("restore-metadata-"))
     return operations.metadata({ client, emit, command, value: args[0] });

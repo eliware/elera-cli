@@ -6,6 +6,7 @@ export async function applyArtifactMetadata(metadata, client) {
     {
       databases: metadata.databases ?? [],
       identities: metadata.identities ?? [],
+      ...(metadata.metadataSnapshot ? { metadataSnapshot: metadata.metadataSnapshot } : {}),
     },
     { idempotencyKey: randomUUID() },
   );

@@ -32,3 +32,13 @@ test("uses empty metadata collections when they are absent", async () => {
     { idempotencyKey: expect.any(String) },
   );
 });
+
+test("includes a metadata snapshot when the artifact has one", async () => {
+  const client = { restoreMetadataApply: jest.fn() };
+  const metadataSnapshot = { tables: [] };
+  await applyArtifactMetadata({ metadataSnapshot }, client);
+  expect(client.restoreMetadataApply).toHaveBeenCalledWith(
+    { databases: [], identities: [], metadataSnapshot },
+    { idempotencyKey: expect.any(String) },
+  );
+});

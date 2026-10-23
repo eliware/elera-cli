@@ -20,6 +20,30 @@ export async function dispatchPrimaryCommands(input) {
     parsed,
     operationId,
   } = input;
+  if (command === "sql-query")
+    return dependencies.runSqlQuery({
+      client,
+      config,
+      query: args[0],
+      output: dependencies.output,
+      errorOutput: dependencies.errorOutput,
+    });
+  if (command === "sql-dump")
+    return dependencies.runSqlDump({
+      client,
+      config,
+      database: args[0],
+      output: dependencies.output,
+      dump: dependencies.dump,
+    });
+  if (command === "sql-restore")
+    return dependencies.runSqlRestore({
+      client,
+      config,
+      database: args[0],
+      input: dependencies.input,
+      restore: dependencies.restore,
+    });
   if (command === "sql-smoke") return runPrimarySqlSmoke({ client, emit, config, dependencies });
   const backupResult = await runBackupRestoreCommand({
     command,

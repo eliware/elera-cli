@@ -36,7 +36,10 @@ export async function restoreArtifact({
   };
   const databases = await readNames(root, read);
   const restored = [];
-  for (const database of databases) {
+  for (const database of [
+    ...databases.filter((name) => name !== "elera_meta"),
+    ...databases.filter((name) => name === "elera_meta"),
+  ]) {
     validateDatabaseName(database);
     if (["mysql", "sys", "information_schema", "performance_schema"].includes(database)) continue;
     await restore(
@@ -48,7 +51,7 @@ export async function restoreArtifact({
         String(profile.port ?? 3306),
         "--user",
         profile.username,
-        profile.physicalDatabase,
+        database,
       ],
       createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()),
       { env: { MYSQL_PWD: profile.password } },

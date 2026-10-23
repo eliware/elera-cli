@@ -7,7 +7,7 @@ export function dumpToGzip(
   binary,
   args,
   destination,
-  { spawnImpl = spawn, createOutput = createWriteStream, gzip = createGzip } = {},
+  { spawnImpl = spawn, createOutput = createWriteStream, gzip = createGzip, env = {} } = {},
 ) {
   return new Promise((resolve, reject) => {
     const controller = new AbortController();
@@ -20,7 +20,11 @@ export function dumpToGzip(
     };
     let child;
     try {
-      child = spawnImpl(binary, args, { shell: false, stdio: ["ignore", "pipe", "pipe"] });
+      child = spawnImpl(binary, args, {
+        shell: false,
+        stdio: ["ignore", "pipe", "pipe"],
+        env: { ...process.env, ...env },
+      });
     } catch (error) {
       fail(error);
       return;
