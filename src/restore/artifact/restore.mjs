@@ -17,6 +17,7 @@ export async function restoreArtifact({
   root,
   client,
   bundle,
+  lease,
   confirm = false,
   restore = runRestore,
   read = readFile,
@@ -26,11 +27,12 @@ export async function restoreArtifact({
   await verifyBackup({ backupPath: root, read });
   const metadata = JSON.parse(await read(join(root, "SUPERVISOR-METADATA.json"), "utf8"));
   const accountCount = await applyArtifactMetadata(metadata, client);
+  const targetBundle = lease ? await lease() : bundle;
   const profile = {
-    ...bundle,
-    ...bundle.credentials,
-    host: bundle.host ?? bundle.routes?.primary?.[0]?.host,
-    port: bundle.port ?? bundle.routes?.primary?.[0]?.port,
+    ...targetBundle,
+    ...targetBundle.credentials,
+    host: targetBundle.host ?? targetBundle.routes?.primary?.[0]?.host,
+    port: targetBundle.port ?? targetBundle.routes?.primary?.[0]?.port,
   };
   const databases = await readNames(root, read);
   const restored = [];
@@ -46,7 +48,7 @@ export async function restoreArtifact({
         String(profile.port ?? 3306),
         "--user",
         profile.username,
-        database,
+        profile.physicalDatabase,
       ],
       createReadStream(join(root, `${database}.sql.gz`)).pipe(createGunzip()),
       { env: { MYSQL_PWD: profile.password } },

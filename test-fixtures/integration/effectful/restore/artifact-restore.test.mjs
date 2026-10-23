@@ -41,7 +41,14 @@ test("artifact restore applies metadata, secrets, and application SQL while skip
     restoreArtifact({
       root,
       client,
-      bundle: { host: "db", port: 3306, username: "root", password: "secret", database: "app" },
+      lease: async () => ({
+        host: "db",
+        port: 3306,
+        username: "root",
+        password: "secret",
+        database: "app",
+        physicalDatabase: "app",
+      }),
       confirm: true,
       restore,
     }),

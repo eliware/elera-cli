@@ -3,8 +3,12 @@ export function createRestoreAccountEndpoints(request) {
   return {
     restoreAccountsPlan: (accounts) =>
       jsonRequest(request, "/api/v1/restores/accounts/plan", { accounts }),
-    restoreAccountsApply: (accounts) =>
-      jsonRequest(request, "/api/v1/restores/accounts/apply", { accounts, confirm: true }),
+    restoreAccountsApply: (accounts, { idempotencyKey } = {}) =>
+      jsonRequest(request, "/api/v1/restores/accounts/apply", {
+        accounts,
+        confirm: true,
+        idempotencyKey,
+      }),
     restoreAccountsVerify: (accounts) =>
       jsonRequest(request, "/api/v1/restores/accounts/verify", { accounts }),
   };

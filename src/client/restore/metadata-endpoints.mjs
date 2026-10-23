@@ -4,7 +4,11 @@ export function createRestoreMetadataEndpoints(request) {
     metadataExport: () => request("/api/v1/metadata/export"),
     restoreMetadataPlan: (desired) =>
       jsonRequest(request, "/api/v1/restores/metadata/plan", { desired }),
-    restoreMetadataApply: (desired) =>
-      jsonRequest(request, "/api/v1/restores/metadata/apply", { desired, confirm: true }),
+    restoreMetadataApply: (desired, { idempotencyKey } = {}) =>
+      jsonRequest(request, "/api/v1/restores/metadata/apply", {
+        desired,
+        confirm: true,
+        idempotencyKey,
+      }),
   };
 }
